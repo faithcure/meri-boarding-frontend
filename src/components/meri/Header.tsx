@@ -1,4 +1,5 @@
 import LocaleSwitcher from "@/components/meri/LocaleSwitcher";
+import MainMenuActive from "@/components/meri/MainMenuActive";
 import type { Locale } from "@/i18n/getLocale";
 import { getLocale } from "@/i18n/getLocale";
 import { localePath } from "@/i18n/localePath";
@@ -15,6 +16,7 @@ export default async function Header({ locale: localeProp }: HeaderProps = {}) {
   const withLocale = (path: string) => localePath(locale, path);
   return (
     <header className="header-light transparent">
+      <MainMenuActive />
       <div className="container">
         <div className="row">
           <div className="col-md-12">

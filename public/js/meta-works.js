@@ -1028,6 +1028,11 @@
        try { if ($.fn.jarallax) { $(".jarallax").jarallax(); } } catch (e) {}
        try { if ($.fn.magnificPopup) { loadMagnificPopup(); } } catch (e) {}
        try { if ($.fn.lazy) { $('.lazy').lazy(); } } catch (e) {}
+       try {
+         $('#mainmenu > li:has(ul)').addClass('menu-item-has-children');
+         $('#mainmenu li:has(ul)').addClass('has-child');
+         menuArrow();
+       } catch (e) {}
        try { sequence(); } catch (e) {}
        try { sequenceA(); } catch (e) {}
        try { if (typeof WOW !== "undefined") { new WOW().init(); } } catch (e) {}
