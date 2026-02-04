@@ -7,6 +7,7 @@ declare global {
   interface Window {
     initHeroSwiper?: () => void;
     metaWorksReinit?: () => void;
+    initDateRangePicker?: () => void;
   }
 }
 
@@ -20,6 +21,9 @@ export default function RouteEffects() {
     }
     if (typeof window.metaWorksReinit === "function") {
       window.metaWorksReinit();
+    }
+    if (typeof window.initDateRangePicker === "function") {
+      window.initDateRangePicker();
     }
     window.dispatchEvent(new Event("resize"));
     window.dispatchEvent(new Event("scroll"));
