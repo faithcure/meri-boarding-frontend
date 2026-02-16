@@ -1,0 +1,863 @@
+{
+  "hero": {
+    "titleLead": "In Stuttgart,",
+    "titleHighlight": "live, stay, and work",
+    "titleTail": "in one place",
+    "description": "256 apartments across 3 locations: 1-3 rooms, fully furnished, and ideal for short or long stays. Smart TV, fast Wi-Fi, and fully equipped kitchens for a comfortable experience.",
+    "ctaLocations": "See Locations",
+    "ctaQuote": "Request a Quote Now"
+  },
+  "facilities": {
+    "subtitle": "Welcome to Meri Boarding",
+    "title": "Facilities & Services",
+    "description": "Fully furnished 1–3 room apartments across 3 locations in Stuttgart with a total of 256 apartments. Enjoy smart layouts, balconies or terraces, fully equipped kitchens for international cooking, Smart‑TV, and fast WLAN. We also support registration so the move‑in is seamless.",
+    "stats": [
+      { "label": "TOTAL APARTMENTS", "suffix": "furnished apartments" },
+      { "label": "LOCATIONS", "suffix": "in Stuttgart" },
+      { "label": "APARTMENT TYPES", "suffix": "1–3 room layouts" }
+    ]
+  },
+  "testimonials": {
+    "apartments": "Apartments",
+    "locations": "3 locations in Stuttgart",
+    "slides": [
+      {
+        "badge": "Fully furnished",
+        "text": "1–3 room apartments designed for living and working on time, across three Stuttgart locations."
+      },
+      {
+        "badge": "Comfort first",
+        "text": "Smart layouts with balcony or terrace, fully equipped kitchens for international cooking, and Smart‑TV."
+      },
+      {
+        "badge": "Work ready",
+        "text": "Fast WLAN and excellent conditions for communication and mobile work in every apartment."
+      },
+      {
+        "badge": "Move-in support",
+        "text": "Registration support and a smooth arrival — including help with the official registration documents."
+      }
+    ]
+  },
+  "gallery": {
+    "subtitle": "Welcome",
+    "title": "Experience Comfort, Elegance, and Exceptional Hospitality",
+    "description": "Welcome to our hotel, where comfort meets refined elegance in a setting designed for relaxation and unforgettable stays. Located in a prime destination, our property offers thoughtfully designed rooms, modern amenities, and warm hospitality tailored to every traveler. From peaceful mornings to restful nights, every detail is carefully crafted to ensure your stay is seamless, comfortable, and truly memorable.",
+    "filters": {
+      "all": "View All",
+      "rooms": "Rooms",
+      "dining": "Dining",
+      "facilities": "Facilities"
+    },
+    "view": "View",
+    "zoomHint": "Use mouse wheel to zoom"
+  },
+  "offers": {
+    "subtitle": "Exclusive Deals",
+    "title": "Latest Hotel Offers",
+    "cards": [
+      { "badge": "20% OFF", "title": "Romantic Stay", "text": "20% Off Weekend Packages" },
+      { "badge": "30% OFF", "title": "Early Bird Deal", "text": "Save Up to 30% on Rooms" },
+      { "badge": "", "title": "Family Getaway", "text": "Kids Stay & Eat Free" }
+    ]
+  },
+  "faq": {
+    "subtitle": "Services",
+    "title": "Everything You Need to Know About Staying With Us",
+    "cta": "Request a quote now",
+    "items": [
+      {
+        "title": "Vacant apartments are available for immediate move-in",
+        "body": "Available apartments can be occupied immediately, with a smooth move‑in process and clear onboarding guidance."
+      },
+      {
+        "title": "Registration confirmation and housing certificate",
+        "body": "We provide the official registration confirmation and housing certificate needed for local registration."
+      },
+      {
+        "title": "Nameplate on the door at move-in",
+        "body": "Your nameplate is prepared ahead of time, so your apartment is ready from day one."
+      },
+      {
+        "title": "Multicultural orientation, atmosphere, and specialization",
+        "body": "A welcoming, multicultural atmosphere tailored to international residents and project teams."
+      },
+      {
+        "title": "Child-friendly and private atmosphere",
+        "body": "Enjoy a child‑friendly environment with privacy and quiet living spaces for families."
+      },
+      {
+        "title": "Visitors possible for only €10 per person per month",
+        "body": "Visitors are welcome for a monthly fee of €10 per person, with clear and transparent rules."
+      },
+      {
+        "title": "Pets possible on request",
+        "body": "Pets are possible on request, depending on apartment availability and house rules."
+      },
+      {
+        "title": "24-hour caretaker service",
+        "body": "24/7 caretaker service ensures quick support whenever you need assistance."
+      },
+      {
+        "title": "Facility and cleaning service on request",
+        "body": "Facility and cleaning services are available on request to keep your stay effortless."
+      },
+      {
+        "title": "Quiet living without service on request",
+        "body": "If preferred, you can opt for disturbance‑free living without additional services."
+      }
+    ]
+  },
+  "servicesHero": {
+    "subtitle": "Meri Boarding",
+    "title": "Services",
+    "home": "Home",
+    "crumb": "Services"
+  },
+  "servicesContent": {
+    "heroSubtitle": "Serviced apartments",
+    "heroTitle": "Everything you need to live, work, and settle in quickly",
+    "heroDescription": "Meri Boarding provides fully equipped 1-3 room apartments across three locations in Stuttgart. In Hildesheim, about 30 minutes south of Hannover, guests can also stay in smaller buildings with the same serviced-apartment feel.",
+    "ctaAvailability": "Request availability",
+    "ctaContact": "Contact us",
+    "stats": [
+      { "label": "Total apartments", "value": "256+", "note": "Across 3 locations in Stuttgart" },
+      { "label": "Apartment layouts", "value": "1-3 rooms", "note": "Smart, fully equipped layouts" },
+      { "label": "Move-in ready", "value": "Available now", "note": "Immediate occupancy is possible" }
+    ],
+    "essentialsSubtitle": "Included in every stay",
+    "essentialsTitle": "Apartment essentials, ready from day one",
+    "highlights": [
+      {
+        "icon": "fa fa-home",
+        "title": "Furnished living rooms",
+        "description": "High-quality furniture, a modern Smart TV with satellite channels, and a sofa that converts into a bed."
+      },
+      {
+        "icon": "fa fa-bed",
+        "title": "Restful bedrooms",
+        "description": "Large double beds with quality mattresses, built-in wardrobes, and optional extra beds. Bedding is provided."
+      },
+      {
+        "icon": "fa fa-cutlery",
+        "title": "International-ready kitchens",
+        "description": "Fully equipped kitchens with dishwasher, coffee machine, microwave, rice cooker, and Chapati board."
+      },
+      {
+        "icon": "fa fa-coffee",
+        "title": "Dining essentials",
+        "description": "Complete sets of dishes, cutlery, and glasses for everyday meals and hosting."
+      },
+      {
+        "icon": "fa fa-sun-o",
+        "title": "Balcony or terrace",
+        "description": "Every apartment includes a furnished balcony or terrace to relax outdoors."
+      },
+      {
+        "icon": "fa fa-wifi",
+        "title": "Connectivity",
+        "description": "Fast, free WLAN and DSL plus a private phone line with flat-rate calls to German landlines."
+      },
+      {
+        "icon": "fa fa-refresh",
+        "title": "Laundry options",
+        "description": "A washing machine in the bathroom or shared laundry with washer and dryer."
+      },
+      {
+        "icon": "fa fa-child",
+        "title": "Family & mobility",
+        "description": "Playground, baby and child beds available, plus parking or underground garage on request."
+      }
+    ],
+    "supportSubtitle": "Resident support",
+    "supportTitle": "Services that make moving simple",
+    "supportDescription": "From registration support to on-request services, Meri Boarding makes every stay smooth for individuals, families, and corporate guests.",
+    "ctaStart": "Start your stay",
+    "supportList": [
+      "Move-in ready apartments with immediate availability.",
+      "Registration support with confirmation documents for residents.",
+      "Name door sign prepared on arrival.",
+      "24-hour caretaker service on site.",
+      "Facility and cleaning services available on request.",
+      "Option for disturbance-free living without additional services.",
+      "Visitor access can be arranged and pets are welcome on request.",
+      "Multicultural, child-friendly, private living atmosphere."
+    ]
+  },
+  "bookingForm": {
+    "checkIn": "Check In",
+    "checkOut": "Check Out",
+    "rooms": "Rooms",
+    "guests": "Guests",
+    "availability": "Check Availability"
+  },
+  "reservation": {
+    "hero": {
+      "subtitle": "Plan Your Stay",
+      "title": "Reservation",
+      "description": "Short stays can be reserved online. For stays longer than 1 month or annual allocations, our team prepares a tailored offer."
+    },
+    "crumb": { "home": "Home", "current": "Reservation" },
+    "shortStay": {
+      "subtitle": "Short stays (up to 30 nights)",
+      "title": "Instant reservation",
+      "description": "Ideal for business trips, short-term projects, or temporary housing. Choose your dates and request availability.",
+      "helper": "For stays longer than 30 nights, please use the long-stay inquiry below."
+    },
+    "form": {
+      "checkIn": "Check In",
+      "checkOut": "Check Out",
+      "boarding": "Boarding House",
+      "select": "Please select",
+      "rooms": "Rooms",
+      "guests": "Guests",
+      "availability": "Check Availability"
+    },
+    "longStay": {
+      "title": "Long-term & corporate stays",
+      "description": "For 1+ month stays, annual allocations, or corporate partnerships (employees and students), we provide tailored offers, fixed rates, and block bookings.",
+      "bullets": [
+        "Dedicated account support for companies and institutions",
+        "Flexible move-in dates and custom invoicing",
+        "Optional services and quiet-living packages"
+      ],
+      "ctaQuote": "Request long-stay quote",
+      "ctaContact": "Contact the team"
+    },
+    "help": {
+      "title": "Need help?",
+      "description": "Our reservation team helps with availability, invoicing, and customized agreements for longer stays.",
+      "hoursTitle": "Office hours",
+      "hoursDay": "Monday - Friday"
+    },
+    "why": {
+      "title": "Why companies book with us",
+      "bullets": [
+        "Reliable capacity for project teams and interns",
+        "Furnished apartments ready for immediate move-in",
+        "Custom agreements for long-term housing"
+      ]
+    }
+  },
+  "hotels": {
+    "hero": {
+      "subtitle": "Meri Boarding Group",
+      "title": "Hotels & Locations",
+      "description": "Find the right boardinghouse for your stay with city connections, calm surroundings, and fully equipped apartments."
+    },
+    "crumb": { "home": "Home", "current": "Hotels" },
+    "glance": {
+      "subtitle": "At a glance",
+      "title": "Boardinghouses designed for modern living",
+      "description": "Whether you are staying for a project, relocation, or long-term assignment, Meri Boarding offers furnished apartments with everything you need to feel at home.",
+      "cta": "Request availability"
+    },
+    "locations": {
+      "subtitle": "Choose your location",
+      "title": "Three unique boardinghouses, one trusted experience",
+      "description": "Each Meri location offers its own neighborhood vibe while keeping the same core standards of comfort, service, and convenience.",
+      "view": "View property",
+      "request": "Request availability"
+    },
+    "shared": {
+      "subtitle": "Shared amenities",
+      "title": "Comfort that follows you to every location",
+      "description": "From fully furnished interiors to practical services, every Meri Boardinghouse is designed for easy, reliable living."
+    },
+    "cta": {
+      "title": "Not sure which location fits best?",
+      "description": "Tell us your dates, budget, and preferences. Our team will recommend the best option.",
+      "button": "Talk to our team"
+    },
+    "hotelCards": [
+      {
+        "name": "Flamingo",
+        "slug": "flamingo",
+        "image": "/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6699.jpg",
+        "location": "North-East Stuttgart",
+        "description": "City-close yet surrounded by greenery, with quick access to the Neckar and Max-Eyth-See recreation area.",
+        "facts": [
+          "76 furnished 1-room apartments",
+          "Green surroundings in North-East Stuttgart",
+          "U-Bahn & bus connections to the city"
+        ]
+      },
+      {
+        "name": "Europaplatz",
+        "slug": "europaplatz",
+        "image": "/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6629.jpg",
+        "location": "Southwest Stuttgart",
+        "description": "Perfect for airport access with fast links to Stuttgart Messe and the A8, plus strong public transport.",
+        "facts": [
+          "65 furnished 1- to 2-room apartments",
+          "About 9 minutes to the airport",
+          "U-Bahn and 7 bus lines connect to the city"
+        ]
+      },
+      {
+        "name": "Hildesheim",
+        "slug": "hildesheim",
+        "image": "/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6709.jpg",
+        "location": "Hildesheim",
+        "description": "Historic city charm with quick highway access, ideal for longer stays near Hannover and Braunschweig.",
+        "facts": [
+          "Fully furnished apartments across smaller properties",
+          "Historic market square and UNESCO churches",
+          "Hub of the A7 and four federal roads"
+        ]
+      }
+    ],
+    "overviewFacts": [
+      { "icon": "fa fa-map-marker", "label": "3 locations across Stuttgart & Hildesheim" },
+      { "icon": "fa fa-building", "label": "256 apartments in total" },
+      { "icon": "fa fa-bed", "label": "1-3 room layouts, fully furnished" },
+      { "icon": "fa fa-calendar", "label": "Flexible stays: short or long term" }
+    ],
+    "sharedHighlights": [
+      "Fully furnished apartments with high-quality furniture",
+      "Kitchenette with international equipment",
+      "Free Wi-Fi and DSL connection",
+      "Laundry facilities on site",
+      "Optional facility or cleaning service",
+      "Family-friendly, multilingual atmosphere"
+    ],
+    "staySteps": [
+      {
+        "icon": "fa fa-search",
+        "title": "Choose a location",
+        "description": "Pick the boardinghouse that best matches your commute and lifestyle."
+      },
+      {
+        "icon": "fa fa-calendar-check-o",
+        "title": "Request availability",
+        "description": "Tell us your dates and preferences so short stays and long stays are both welcome."
+      },
+      {
+        "icon": "fa fa-key",
+        "title": "Move in comfortably",
+        "description": "Arrive to a ready-to-live apartment with essentials already in place."
+      }
+    ]
+  },
+  "hotelDetail": {
+    "flamingo": {
+      "heroSubtitle": "Meri Boarding Stuttgart",
+      "heroTitle": "MERI BOARDINGHOUSE Flamingo",
+      "crumb": { "home": "Home", "hotels": "Hotels", "current": "Flamingo" },
+      "facts": [
+        { "icon": "fa fa-building", "label": "76 furnished 1-room apartments" },
+        { "icon": "fa fa-leaf", "label": "Green surroundings in North-East Stuttgart" },
+        { "icon": "fa fa-ship", "label": "Neckar & Max-Eyth-See nearby" },
+        { "icon": "fa fa-subway", "label": "U-Bahn & bus connections to the city" }
+      ],
+      "description": [
+        "City-close yet surrounded by greenery, our Flamingo Boardinghouse is located in the North-East of Stuttgart. The Neckar and the Max-Eyth-See recreation area are nearby and invite you to barbecue, walk, or enjoy pedal boating on the water.",
+        "From here, the northern and eastern regions of Stuttgart are easy to reach by car. U-Bahn and bus connections to the city and beyond are also available."
+      ],
+      "amenitiesTitle": "Amenities, services & highlights",
+      "highlights": [
+        "Fully furnished apartments with high-quality furniture and all essentials",
+        "Kitchenette with international equipment incl. dishwasher, coffee machine, rice cooker, Indian chapati board, microwave",
+        "Free use of washing machine and dryer in the shared laundry room",
+        "Free WiFi and DSL connection",
+        "Private phone line incl. flat rate to German landlines",
+        "Nameplate on the door upon move-in",
+        "Registration confirmation and housing certificate",
+        "Parking / underground garage on request",
+        "Optional facility or cleaning service, or quiet living without service",
+        "Multicultural focus, atmosphere, and specialization",
+        "Family-friendly and private atmosphere, playground on site",
+        "Baby, kids, and extra beds bookable at any time",
+        "Visitors possible for only 10 € per person per month",
+        "Pets possible on request"
+      ],
+      "form": {
+        "checkIn": "Check In",
+        "checkOut": "Check Out",
+        "rooms": "Rooms",
+        "guests": "Guests",
+        "availability": "Check Availability",
+        "riskFree": "Risk-free booking: Free cancellation available."
+      },
+      "location": {
+        "title": "Find us here",
+        "hoursTitle": "Office hours",
+        "hoursDay": "Monday - Friday",
+        "cta": "Request availability"
+      },
+      "gallery": {
+        "all": "View All",
+        "rooms": "Rooms",
+        "dining": "Dining",
+        "facilities": "Facilities",
+        "view": "View"
+      }
+    },
+    "europaplatz": {
+      "heroSubtitle": "Meri Boarding Stuttgart",
+      "heroTitle": "MERI BOARDINGHOUSE Europaplatz",
+      "crumb": { "home": "Home", "hotels": "Hotels", "current": "Europaplatz" },
+      "facts": [
+        { "icon": "fa fa-building", "label": "65 furnished 1- to 2-room apartments" },
+        { "icon": "fa fa-plane", "label": "Southwest Stuttgart, about 9 minutes to the airport" },
+        { "icon": "fa fa-road", "label": "Less than 1 km to A8 Stuttgart Airport/Messe exit" },
+        { "icon": "fa fa-subway", "label": "U-Bahn and 7 bus lines connect to the city" }
+      ],
+      "description": [
+        "Europaplatz is located in the southwest of Stuttgart and is about nine minutes by car from the airport.",
+        "The boardinghouse is less than one kilometer from the A8 Stuttgart Airport/Messe exit, with excellent connections to southern destinations. U-Bahn and seven bus lines connect Europaplatz with the city and beyond."
+      ],
+      "amenitiesTitle": "Amenities, services & highlights",
+      "highlights": [
+        "Fully furnished apartments with high-quality furniture and all essentials",
+        "Kitchenette with international equipment incl. dishwasher, coffee machine, rice cooker, Indian chapati board, microwave",
+        "Free use of washing machine and dryer in the shared laundry room",
+        "Free WiFi and DSL connection",
+        "Private phone line incl. flat rate to German landlines",
+        "Nameplate on the door upon move-in",
+        "Registration confirmation and housing certificate",
+        "Parking / underground garage on request",
+        "Covered bicycle parking",
+        "Optional facility or cleaning service, or quiet living without service",
+        "Multicultural focus, atmosphere, and specialization",
+        "Family-friendly and private atmosphere, playground on site",
+        "Baby, kids, and extra beds bookable at any time",
+        "Visitors possible for only 10 EUR per person per month",
+        "Pets possible on request"
+      ],
+      "form": {
+        "checkIn": "Check In",
+        "checkOut": "Check Out",
+        "rooms": "Rooms",
+        "guests": "Guests",
+        "availability": "Check Availability",
+        "riskFree": "Risk-free booking: Free cancellation available."
+      },
+      "location": {
+        "title": "Find us here",
+        "hoursTitle": "Office hours",
+        "hoursDay": "Monday - Friday",
+        "cta": "Request availability"
+      },
+      "gallery": {
+        "all": "View All",
+        "rooms": "Rooms",
+        "dining": "Dining",
+        "facilities": "Facilities",
+        "view": "View"
+      }
+    },
+    "hildesheim": {
+      "heroSubtitle": "Meri Boarding",
+      "heroTitle": "Hildesheim",
+      "crumb": { "home": "Home", "hotels": "Hotels", "current": "Hildesheim" },
+      "facts": [
+        { "icon": "fa fa-building", "label": "Fully furnished apartments across smaller properties" },
+        { "icon": "fa fa-university", "label": "Historic market square and UNESCO churches" },
+        { "icon": "fa fa-road", "label": "Located on the A7 and a hub of four federal roads" },
+        { "icon": "fa fa-map", "label": "Less than 15 km to Hannover and Salzgitter, about 30 km to Braunschweig" }
+      ],
+      "description": [
+        "Hildesheim is known for its historic market square with beautiful timber-framed houses. Two churches, St. Michaelis and the Mariendom, are UNESCO World Heritage sites.",
+        "The city sits on the A7 and is a hub of four federal roads. The city border of Hildesheim is less than 15 km from Hannover and Salzgitter, while Braunschweig is around 30 km away."
+      ],
+      "amenitiesTitle": "Amenities, services & highlights",
+      "highlights": [
+        "Fully furnished apartments with high-quality furniture and all essentials",
+        "Kitchenette with international equipment incl. dishwasher, coffee machine, rice cooker, Indian chapati board, microwave",
+        "Washing machine and dryer available",
+        "Free WiFi and DSL connection",
+        "Private phone line incl. flat rate to German landlines",
+        "Nameplate on the door upon move-in",
+        "Registration confirmation and housing certificate",
+        "Parking / underground garage on request",
+        "Optional facility or cleaning service, or quiet living without service",
+        "Multicultural focus, atmosphere, and specialization",
+        "Family-friendly and private atmosphere, playground on site",
+        "Baby, kids, and extra beds bookable at any time",
+        "Visitors possible for only 10 EUR per person per month",
+        "Pets possible on request"
+      ],
+      "form": {
+        "checkIn": "Check In",
+        "checkOut": "Check Out",
+        "rooms": "Rooms",
+        "guests": "Guests",
+        "availability": "Check Availability",
+        "riskFree": "Risk-free booking: Free cancellation available."
+      },
+      "location": {
+        "title": "Find us here",
+        "hoursTitle": "Office hours",
+        "hoursDay": "Monday - Friday",
+        "cta": "Request availability"
+      },
+      "gallery": {
+        "all": "View All",
+        "rooms": "Rooms",
+        "dining": "Dining",
+        "facilities": "Facilities",
+        "view": "View"
+      }
+    }
+  },
+  "contactHero": {
+    "subtitle": "Enjoy Your Stay",
+    "title": "Contact",
+    "crumb": "Contact",
+    "home": "Home"
+  },
+  "contactDetails": {
+    "subtitle": "Write a Message",
+    "title": "Get In Touch",
+    "description": "Have a question, suggestion, or just want to say hi? We are here and happy to hear from you! Office hours are Monday to Friday, 08:00-12:00 and 13:00-17:00. Weekend by appointment.",
+    "address": "Address",
+    "email": "Email",
+    "phone": "Phone",
+    "whatsapp": "WhatsApp"
+  },
+  "contactForm": {
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "message": "Message",
+    "send": "Send Message",
+    "success": "Your message has been sent successfully. Refresh this page if you want to send more messages.",
+    "error": "Sorry there was an error sending your form.",
+    "namePlaceholder": "Your Name",
+    "emailPlaceholder": "Your Email",
+    "phonePlaceholder": "Your Phone",
+    "messagePlaceholder": "Your Message"
+  },
+  "bookingInquiryForm": {
+    "subtitle": "Non-binding booking inquiry",
+    "title": "Request a Quote",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "company": "Company (for business requests)",
+    "email": "Email",
+    "phone": "Phone",
+    "purpose": "Purpose of Stay",
+    "nationality": "Nationality",
+    "guests": "Number of Guests",
+    "rooms": "Number of Rooms",
+    "boarding": "Boarding House",
+    "moveIn": "Move-in Date",
+    "message": "Your Message",
+    "select": "Please select",
+    "send": "Send Request",
+    "policy": "* By submitting this form, you agree that we may use your data to process your request. Information about data protection can be found ",
+    "policyLink": "here",
+    "stayPurposes": [
+      { "value": "Business", "label": "Business" },
+      { "value": "Private", "label": "Private" },
+      { "value": "Project", "label": "Project" },
+      { "value": "Relocation", "label": "Relocation" },
+      { "value": "Other", "label": "Other" }
+    ]
+  },
+  "header": {
+    "home": "Home",
+    "hotels": "Hotels",
+    "services": "Services",
+    "ourServices": "Our Services",
+    "amenities": "Amenities",
+    "ourAmenities": "Our Amenities",
+    "contact": "Contact",
+    "reservation": "Reservation",
+    "flamingo": "Flamingo",
+    "europaplatz": "Europaplatz",
+    "hildesheim": "Hildesheim"
+  },
+  "footer": {
+    "company": "Meri Boarding Group GmbH",
+    "addressLine1": "Flamingoweg 70",
+    "addressLine2": "D-70378 Stuttgart",
+    "contactTitle": "Contact",
+    "phone": "Phone: +49 (0) 711 54 89 84-0",
+    "whatsapp": "WhatsApp: +49 (0) 152 06419253",
+    "email": "Email: info@meri-boarding.de",
+    "officeTitle": "Office Hours",
+    "officeDay": "Monday - Friday",
+    "officeMorning": "08:00 - 12:00",
+    "officeAfternoon": "13:00 - 17:00",
+    "linksTitle": "Quick Links",
+    "linkContact": "Contact",
+    "linkPrivacy": "Privacy Policy",
+    "linkTerms": "Terms & Conditions",
+    "linkImprint": "Legal Notice",
+    "copyright": "Copyright 2026 - Meri Boarding Group",
+    "tagline": "Serviced apartments for living & working on time.",
+    "language": "Language"
+  },
+  "chatWidget": {
+    "toggle": "Talk with Meri",
+    "panelTitle": "Talk with Meri",
+    "badge": "Online",
+    "intro": "Hi! I'm Meri. Share your name and email to get started.",
+    "fullName": "Full name",
+    "email": "Email",
+    "continue": "Continue",
+    "typing": "Meri is typing...",
+    "placeholder": "Type your message...",
+    "send": "Send",
+    "thanks": "Thanks! We'll get back to you shortly. For long stays (30+ nights), we'll prepare a tailored offer.",
+    "greeting": "Thanks, {{name}}! How can I help you today?",
+    "fallbackName": "there",
+    "namePlaceholder": "Jane Doe",
+    "emailPlaceholder": "jane@example.com"
+  },
+  "amenitiesHero": {
+    "subtitle": "Meri Boarding",
+    "title": "Amenities",
+    "crumb": "Amenities",
+    "home": "Home"
+  },
+  "rooms": {
+    "subtitle": "Meri Boarding Amenities",
+    "title": "Apartment Amenities",
+    "description": "Fully furnished apartments with thoughtful details for everyday living, work, and family stays.",
+    "allAmenities": "View all amenities",
+    "request": "Request availability"
+  },
+  "amenitiesContent": {
+    "layoutSubtitle": "Layout options",
+    "layoutTitle": "Choose the layout that fits your stay",
+    "layoutDesc": "From compact studios to spacious multi-room apartments.",
+    "layoutOptions": [
+      {
+        "title": "Studio / 1-Room",
+        "icon": "fa fa-square-o",
+        "description": "Open-plan layouts that keep everything close and practical.",
+        "highlights": ["Living and sleeping in one space", "Compact dining and storage"]
+      },
+      {
+        "title": "2-Room",
+        "icon": "fa fa-columns",
+        "description": "Separate sleeping area for extra privacy and comfort.",
+        "highlights": ["Distinct living and bedroom zones", "Ideal for couples or remote work"]
+      },
+      {
+        "title": "3-Room",
+        "icon": "fa fa-th-large",
+        "description": "More space for families, longer stays, or sharing.",
+        "highlights": ["Extra room for guests or a workspace", "Great for longer stays"]
+      }
+    ],
+    "amenitiesSubtitle": "All amenities",
+    "amenitiesTitle": "Everything included for everyday living",
+    "toggleLabel": "View options",
+    "cardView": "Card view",
+    "listView": "List view",
+    "switchHelp": "Switch between card and list views to scan details your way.",
+    "includedTitle": "Included in your stay",
+    "request": "Request availability"
+  },
+  "amenitiesData": {
+    "cards": [
+      {
+        "title": "Living Room",
+        "icon": "fa fa-home",
+        "image": "/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6699.jpg",
+        "description": "Quality furnishings create a relaxed atmosphere in every apartment, with space to unwind.",
+        "highlights": ["Smart TV with satellite channels", "Sofa converts into an extra bed"]
+      },
+      {
+        "title": "Bedroom",
+        "icon": "fa fa-bed",
+        "image": "/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6744.jpg",
+        "description": "Large double beds with quality mattresses and built-in wardrobes keep things comfortable and tidy.",
+        "highlights": ["Extra beds available for adults or children", "Bedding provided and refreshed on request"]
+      },
+      {
+        "title": "Kitchen",
+        "icon": "fa fa-cutlery",
+        "image": "/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6754.jpg",
+        "description": "Fully equipped kitchens for European and international cooking, ready for everyday use.",
+        "highlights": ["Dishwasher, coffee machine, microwave, rice cooker", "Chapati board and a shopping trolley for groceries"]
+      },
+      {
+        "title": "Dining Area",
+        "icon": "fa fa-coffee",
+        "image": "/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6756.jpg",
+        "description": "Complete dining setup for daily meals and shared moments.",
+        "highlights": ["Full set of tableware, cutlery, and glasses"]
+      },
+      {
+        "title": "Balcony / Terrace",
+        "icon": "fa fa-sun-o",
+        "image": "/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6821-Bearbeitet.jpg",
+        "description": "Every apartment includes a furnished balcony or terrace for fresh-air breaks.",
+        "highlights": ["Plenty of space to relax outdoors"]
+      },
+      {
+        "title": "Connectivity",
+        "icon": "fa fa-wifi",
+        "image": "/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6844.jpg",
+        "description": "Stay connected with fast, reliable internet and a private phone line.",
+        "highlights": ["Free WiFi and DSL", "Phone line with flat rate to German landlines"]
+      },
+      {
+        "title": "For Little Guests",
+        "icon": "fa fa-child",
+        "image": "/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6846.jpg",
+        "description": "Family-friendly touches make traveling with kids easy and comfortable.",
+        "highlights": ["Play area and playground on site", "Baby, kids, and extra beds bookable anytime"]
+      },
+      {
+        "title": "Parking / Underground Garage",
+        "icon": "fa fa-car",
+        "image": "/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6856-Bearbeitet.jpg",
+        "description": "Parking options are available on request, with added bike facilities in some locations.",
+        "highlights": ["Parking or underground spaces on request", "Bicycle parking or storage where available"]
+      }
+    ],
+    "overviewItems": [
+      "Washing machine in the bathroom or shared laundry room with dryer",
+      "Heat-resistant blackout curtains",
+      "Playroom with table tennis table",
+      "Fully furnished apartments with quality furniture"
+    ]
+  },
+  "terms": {
+    "hero": {
+      "subtitle": "Meri Boarding",
+      "title": "Terms and Conditions",
+      "description": "Clear terms for booking, payment, and your stay.",
+      "crumb": "Terms",
+      "home": "Home"
+    },
+    "sections": [
+      {
+        "title": "Scope",
+        "body": "These terms apply to all bookings, inquiries, and contracts between Meri Boarding Group GmbH and guests."
+      },
+      {
+        "title": "Booking & Contract",
+        "body": "A booking is confirmed upon written confirmation. All information provided must be accurate."
+      },
+      {
+        "title": "Prices & Payment",
+        "body": "Prices confirmed at booking apply. Payments are due according to the agreed deadlines."
+      },
+      {
+        "title": "Changes & Cancellations",
+        "body": "Changes or cancellations must be submitted in writing. Fees may apply as agreed."
+      },
+      {
+        "title": "Liability",
+        "body": "Liability is limited to the extent permitted by law. We recommend safekeeping of valuables."
+      },
+      {
+        "title": "House Rules",
+        "body": "Please follow house rules and respect quiet hours and shared areas."
+      }
+    ],
+    "cta": {
+      "title": "Questions about the terms?",
+      "body": "Contact us if you need details about booking or your stay.",
+      "button": "Contact us"
+    }
+  },
+  "imprint": {
+    "hero": {
+      "subtitle": "Meri Boarding",
+      "title": "Legal Notice",
+      "description": "Legal information about Meri Boarding Group GmbH.",
+      "crumb": "Legal Notice",
+      "home": "Home"
+    },
+    "company": {
+      "title": "Company",
+      "name": "Meri Boarding Group GmbH",
+      "address": "Flamingoweg 70, D-70378 Stuttgart"
+    },
+    "contact": {
+      "title": "Contact",
+      "email": "info@meri-boarding.de",
+      "phone": "+49 (0) 711 54 89 84 - 0"
+    },
+    "represented": {
+      "title": "Represented by",
+      "body": "Managing directors (to be completed)"
+    },
+    "register": {
+      "title": "Commercial register",
+      "body": "Register court and number (to be completed)"
+    },
+    "vat": {
+      "title": "VAT ID",
+      "body": "VAT identification number (to be completed)"
+    },
+    "responsible": {
+      "title": "Responsible for content",
+      "body": "Information pursuant to § 55 Abs. 2 RStV (to be completed)"
+    },
+    "cta": {
+      "title": "Need more information?",
+      "body": "Get in touch if you require legal details.",
+      "button": "Contact us"
+    }
+  },
+  "privacy": {
+    "hero": {
+      "subtitle": "Meri Boarding",
+      "title": "Privacy Policy",
+      "description": "We treat your data confidentially and use it only to handle your request and provide our services.",
+      "crumb": "Privacy",
+      "home": "Home"
+    },
+    "intro": {
+      "title": "Overview",
+      "headline": "How we handle your data",
+      "body": "This privacy notice explains which data we process, for what purposes, and what rights you have.",
+      "contactTitle": "Contact for privacy questions",
+      "contactBody": "Meri Boarding Group GmbH, Flamingoweg 70, D-70378 Stuttgart",
+      "contactEmail": "info@meri-boarding.de",
+      "contactPhone": "+49 (0) 711 54 89 84 - 0"
+    },
+    "blocks": [
+      {
+        "title": "Data we collect",
+        "body": "Contact and inquiry data (e.g., name, email, phone), booking details, and technical usage data (e.g., IP address, browser)."
+      },
+      {
+        "title": "How we use data",
+        "body": "To respond to your inquiry, provide offers, manage contracts, communicate with you, and improve our services."
+      },
+      {
+        "title": "Sharing with third parties",
+        "body": "We share data only with service providers needed for hosting, email, or IT operations. No sharing for advertising."
+      },
+      {
+        "title": "Retention",
+        "body": "We keep data only as long as needed for the stated purpose or as required by law."
+      },
+      {
+        "title": "Cookies & analytics",
+        "body": "We use functional cookies and, if applicable, analytics tools to improve the experience. See related notices for details."
+      },
+      {
+        "title": "Your rights",
+        "body": "You have the right to access, rectify, delete, restrict, object to processing, and request data portability."
+      }
+    ],
+    "cta": {
+      "title": "Questions about privacy?",
+      "body": "Get in touch if you want information or wish to exercise your rights.",
+      "button": "Contact us"
+    }
+  },
+  "notFound": {
+    "title": "404",
+    "subtitle": "Page not found",
+    "description": "The page you are looking for does not exist or has been moved.",
+    "where": "Where would you like to go?",
+    "helper": "Use the links below or return to the homepage to keep exploring Meri Boarding.",
+    "home": "Back to Home",
+    "homeCrumb": "Home",
+    "hotels": "View Hotels",
+    "contact": "Contact Us",
+    "crumb": "404"
+  }
+}

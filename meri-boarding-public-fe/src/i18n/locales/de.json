@@ -1,0 +1,863 @@
+{
+  "hero": {
+    "titleLead": "In Stuttgart",
+    "titleHighlight": "leben, wohnen und arbeiten",
+    "titleTail": "an einem Ort",
+    "description": "256 Apartments an 3 Standorten: 1–3 Zimmer, voll möbliert und ideal für kurze oder lange Aufenthalte. Smart-TV, schnelles WLAN und voll ausgestattete Küchen sorgen für ein komfortables Wohnen.",
+    "ctaLocations": "Standorte ansehen",
+    "ctaQuote": "Jetzt Angebot anfragen"
+  },
+  "facilities": {
+    "subtitle": "Willkommen bei Meri Boarding",
+    "title": "Ausstattung & Services",
+    "description": "Voll möblierte 1–3 Zimmer-Apartments an 3 Standorten in Stuttgart mit insgesamt 256 Apartments. Freuen Sie sich auf smarte Grundrisse, Balkone oder Terrassen, voll ausgestattete Küchen für internationale Küche, Smart‑TV und schnelles WLAN. Wir unterstützen auch bei der Anmeldung, damit der Einzug reibungslos ist.",
+    "stats": [
+      { "label": "GESAMTAPARTMENTS", "suffix": "möblierte Apartments" },
+      { "label": "STANDORTE", "suffix": "in Stuttgart" },
+      { "label": "APARTMENTTYPEN", "suffix": "1–3 Zimmer-Grundrisse" }
+    ]
+  },
+  "testimonials": {
+    "apartments": "Apartments",
+    "locations": "3 Standorte in Stuttgart",
+    "slides": [
+      {
+        "badge": "Voll möbliert",
+        "text": "1–3 Zimmer-Apartments fürs Wohnen und Arbeiten auf Zeit – an drei Standorten in Stuttgart."
+      },
+      {
+        "badge": "Komfort zuerst",
+        "text": "Smarte Grundrisse mit Balkon oder Terrasse, voll ausgestattete Küchen für internationale Küche und Smart‑TV."
+      },
+      {
+        "badge": "Arbeitsbereit",
+        "text": "Schnelles WLAN und beste Bedingungen für Kommunikation und mobiles Arbeiten in jedem Apartment."
+      },
+      {
+        "badge": "Einzugsservice",
+        "text": "Anmeldeunterstützung und ein reibungsloser Start – inklusive Hilfe bei offiziellen Unterlagen."
+      }
+    ]
+  },
+  "gallery": {
+    "subtitle": "Willkommen",
+    "title": "Komfort, Eleganz und außergewöhnliche Gastfreundschaft erleben",
+    "description": "Willkommen in unserem Haus, wo Komfort auf stilvolle Eleganz trifft – gestaltet für Entspannung und unvergessliche Aufenthalte. In bester Lage erwarten Sie durchdachte Apartments, moderne Ausstattung und herzliche Betreuung. Von ruhigen Morgenstunden bis zu entspannten Abenden ist jedes Detail darauf ausgelegt, Ihren Aufenthalt mühelos, komfortabel und wirklich besonders zu machen.",
+    "filters": {
+      "all": "Alle ansehen",
+      "rooms": "Zimmer",
+      "dining": "Gastronomie",
+      "facilities": "Ausstattung"
+    },
+    "view": "Ansehen",
+    "zoomHint": "Mit dem Mausrad zoomen"
+  },
+  "offers": {
+    "subtitle": "Exklusive Angebote",
+    "title": "Aktuelle Hotelangebote",
+    "cards": [
+      { "badge": "20 % RABATT", "title": "Romantischer Aufenthalt", "text": "20 % Rabatt auf Wochenendpakete" },
+      { "badge": "30 % RABATT", "title": "Frühbucher-Deal", "text": "Bis zu 30 % Rabatt auf Zimmer" },
+      { "badge": "", "title": "Familienurlaub", "text": "Kinder übernachten & essen kostenlos" }
+    ]
+  },
+  "faq": {
+    "subtitle": "Leistungen",
+    "title": "Alles, was Sie über den Aufenthalt bei uns wissen sollten",
+    "cta": "Jetzt Angebot anfragen",
+    "items": [
+      {
+        "title": "Freie Apartments sind sofort bezugsfertig",
+        "body": "Verfügbare Apartments können sofort bezogen werden – mit reibungslosem Einzug und klarer Anleitung."
+      },
+      {
+        "title": "Anmeldebestätigung und Wohnungsgeberbescheinigung",
+        "body": "Wir stellen die offizielle Anmeldebestätigung und Wohnungsgeberbescheinigung für die Anmeldung bereit."
+      },
+      {
+        "title": "Namensschild an der Tür beim Einzug",
+        "body": "Ihr Namensschild ist vorbereitet, damit Ihr Apartment vom ersten Tag an bereit ist."
+      },
+      {
+        "title": "Multikulturelle Ausrichtung, Atmosphäre und Spezialisierung",
+        "body": "Eine offene, multikulturelle Atmosphäre – abgestimmt auf internationale Bewohner und Projektteams."
+      },
+      {
+        "title": "Kinderfreundliche und private Atmosphäre",
+        "body": "Genießen Sie ein kinderfreundliches Umfeld mit Privatsphäre und ruhigen Wohnbereichen."
+      },
+      {
+        "title": "Besucher möglich für nur 10 € pro Person und Monat",
+        "body": "Besucher sind für 10 € pro Person und Monat möglich – mit klaren, transparenten Regeln."
+      },
+      {
+        "title": "Haustiere auf Anfrage möglich",
+        "body": "Haustiere sind auf Anfrage möglich, abhängig von Verfügbarkeit und Hausordnung."
+      },
+      {
+        "title": "24-Stunden-Hausmeisterservice",
+        "body": "Ein 24/7-Hausmeisterservice sorgt für schnelle Unterstützung."
+      },
+      {
+        "title": "Haus- und Reinigungsservice auf Anfrage",
+        "body": "Haus- und Reinigungsservice sind auf Anfrage verfügbar."
+      },
+      {
+        "title": "Ruhiges Wohnen ohne Service auf Anfrage",
+        "body": "Auf Wunsch ist ruhiges Wohnen ohne Zusatzservices möglich."
+      }
+    ]
+  },
+  "servicesHero": {
+    "subtitle": "Meri Boarding",
+    "title": "Leistungen",
+    "home": "Startseite",
+    "crumb": "Leistungen"
+  },
+  "servicesContent": {
+    "heroSubtitle": "Serviced Apartments",
+    "heroTitle": "Alles, was Sie brauchen, um schnell anzukommen und zu leben",
+    "heroDescription": "Meri Boarding bietet voll ausgestattete 1–3 Zimmer-Apartments an drei Standorten in Stuttgart. In Hildesheim, etwa 30 Minuten südlich von Hannover, können Gäste auch in kleineren Häusern mit dem gleichen Serviced‑Apartment‑Gefühl wohnen.",
+    "ctaAvailability": "Verfügbarkeit anfragen",
+    "ctaContact": "Kontakt aufnehmen",
+    "stats": [
+      { "label": "Gesamtapartments", "value": "256+", "note": "An 3 Standorten in Stuttgart" },
+      { "label": "Apartment-Grundrisse", "value": "1–3 Zimmer", "note": "Smart und voll ausgestattet" },
+      { "label": "Bezugsfertig", "value": "Jetzt verfügbar", "note": "Sofortiger Einzug möglich" }
+    ],
+    "essentialsSubtitle": "In jedem Aufenthalt enthalten",
+    "essentialsTitle": "Apartment-Essentials ab Tag eins",
+    "highlights": [
+      {
+        "icon": "fa fa-home",
+        "title": "Möblierte Wohnbereiche",
+        "description": "Hochwertige Möbel, ein moderner Smart‑TV mit Satellitenkanälen und ein Sofa, das sich in ein Bett verwandeln lässt."
+      },
+      {
+        "icon": "fa fa-bed",
+        "title": "Erholsame Schlafzimmer",
+        "description": "Große Doppelbetten mit hochwertigen Matratzen, Einbauschränke und optionale Zusatzbetten. Bettwäsche ist vorhanden."
+      },
+      {
+        "icon": "fa fa-cutlery",
+        "title": "Internationale Küchen",
+        "description": "Voll ausgestattete Küchen mit Geschirrspüler, Kaffeemaschine, Mikrowelle, Reiskocher und Chapati‑Brett."
+      },
+      {
+        "icon": "fa fa-coffee",
+        "title": "Essentials für Mahlzeiten",
+        "description": "Komplette Sets aus Geschirr, Besteck und Gläsern für den Alltag und Gäste."
+      },
+      {
+        "icon": "fa fa-sun-o",
+        "title": "Balkon oder Terrasse",
+        "description": "Jedes Apartment hat einen möblierten Balkon oder eine Terrasse zum Entspannen."
+      },
+      {
+        "icon": "fa fa-wifi",
+        "title": "Konnektivität",
+        "description": "Schnelles, kostenloses WLAN und DSL plus private Telefonleitung mit Flatrate ins deutsche Festnetz."
+      },
+      {
+        "icon": "fa fa-refresh",
+        "title": "Waschmöglichkeiten",
+        "description": "Waschmaschine im Bad oder gemeinsamer Waschraum mit Waschmaschine und Trockner."
+      },
+      {
+        "icon": "fa fa-child",
+        "title": "Familie & Mobilität",
+        "description": "Spielplatz, Baby- und Kinderbetten sowie Parkplatz oder Tiefgarage auf Anfrage."
+      }
+    ],
+    "supportSubtitle": "Bewohner-Support",
+    "supportTitle": "Services, die den Umzug einfach machen",
+    "supportDescription": "Von Anmeldeunterstützung bis zu Services auf Anfrage – Meri Boarding macht jeden Aufenthalt für Einzelpersonen, Familien und Firmenkunden einfach.",
+    "ctaStart": "Aufenthalt starten",
+    "supportList": [
+      "Bezugsfertige Apartments mit sofortiger Verfügbarkeit.",
+      "Anmeldeunterstützung mit Bestätigung für Bewohner.",
+      "Namensschild an der Tür bei Anreise.",
+      "24-Stunden-Hausmeisterservice vor Ort.",
+      "Haus- und Reinigungsservice auf Anfrage.",
+      "Optional ruhiges Wohnen ohne zusätzliche Services.",
+      "Besuchermöglichkeiten sowie Haustiere auf Anfrage.",
+      "Multikulturelles, kinderfreundliches und privates Wohnumfeld."
+    ]
+  },
+  "bookingForm": {
+    "checkIn": "Anreise",
+    "checkOut": "Abreise",
+    "rooms": "Zimmer",
+    "guests": "Gäste",
+    "availability": "Verfügbarkeit prüfen"
+  },
+  "reservation": {
+    "hero": {
+      "subtitle": "Aufenthalt planen",
+      "title": "Reservierung",
+      "description": "Kurzaufenthalte können online reserviert werden. Für Aufenthalte länger als 1 Monat oder Jahreskontingente erstellt unser Team ein individuelles Angebot."
+    },
+    "crumb": { "home": "Startseite", "current": "Reservierung" },
+    "shortStay": {
+      "subtitle": "Kurzaufenthalte (bis 30 Nächte)",
+      "title": "Sofort reservieren",
+      "description": "Ideal für Geschäftsreisen, Kurzprojekte oder Zwischenwohnen. Wählen Sie Ihre Daten und fragen Sie die Verfügbarkeit an.",
+      "helper": "Für Aufenthalte länger als 30 Nächte nutzen Sie bitte die Langzeit-Anfrage unten."
+    },
+    "form": {
+      "checkIn": "Anreise",
+      "checkOut": "Abreise",
+      "boarding": "Boardinghaus",
+      "select": "Bitte auswählen",
+      "rooms": "Zimmer",
+      "guests": "Gäste",
+      "availability": "Verfügbarkeit prüfen"
+    },
+    "longStay": {
+      "title": "Langzeit- & Firmenaufenthalte",
+      "description": "Für Aufenthalte ab 1 Monat, Jahreskontingente oder Firmenpartnerschaften (Mitarbeiter und Studierende) bieten wir individuelle Angebote, Festpreise und Kontingente.",
+      "bullets": [
+        "Persönliche Betreuung für Unternehmen und Institutionen",
+        "Flexible Einzugsdaten und individuelle Rechnungsstellung",
+        "Optionale Services und Ruhepakete"
+      ],
+      "ctaQuote": "Langzeitangebot anfragen",
+      "ctaContact": "Team kontaktieren"
+    },
+    "help": {
+      "title": "Brauchen Sie Hilfe?",
+      "description": "Unser Reservierungsteam hilft bei Verfügbarkeit, Abrechnung und individuellen Vereinbarungen für längere Aufenthalte.",
+      "hoursTitle": "Bürostunden",
+      "hoursDay": "Montag - Freitag"
+    },
+    "why": {
+      "title": "Warum Unternehmen bei uns buchen",
+      "bullets": [
+        "Zuverlässige Kapazität für Projektteams und Praktikanten",
+        "Möblierte Apartments sofort bezugsfertig",
+        "Individuelle Vereinbarungen für Langzeitwohnen"
+      ]
+    }
+  },
+  "hotels": {
+    "hero": {
+      "subtitle": "Meri Boarding Group",
+      "title": "Hotels & Standorte",
+      "description": "Finden Sie das passende Boardinghouse mit Stadtanbindung, ruhiger Umgebung und voll ausgestatteten Apartments."
+    },
+    "crumb": { "home": "Startseite", "current": "Hotels" },
+    "glance": {
+      "subtitle": "Auf einen Blick",
+      "title": "Boardinghouses für modernes Wohnen",
+      "description": "Ob Projekt, Umzug oder Langzeitauftrag – Meri Boarding bietet möblierte Apartments mit allem, was Sie zum Wohlfühlen brauchen.",
+      "cta": "Verfügbarkeit anfragen"
+    },
+    "locations": {
+      "subtitle": "Standort wählen",
+      "title": "Drei Boardinghouses, ein vertrautes Erlebnis",
+      "description": "Jeder Meri-Standort hat sein eigenes Umfeld, bleibt aber in Komfort, Service und Ausstattung verlässlich gleich.",
+      "view": "Objekt ansehen",
+      "request": "Verfügbarkeit anfragen"
+    },
+    "shared": {
+      "subtitle": "Gemeinsame Ausstattung",
+      "title": "Komfort, der an jedem Standort bleibt",
+      "description": "Von voll möblierten Innenräumen bis zu praktischen Services – jedes Meri Boardinghouse ist für unkompliziertes Wohnen gemacht."
+    },
+    "cta": {
+      "title": "Nicht sicher, welcher Standort am besten passt?",
+      "description": "Teilen Sie uns Daten, Budget und Wünsche mit. Unser Team empfiehlt die beste Option.",
+      "button": "Mit unserem Team sprechen"
+    },
+    "hotelCards": [
+      {
+        "name": "Flamingo",
+        "slug": "flamingo",
+        "image": "/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6699.jpg",
+        "location": "Nordost Stuttgart",
+        "description": "Stadtnah und dennoch im Grünen, mit schnellem Zugang zum Neckar und zum Naherholungsgebiet Max‑Eyth‑See.",
+        "facts": [
+          "76 möblierte 1‑Zimmer-Apartments",
+          "Grüne Umgebung im Nordosten Stuttgarts",
+          "U‑Bahn- & Busverbindungen in die Stadt"
+        ]
+      },
+      {
+        "name": "Europaplatz",
+        "slug": "europaplatz",
+        "image": "/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6629.jpg",
+        "location": "Südwest Stuttgart",
+        "description": "Perfekt für den Flughafen mit schnellen Verbindungen zur Messe Stuttgart und zur A8 sowie guter ÖPNV‑Anbindung.",
+        "facts": [
+          "65 möblierte 1‑ bis 2‑Zimmer-Apartments",
+          "Rund 9 Minuten zum Flughafen",
+          "U‑Bahn und 7 Buslinien in die Stadt"
+        ]
+      },
+      {
+        "name": "Hildesheim",
+        "slug": "hildesheim",
+        "image": "/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6709.jpg",
+        "location": "Hildesheim",
+        "description": "Historischer Charme mit schneller Autobahnanbindung – ideal für längere Aufenthalte nahe Hannover und Braunschweig.",
+        "facts": [
+          "Voll möblierte Apartments in kleineren Häusern",
+          "Historischer Marktplatz und UNESCO‑Kirchen",
+          "Knotenpunkt der A7 und vier Bundesstraßen"
+        ]
+      }
+    ],
+    "overviewFacts": [
+      { "icon": "fa fa-map-marker", "label": "3 Standorte in Stuttgart & Hildesheim" },
+      { "icon": "fa fa-building", "label": "256 Apartments insgesamt" },
+      { "icon": "fa fa-bed", "label": "1–3 Zimmer-Grundrisse, voll möbliert" },
+      { "icon": "fa fa-calendar", "label": "Flexible Aufenthalte: kurz oder lang" }
+    ],
+    "sharedHighlights": [
+      "Voll möblierte Apartments mit hochwertiger Einrichtung",
+      "Kitchenette mit internationaler Ausstattung",
+      "Kostenloses WLAN und DSL",
+      "Waschmöglichkeiten vor Ort",
+      "Optionaler Haus- oder Reinigungsservice",
+      "Familienfreundliche, mehrsprachige Atmosphäre"
+    ],
+    "staySteps": [
+      {
+        "icon": "fa fa-search",
+        "title": "Standort auswählen",
+        "description": "Wählen Sie das Boardinghaus, das am besten zu Arbeitsweg und Lifestyle passt."
+      },
+      {
+        "icon": "fa fa-calendar-check-o",
+        "title": "Verfügbarkeit anfragen",
+        "description": "Teilen Sie uns Ihre Daten und Wünsche mit – Kurz- und Langzeitaufenthalte sind willkommen."
+      },
+      {
+        "icon": "fa fa-key",
+        "title": "Komfortabel einziehen",
+        "description": "Beziehen Sie ein bezugsfertiges Apartment mit allem, was Sie brauchen."
+      }
+    ]
+  },
+  "hotelDetail": {
+    "flamingo": {
+      "heroSubtitle": "Meri Boarding Stuttgart",
+      "heroTitle": "MERI BOARDINGHOUSE Flamingo",
+      "crumb": { "home": "Startseite", "hotels": "Hotels", "current": "Flamingo" },
+      "facts": [
+        { "icon": "fa fa-building", "label": "76 möblierte 1‑Zimmer-Apartments" },
+        { "icon": "fa fa-leaf", "label": "Grüne Umgebung im Nordosten Stuttgarts" },
+        { "icon": "fa fa-ship", "label": "Neckar & Max‑Eyth‑See in der Nähe" },
+        { "icon": "fa fa-subway", "label": "U‑Bahn- & Busverbindungen in die Stadt" }
+      ],
+      "description": [
+        "Stadtnah und dennoch im Grünen liegt unser Flamingo Boardinghouse im Nordosten Stuttgarts. Der Neckar und das Naherholungsgebiet Max‑Eyth‑See sind in der Nähe und laden zum Grillen, Spazieren oder Tretbootfahren ein.",
+        "Von hier aus sind der Norden und Osten Stuttgarts mit dem Auto gut erreichbar. U‑Bahn- und Busverbindungen in die Stadt und darüber hinaus sind ebenfalls vorhanden."
+      ],
+      "amenitiesTitle": "Ausstattung, Services & Highlights",
+      "highlights": [
+        "Voll möblierte Apartments mit hochwertiger Einrichtung und allem Wesentlichen",
+        "Kitchenette mit internationaler Ausstattung inkl. Geschirrspüler, Kaffeemaschine, Reiskocher, indischem Chapati‑Brett, Mikrowelle",
+        "Kostenlose Nutzung von Waschmaschine und Trockner im gemeinsamen Waschraum",
+        "Kostenloses WLAN und DSL-Anschluss",
+        "Private Telefonleitung inkl. Flatrate ins deutsche Festnetz",
+        "Namensschild an der Tür beim Einzug",
+        "Anmeldebestätigung und Wohnungsgeberbescheinigung",
+        "Parkplatz / Tiefgarage auf Anfrage",
+        "Optionaler Haus- oder Reinigungsservice oder ruhiges Wohnen ohne Service",
+        "Multikultureller Fokus, Atmosphäre und Spezialisierung",
+        "Familienfreundliche und private Atmosphäre, Spielplatz vor Ort",
+        "Baby-, Kinder- und Zusatzbetten jederzeit buchbar",
+        "Besucher möglich für nur 10 € pro Person und Monat",
+        "Haustiere auf Anfrage möglich"
+      ],
+      "form": {
+        "checkIn": "Anreise",
+        "checkOut": "Abreise",
+        "rooms": "Zimmer",
+        "guests": "Gäste",
+        "availability": "Verfügbarkeit prüfen",
+        "riskFree": "Risikofreie Buchung: Kostenlose Stornierung möglich."
+      },
+      "location": {
+        "title": "Hier finden Sie uns",
+        "hoursTitle": "Bürostunden",
+        "hoursDay": "Montag - Freitag",
+        "cta": "Verfügbarkeit anfragen"
+      },
+      "gallery": {
+        "all": "Alle ansehen",
+        "rooms": "Zimmer",
+        "dining": "Gastronomie",
+        "facilities": "Ausstattung",
+        "view": "Ansehen"
+      }
+    },
+    "europaplatz": {
+      "heroSubtitle": "Meri Boarding Stuttgart",
+      "heroTitle": "MERI BOARDINGHOUSE Europaplatz",
+      "crumb": { "home": "Startseite", "hotels": "Hotels", "current": "Europaplatz" },
+      "facts": [
+        { "icon": "fa fa-building", "label": "65 möblierte 1‑ bis 2‑Zimmer-Apartments" },
+        { "icon": "fa fa-plane", "label": "Südwest Stuttgart, rund 9 Minuten zum Flughafen" },
+        { "icon": "fa fa-road", "label": "Weniger als 1 km zur A8-Ausfahrt Stuttgart Flughafen/Messe" },
+        { "icon": "fa fa-subway", "label": "U‑Bahn und 7 Buslinien verbinden mit der Stadt" }
+      ],
+      "description": [
+        "Europaplatz liegt im Südwesten Stuttgarts und ist etwa neun Minuten mit dem Auto vom Flughafen entfernt.",
+        "Das Boardinghouse liegt weniger als einen Kilometer von der A8-Ausfahrt Stuttgart Flughafen/Messe entfernt, mit sehr guter Anbindung an südliche Ziele. U‑Bahn und sieben Buslinien verbinden den Europaplatz mit der Stadt und darüber hinaus."
+      ],
+      "amenitiesTitle": "Ausstattung, Services & Highlights",
+      "highlights": [
+        "Voll möblierte Apartments mit hochwertiger Einrichtung und allem Wesentlichen",
+        "Kitchenette mit internationaler Ausstattung inkl. Geschirrspüler, Kaffeemaschine, Reiskocher, indischem Chapati‑Brett, Mikrowelle",
+        "Kostenlose Nutzung von Waschmaschine und Trockner im gemeinsamen Waschraum",
+        "Kostenloses WLAN und DSL-Anschluss",
+        "Private Telefonleitung inkl. Flatrate ins deutsche Festnetz",
+        "Namensschild an der Tür beim Einzug",
+        "Anmeldebestätigung und Wohnungsgeberbescheinigung",
+        "Parkplatz / Tiefgarage auf Anfrage",
+        "Überdachte Fahrradstellplätze",
+        "Optionaler Haus- oder Reinigungsservice oder ruhiges Wohnen ohne Service",
+        "Multikultureller Fokus, Atmosphäre und Spezialisierung",
+        "Familienfreundliche und private Atmosphäre, Spielplatz vor Ort",
+        "Baby-, Kinder- und Zusatzbetten jederzeit buchbar",
+        "Besucher möglich für nur 10 € pro Person und Monat",
+        "Haustiere auf Anfrage möglich"
+      ],
+      "form": {
+        "checkIn": "Anreise",
+        "checkOut": "Abreise",
+        "rooms": "Zimmer",
+        "guests": "Gäste",
+        "availability": "Verfügbarkeit prüfen",
+        "riskFree": "Risikofreie Buchung: Kostenlose Stornierung möglich."
+      },
+      "location": {
+        "title": "Hier finden Sie uns",
+        "hoursTitle": "Bürostunden",
+        "hoursDay": "Montag - Freitag",
+        "cta": "Verfügbarkeit anfragen"
+      },
+      "gallery": {
+        "all": "Alle ansehen",
+        "rooms": "Zimmer",
+        "dining": "Gastronomie",
+        "facilities": "Ausstattung",
+        "view": "Ansehen"
+      }
+    },
+    "hildesheim": {
+      "heroSubtitle": "Meri Boarding",
+      "heroTitle": "Hildesheim",
+      "crumb": { "home": "Startseite", "hotels": "Hotels", "current": "Hildesheim" },
+      "facts": [
+        { "icon": "fa fa-building", "label": "Voll möblierte Apartments in kleineren Häusern" },
+        { "icon": "fa fa-university", "label": "Historischer Marktplatz und UNESCO‑Kirchen" },
+        { "icon": "fa fa-road", "label": "An der A7 gelegen, Knotenpunkt von vier Bundesstraßen" },
+        { "icon": "fa fa-map", "label": "Weniger als 15 km nach Hannover und Salzgitter, rund 30 km nach Braunschweig" }
+      ],
+      "description": [
+        "Hildesheim ist bekannt für seinen historischen Marktplatz mit schönen Fachwerkhäusern. Zwei Kirchen, St. Michaelis und der Mariendom, sind UNESCO‑Welterbestätten.",
+        "Die Stadt liegt an der A7 und ist Knotenpunkt von vier Bundesstraßen. Die Stadtgrenze von Hildesheim ist weniger als 15 km von Hannover und Salzgitter entfernt, Braunschweig liegt etwa 30 km entfernt."
+      ],
+      "amenitiesTitle": "Ausstattung, Services & Highlights",
+      "highlights": [
+        "Voll möblierte Apartments mit hochwertiger Einrichtung und allem Wesentlichen",
+        "Kitchenette mit internationaler Ausstattung inkl. Geschirrspüler, Kaffeemaschine, Reiskocher, indischem Chapati‑Brett, Mikrowelle",
+        "Waschmaschine und Trockner verfügbar",
+        "Kostenloses WLAN und DSL-Anschluss",
+        "Private Telefonleitung inkl. Flatrate ins deutsche Festnetz",
+        "Namensschild an der Tür beim Einzug",
+        "Anmeldebestätigung und Wohnungsgeberbescheinigung",
+        "Parkplatz / Tiefgarage auf Anfrage",
+        "Optionaler Haus- oder Reinigungsservice oder ruhiges Wohnen ohne Service",
+        "Multikultureller Fokus, Atmosphäre und Spezialisierung",
+        "Familienfreundliche und private Atmosphäre, Spielplatz vor Ort",
+        "Baby-, Kinder- und Zusatzbetten jederzeit buchbar",
+        "Besucher möglich für nur 10 € pro Person und Monat",
+        "Haustiere auf Anfrage möglich"
+      ],
+      "form": {
+        "checkIn": "Anreise",
+        "checkOut": "Abreise",
+        "rooms": "Zimmer",
+        "guests": "Gäste",
+        "availability": "Verfügbarkeit prüfen",
+        "riskFree": "Risikofreie Buchung: Kostenlose Stornierung möglich."
+      },
+      "location": {
+        "title": "Hier finden Sie uns",
+        "hoursTitle": "Bürostunden",
+        "hoursDay": "Montag - Freitag",
+        "cta": "Verfügbarkeit anfragen"
+      },
+      "gallery": {
+        "all": "Alle ansehen",
+        "rooms": "Zimmer",
+        "dining": "Gastronomie",
+        "facilities": "Ausstattung",
+        "view": "Ansehen"
+      }
+    }
+  },
+  "contactHero": {
+    "subtitle": "Kontakt",
+    "title": "Kontakt",
+    "crumb": "Kontakt",
+    "home": "Startseite"
+  },
+  "contactDetails": {
+    "subtitle": "Nachricht schreiben",
+    "title": "Kontakt aufnehmen",
+    "description": "Haben Sie eine Frage oder möchten Sie uns etwas mitteilen? Wir helfen gerne weiter. Bürostunden: Montag bis Freitag, 08:00-12:00 und 13:00-17:00. Wochenende nach Vereinbarung.",
+    "address": "Adresse",
+    "email": "E-Mail",
+    "phone": "Telefon",
+    "whatsapp": "WhatsApp"
+  },
+  "contactForm": {
+    "name": "Name",
+    "email": "E-Mail",
+    "phone": "Telefon",
+    "message": "Nachricht",
+    "send": "Nachricht senden",
+    "success": "Ihre Nachricht wurde erfolgreich gesendet. Laden Sie diese Seite neu, wenn Sie weitere Nachrichten senden möchten.",
+    "error": "Leider ist beim Senden des Formulars ein Fehler aufgetreten.",
+    "namePlaceholder": "Ihr Name",
+    "emailPlaceholder": "Ihre E-Mail",
+    "phonePlaceholder": "Ihre Telefonnummer",
+    "messagePlaceholder": "Ihre Nachricht"
+  },
+  "bookingInquiryForm": {
+    "subtitle": "Unverbindliche Buchungsanfrage",
+    "title": "Angebot anfragen",
+    "firstName": "Vorname",
+    "lastName": "Nachname",
+    "company": "Firma (bei Geschäftsanfragen)",
+    "email": "E-Mail",
+    "phone": "Telefon",
+    "purpose": "Reisezweck",
+    "nationality": "Nationalität",
+    "guests": "Anzahl der Gäste",
+    "rooms": "Anzahl der Zimmer",
+    "boarding": "Boardinghaus",
+    "moveIn": "Einzugsdatum",
+    "message": "Ihre Nachricht",
+    "select": "Bitte auswählen",
+    "send": "Anfrage senden",
+    "policy": "* Mit dem Absenden dieses Formulars stimmen Sie zu, dass wir Ihre Daten zur Bearbeitung Ihrer Anfrage verwenden. Informationen zum Datenschutz finden Sie ",
+    "policyLink": "hier",
+    "stayPurposes": [
+      { "value": "Business", "label": "Geschäftlich" },
+      { "value": "Private", "label": "Privat" },
+      { "value": "Project", "label": "Projekt" },
+      { "value": "Relocation", "label": "Umzug" },
+      { "value": "Other", "label": "Sonstiges" }
+    ]
+  },
+  "header": {
+    "home": "Startseite",
+    "hotels": "Hotels",
+    "services": "Leistungen",
+    "ourServices": "Unsere Leistungen",
+    "amenities": "Ausstattung",
+    "ourAmenities": "Unsere Ausstattung",
+    "contact": "Kontakt",
+    "reservation": "Reservierung",
+    "flamingo": "Flamingo",
+    "europaplatz": "Europaplatz",
+    "hildesheim": "Hildesheim"
+  },
+  "footer": {
+    "company": "Meri Boarding Group GmbH",
+    "addressLine1": "Flamingoweg 70",
+    "addressLine2": "D-70378 Stuttgart",
+    "contactTitle": "Kontakt",
+    "phone": "Telefon: +49 (0) 711 54 89 84-0",
+    "whatsapp": "WhatsApp: +49 (0) 152 06419253",
+    "email": "E-Mail: info@meri-boarding.de",
+    "officeTitle": "Bürostunden",
+    "officeDay": "Montag - Freitag",
+    "officeMorning": "08:00 - 12:00",
+    "officeAfternoon": "13:00 - 17:00",
+    "linksTitle": "Schnellzugriff",
+    "linkContact": "Kontakt",
+    "linkPrivacy": "Datenschutz",
+    "linkTerms": "AGB",
+    "linkImprint": "Impressum",
+    "copyright": "Copyright 2026 - Meri Boarding Group",
+    "tagline": "Serviced Apartments für Wohnen und Arbeiten auf Zeit.",
+    "language": "Sprache"
+  },
+  "chatWidget": {
+    "toggle": "Mit Meri sprechen",
+    "panelTitle": "Mit Meri sprechen",
+    "badge": "Online",
+    "intro": "Hallo! Ich bin Meris. Teilen Sie Ihren Namen und Ihre E‑Mail, um zu starten.",
+    "fullName": "Vollständiger Name",
+    "email": "E-Mail",
+    "continue": "Weiter",
+    "typing": "Meri tippt...",
+    "placeholder": "Nachricht schreiben...",
+    "send": "Senden",
+    "thanks": "Danke! Wir melden uns in Kürze. Für Langzeitaufenthalte (30+ Nächte) erstellen wir ein individuelles Angebot.",
+    "greeting": "Danke, {{name}}! Wie kann ich Ihnen heute helfen?",
+    "fallbackName": "dort",
+    "namePlaceholder": "Max Mustermann",
+    "emailPlaceholder": "max@beispiel.de"
+  },
+  "amenitiesHero": {
+    "subtitle": "Meri Boarding",
+    "title": "Ausstattung",
+    "crumb": "Ausstattung",
+    "home": "Startseite"
+  },
+  "rooms": {
+    "subtitle": "Meri Boarding Ausstattung",
+    "title": "Apartment-Ausstattung",
+    "description": "Voll möblierte Apartments mit durchdachten Details für Wohnen, Arbeiten und Familienaufenthalte.",
+    "allAmenities": "Alle Ausstattungen ansehen",
+    "request": "Verfügbarkeit anfragen"
+  },
+  "amenitiesContent": {
+    "layoutSubtitle": "Grundriss-Optionen",
+    "layoutTitle": "Wählen Sie den passenden Grundriss",
+    "layoutDesc": "Von kompakten Studios bis zu großzügigen Mehrzimmer-Apartments.",
+    "layoutOptions": [
+      {
+        "title": "Studio / 1-Zimmer",
+        "icon": "fa fa-square-o",
+        "description": "Offene Grundrisse, bei denen alles praktisch nah beieinander liegt.",
+        "highlights": ["Wohnen und Schlafen in einem Raum", "Kompakter Ess- und Stauraum"]
+      },
+      {
+        "title": "2-Zimmer",
+        "icon": "fa fa-columns",
+        "description": "Separater Schlafbereich für mehr Privatsphäre und Komfort.",
+        "highlights": ["Getrennte Wohn- und Schlafzonen", "Ideal für Paare oder Remote Work"]
+      },
+      {
+        "title": "3-Zimmer",
+        "icon": "fa fa-th-large",
+        "description": "Mehr Platz für Familien, längere Aufenthalte oder gemeinsames Wohnen.",
+        "highlights": ["Zusätzlicher Raum für Gäste oder Arbeitsbereich", "Perfekt für längere Aufenthalte"]
+      }
+    ],
+    "amenitiesSubtitle": "Alle Ausstattungen",
+    "amenitiesTitle": "Alles inklusive für den Alltag",
+    "toggleLabel": "Ansicht umschalten",
+    "cardView": "Kartenansicht",
+    "listView": "Listenansicht",
+    "switchHelp": "Wechseln Sie zwischen Karten- und Listenansicht.",
+    "includedTitle": "Im Aufenthalt enthalten",
+    "request": "Verfügbarkeit anfragen"
+  },
+  "amenitiesData": {
+    "cards": [
+      {
+        "title": "Wohnbereich",
+        "icon": "fa fa-home",
+        "image": "/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6699.jpg",
+        "description": "Hochwertige Einrichtung schafft in jedem Apartment eine entspannte Atmosphäre mit Platz zum Abschalten.",
+        "highlights": ["Smart-TV mit Satellitenkanälen", "Sofa lässt sich in ein Zusatzbett verwandeln"]
+      },
+      {
+        "title": "Schlafzimmer",
+        "icon": "fa fa-bed",
+        "image": "/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6744.jpg",
+        "description": "Große Doppelbetten mit hochwertigen Matratzen und Einbauschränken sorgen für Komfort und Ordnung.",
+        "highlights": ["Zusatzbetten für Erwachsene oder Kinder verfügbar", "Bettwäsche vorhanden und auf Wunsch gewechselt"]
+      },
+      {
+        "title": "Küche",
+        "icon": "fa fa-cutlery",
+        "image": "/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6754.jpg",
+        "description": "Voll ausgestattete Küchen für europäisches und internationales Kochen – alltagstauglich.",
+        "highlights": ["Geschirrspüler, Kaffeemaschine, Mikrowelle, Reiskocher", "Chapati-Brett und Einkaufstrolley"]
+      },
+      {
+        "title": "Essbereich",
+        "icon": "fa fa-coffee",
+        "image": "/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6756.jpg",
+        "description": "Komplettes Ess-Setup für tägliche Mahlzeiten und gemeinsame Momente.",
+        "highlights": ["Komplettes Set an Geschirr, Besteck und Gläsern"]
+      },
+      {
+        "title": "Balkon / Terrasse",
+        "icon": "fa fa-sun-o",
+        "image": "/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6821-Bearbeitet.jpg",
+        "description": "Jedes Apartment verfügt über einen möblierten Balkon oder eine Terrasse für frische Luft.",
+        "highlights": ["Viel Platz zum Entspannen im Freien"]
+      },
+      {
+        "title": "Konnektivität",
+        "icon": "fa fa-wifi",
+        "image": "/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6844.jpg",
+        "description": "Schnelles, zuverlässiges Internet und eine private Telefonleitung halten Sie verbunden.",
+        "highlights": ["Kostenloses WLAN und DSL", "Telefonanschluss mit Flatrate ins deutsche Festnetz"]
+      },
+      {
+        "title": "Für kleine Gäste",
+        "icon": "fa fa-child",
+        "image": "/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6846.jpg",
+        "description": "Familienfreundliche Details machen das Reisen mit Kindern einfach und komfortabel.",
+        "highlights": ["Spielbereich und Spielplatz vor Ort", "Baby-, Kinder- und Zusatzbetten jederzeit buchbar"]
+      },
+      {
+        "title": "Parken / Tiefgarage",
+        "icon": "fa fa-car",
+        "image": "/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6856-Bearbeitet.jpg",
+        "description": "Parkmöglichkeiten sind auf Anfrage verfügbar, teils mit Fahrradstellplätzen.",
+        "highlights": ["Parkplätze oder Tiefgarage auf Anfrage", "Fahrradstellplätze oder -räume je nach Standort"]
+      }
+    ],
+    "overviewItems": [
+      "Waschmaschine im Bad oder gemeinsamer Waschraum mit Trockner",
+      "Hitzebeständige Verdunkelungsvorhänge",
+      "Spielzimmer mit Tischtennisplatte",
+      "Voll möblierte Apartments mit hochwertiger Einrichtung"
+    ]
+  },
+  "terms": {
+    "hero": {
+      "subtitle": "Meri Boarding",
+      "title": "Allgemeine Geschäftsbedingungen",
+      "description": "Transparente Bedingungen für Buchung, Zahlung und Aufenthalt.",
+      "crumb": "AGB",
+      "home": "Startseite"
+    },
+    "sections": [
+      {
+        "title": "Geltungsbereich",
+        "body": "Diese AGB gelten für alle Buchungen, Anfragen und Verträge zwischen Meri Boarding Group GmbH und ihren Gästen."
+      },
+      {
+        "title": "Buchung & Vertragsabschluss",
+        "body": "Eine Buchung kommt mit schriftlicher Bestätigung zustande. Alle Angaben müssen vollständig und korrekt sein."
+      },
+      {
+        "title": "Preise & Zahlung",
+        "body": "Es gelten die zum Zeitpunkt der Buchung bestätigten Preise. Zahlungen sind gemäß den vereinbarten Fristen fällig."
+      },
+      {
+        "title": "Stornierung & Änderungen",
+        "body": "Änderungen oder Stornierungen sind schriftlich mitzuteilen. Es können Gebühren gemäß Vereinbarung anfallen."
+      },
+      {
+        "title": "Haftung",
+        "body": "Die Haftung ist im gesetzlich zulässigen Rahmen begrenzt. Für Wertgegenstände empfehlen wir eine sichere Aufbewahrung."
+      },
+      {
+        "title": "Hausordnung",
+        "body": "Bitte beachten Sie die Hausordnung und respektieren Sie Ruhezeiten sowie gemeinschaftliche Bereiche."
+      }
+    ],
+    "cta": {
+      "title": "Fragen zu den AGB?",
+      "body": "Kontaktieren Sie uns, wenn Sie Details zu Buchung oder Aufenthalt klären möchten.",
+      "button": "Kontakt aufnehmen"
+    }
+  },
+  "imprint": {
+    "hero": {
+      "subtitle": "Meri Boarding",
+      "title": "Impressum",
+      "description": "Rechtliche Informationen zur Meri Boarding Group GmbH.",
+      "crumb": "Impressum",
+      "home": "Startseite"
+    },
+    "company": {
+      "title": "Unternehmen",
+      "name": "Meri Boarding Group GmbH",
+      "address": "Flamingoweg 70, D-70378 Stuttgart"
+    },
+    "contact": {
+      "title": "Kontakt",
+      "email": "info@meri-boarding.de",
+      "phone": "+49 (0) 711 54 89 84 - 0"
+    },
+    "represented": {
+      "title": "Vertreten durch",
+      "body": "Geschäftsführung (bitte ergänzen)"
+    },
+    "register": {
+      "title": "Handelsregister",
+      "body": "Registergericht und Registernummer (bitte ergänzen)"
+    },
+    "vat": {
+      "title": "Umsatzsteuer-ID",
+      "body": "USt-IdNr. (bitte ergänzen)"
+    },
+    "responsible": {
+      "title": "Verantwortlich für den Inhalt",
+      "body": "Angaben nach § 55 Abs. 2 RStV (bitte ergänzen)"
+    },
+    "cta": {
+      "title": "Weitere Fragen?",
+      "body": "Schreiben Sie uns, wenn Sie rechtliche Informationen benötigen.",
+      "button": "Kontakt aufnehmen"
+    }
+  },
+  "privacy": {
+    "hero": {
+      "subtitle": "Meri Boarding",
+      "title": "Datenschutz",
+      "description": "Wir behandeln Ihre Daten vertraulich und verwenden sie nur zur Bearbeitung Ihrer Anfrage und zur Bereitstellung unserer Leistungen.",
+      "crumb": "Datenschutz",
+      "home": "Startseite"
+    },
+    "intro": {
+      "title": "Überblick",
+      "headline": "So gehen wir mit Ihren Daten um",
+      "body": "Diese Datenschutzerklärung informiert darüber, welche Daten wir verarbeiten, zu welchen Zwecken und welche Rechte Sie haben.",
+      "contactTitle": "Kontakt für Datenschutzfragen",
+      "contactBody": "Meri Boarding Group GmbH, Flamingoweg 70, D-70378 Stuttgart",
+      "contactEmail": "info@meri-boarding.de",
+      "contactPhone": "+49 (0) 711 54 89 84 - 0"
+    },
+    "blocks": [
+      {
+        "title": "Welche Daten wir erheben",
+        "body": "Kontakt- und Anfragedaten (z. B. Name, E-Mail, Telefon), Buchungsdetails sowie technische Nutzungsdaten (z. B. IP-Adresse, Browser)."
+      },
+      {
+        "title": "Wofür wir Daten nutzen",
+        "body": "Zur Beantwortung Ihrer Anfrage, zur Angebots- und Vertragsabwicklung, zur Kommunikation sowie zur Verbesserung unseres Angebots."
+      },
+      {
+        "title": "Weitergabe an Dritte",
+        "body": "Eine Weitergabe erfolgt nur an Dienstleister, die wir für Hosting, E-Mail oder IT-Betrieb benötigen. Keine Weitergabe zu Werbezwecken."
+      },
+      {
+        "title": "Speicherdauer",
+        "body": "Wir speichern Daten nur so lange, wie es für den jeweiligen Zweck erforderlich ist oder gesetzliche Pflichten bestehen."
+      },
+      {
+        "title": "Cookies & Analyse",
+        "body": "Wir verwenden funktionale Cookies und ggf. Analyse-Tools, um die Nutzung zu verbessern. Details finden Sie in den jeweiligen Hinweisen."
+      },
+      {
+        "title": "Ihre Rechte",
+        "body": "Sie haben das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung, Widerspruch und Datenübertragbarkeit."
+      }
+    ],
+    "cta": {
+      "title": "Noch Fragen zum Datenschutz?",
+      "body": "Schreiben Sie uns, wenn Sie Auskunft wünschen oder Ihre Rechte wahrnehmen möchten.",
+      "button": "Kontakt aufnehmen"
+    }
+  },
+  "notFound": {
+    "title": "404",
+    "subtitle": "Seite nicht gefunden",
+    "description": "Die Seite, die Sie suchen, existiert nicht oder wurde verschoben.",
+    "where": "Wohin möchten Sie gehen?",
+    "helper": "Nutzen Sie die Links unten oder kehren Sie zur Startseite zurück.",
+    "home": "Zur Startseite",
+    "homeCrumb": "Startseite",
+    "hotels": "Hotels ansehen",
+    "contact": "Kontakt",
+    "crumb": "404"
+  }
+}
