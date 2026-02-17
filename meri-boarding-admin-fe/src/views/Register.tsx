@@ -7,26 +7,13 @@ import IconButton from '@mui/material/IconButton'
 import InputAdornment from '@mui/material/InputAdornment'
 import Button from '@mui/material/Button'
 import Alert from '@mui/material/Alert'
-import { styled, useTheme } from '@mui/material/styles'
-import classnames from 'classnames'
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
+import Box from '@mui/material/Box'
+import Divider from '@mui/material/Divider'
 import Link from '@components/Link'
 import Logo from '@components/layout/shared/Logo'
 import CustomTextField from '@core/components/mui/TextField'
-import { useSettings } from '@core/hooks/useSettings'
-
-const RegisterIllustration = styled('img')(({ theme }) => ({
-  zIndex: 2,
-  blockSize: 'auto',
-  maxBlockSize: 600,
-  maxInlineSize: '100%',
-  margin: theme.spacing(12),
-  [theme.breakpoints.down(1536)]: {
-    maxBlockSize: 550
-  },
-  [theme.breakpoints.down('lg')]: {
-    maxBlockSize: 450
-  }
-}))
 
 const RegisterView = () => {
   const [isPasswordShown, setIsPasswordShown] = useState(false)
@@ -40,39 +27,43 @@ const RegisterView = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const router = useRouter()
-  const { settings } = useSettings()
-  const theme = useTheme()
   const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:4000'
 
   const handleClickShowPassword = () => setIsPasswordShown(show => !show)
 
   return (
-    <div className='flex bs-full justify-center'>
-      <div
-        className={classnames(
-          'flex bs-full items-center justify-center flex-1 min-bs-[100dvh] relative p-6 max-md:hidden',
-          { 'border-ie': settings.skin === 'bordered' }
-        )}
-      >
-        <RegisterIllustration
-          src='/images/illustrations/characters-with-objects/8.png'
-          alt='register-illustration'
-          className={classnames({ 'scale-x-[-1]': theme.direction === 'rtl' })}
-        />
+    <Box className='relative flex min-bs-[100dvh] items-center justify-center p-6 pt-40 sm:p-10 sm:pt-44 bg-backgroundDefault'>
+      <div className='pointer-events-none fixed left-1/2 top-6 z-20 -translate-x-1/2 sm:top-8'>
+        <Logo height={112} maxWidth={520} />
       </div>
-      <div className='flex justify-center items-center bs-full bg-backgroundPaper !min-is-full p-6 md:!min-is-[unset] md:p-12 md:is-[520px]'>
-        <Link href='/login' className='absolute block-start-5 sm:block-start-[33px] inline-start-6 sm:inline-start-[38px]'>
-          <Logo />
-        </Link>
-        <div className='flex flex-col gap-6 is-full sm:is-auto md:is-full sm:max-is-[420px] md:max-is-[unset] mbs-11 sm:mbs-14 md:mbs-0'>
-          <div className='flex flex-col gap-1 items-start text-left'>
-            <img
-              src='/images/branding/meri-logo-mark.svg'
-              alt='Meri mark'
-              style={{ width: 200, height: 200, objectFit: 'contain', marginTop: -72, marginBottom: -10, alignSelf: 'center' }}
-            />
+
+      <Card className='w-full max-w-[560px]'>
+        <CardContent className='relative overflow-hidden p-6 sm:p-10'>
+          <img
+            src='/images/branding/meri-logo-mark.svg'
+            alt=''
+            aria-hidden='true'
+            style={{
+              position: 'absolute',
+              width: 360,
+              height: 360,
+              objectFit: 'contain',
+              inset: '50% auto auto 50%',
+              transform: 'translate(-50%, -50%)',
+              opacity: 0.05,
+              pointerEvents: 'none',
+              userSelect: 'none'
+            }}
+          />
+
+          <div className='relative mb-6 flex flex-col gap-1 items-center text-center'>
             <Typography variant='h4'>Create account</Typography>
             <Typography>Your account will be reviewed by admin before login is allowed.</Typography>
+            <Divider flexItem className='my-2' />
+            <Typography color='text.secondary' className='max-w-[460px]'>
+              Please submit your membership details and notify the admin. Your assignment will be activated by the
+              administrator.
+            </Typography>
           </div>
 
           <form
@@ -117,7 +108,7 @@ const RegisterView = () => {
                 setIsSubmitting(false)
               }
             }}
-            className='flex flex-col gap-5'
+            className='relative flex flex-col gap-5'
           >
             {error ? <Alert severity='error'>{error}</Alert> : null}
             {success ? <Alert severity='success'>{success}</Alert> : null}
@@ -160,9 +151,9 @@ const RegisterView = () => {
               </Typography>
             </div>
           </form>
-        </div>
-      </div>
-    </div>
+        </CardContent>
+      </Card>
+    </Box>
   )
 }
 
