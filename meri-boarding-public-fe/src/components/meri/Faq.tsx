@@ -3,15 +3,17 @@ import type { Locale } from "@/i18n/getLocale";
 import { getLocale } from "@/i18n/getLocale";
 import { localePath } from "@/i18n/localePath";
 import { getMessages } from "@/i18n/messages";
+import type { HomeResolvedContent } from "@/lib/homeContentApi";
 import Link from "next/link";
 
 type FaqProps = {
   locale?: Locale;
+  content?: HomeResolvedContent["faq"];
 };
 
-export default async function Faq({ locale: localeProp }: FaqProps = {}) {
+export default async function Faq({ locale: localeProp, content }: FaqProps = {}) {
   const locale = localeProp ?? (await getLocale());
-  const t = getMessages(locale).faq;
+  const t = content || getMessages(locale).faq;
   const withLocale = (path: string) => localePath(locale, path);
   return (
     <section>

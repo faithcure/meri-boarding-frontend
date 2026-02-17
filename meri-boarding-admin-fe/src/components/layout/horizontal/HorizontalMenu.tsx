@@ -5,7 +5,7 @@ import { useTheme } from '@mui/material/styles'
 import type { VerticalMenuContextProps } from '@menu/components/vertical-menu/Menu'
 
 // Component Imports
-import HorizontalNav, { Menu, MenuItem } from '@menu/horizontal-menu'
+import HorizontalNav, { Menu, MenuItem, SubMenu } from '@menu/horizontal-menu'
 import VerticalNavContent from './VerticalNavContent'
 
 // Hook Imports
@@ -78,9 +78,23 @@ const HorizontalMenu = () => {
           menuSectionStyles: verticalMenuSectionStyles(verticalNavOptions, theme)
         }}
       >
-        <MenuItem href='/' icon={<i className='bx-home' />}>
+        <MenuItem href='/home' icon={<i className='bx-home' />}>
           Home
         </MenuItem>
+        <MenuItem href='/hotels' icon={<i className='bx-building-house' />}>
+          Hotels
+        </MenuItem>
+        <SubMenu label='Home Content' icon={<i className='bx-edit-alt' />}>
+          <MenuItem href='/content-home' icon={<i className='bx-sort' />}>
+            Section Order
+          </MenuItem>
+          <MenuItem href='/content-home/hero' icon={<i className='bx-image' />}>
+            Hero Settings
+          </MenuItem>
+          <MenuItem href='/content-home/rooms' icon={<i className='bx-layout' />}>
+            Rooms Settings
+          </MenuItem>
+        </SubMenu>
         <MenuItem href='/about' icon={<i className='bx-info-circle' />}>
           About
         </MenuItem>

@@ -1,22 +1,29 @@
 import type { Locale } from "@/i18n/getLocale";
 import { getLocale } from "@/i18n/getLocale";
 import { getMessages } from "@/i18n/messages";
+import type { HomeResolvedContent } from "@/lib/homeContentApi";
 
 type TestimonialsProps = {
   locale?: Locale;
+  content?: HomeResolvedContent["testimonials"];
 };
 
-export default async function Testimonials({ locale: localeProp }: TestimonialsProps = {}) {
+export default async function Testimonials({ locale: localeProp, content }: TestimonialsProps = {}) {
   const locale = localeProp ?? (await getLocale());
-  const t = getMessages(locale).testimonials;
+  const base = getMessages(locale).testimonials;
+  const t = {
+    ...base,
+    apartmentsCount: content?.apartmentsCount ?? 256,
+    backgroundImage: content?.backgroundImage || "/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6629.jpg"
+  };
   return (
     <section className="text-light jarallax mx-2 rounded-1 overflow-hidden">
-      <img src="/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6629.jpg" className="jarallax-img" alt="" />
+      <img src={t.backgroundImage || "/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6629.jpg"} className="jarallax-img" alt="" />
       <div className="sw-overlay op-6"></div>
       <div className="container relative z-2">
         <div className="row g-4 gx-5 align-items-center">
           <div className="col-lg-5 text-center">
-            <h2 className="fs-96 mb-0">256</h2>
+            <h2 className="fs-96 mb-0">{t.apartmentsCount || 256}</h2>
             <span className="d-block id-color wow fadeInUp">{t.apartments}</span>
             {t.locations}
           </div>

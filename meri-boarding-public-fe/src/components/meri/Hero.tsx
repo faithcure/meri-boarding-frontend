@@ -4,31 +4,30 @@ import { localePath } from "@/i18n/localePath";
 import { getMessages } from "@/i18n/messages";
 import Link from "next/link";
 
+import type { HomeResolvedContent } from "@/lib/homeContentApi";
+
 type HeroProps = {
   locale?: Locale;
+  content?: HomeResolvedContent['hero'];
 };
 
-export default async function Hero({ locale: localeProp }: HeroProps = {}) {
+export default async function Hero({ locale: localeProp, content }: HeroProps = {}) {
   const locale = localeProp ?? (await getLocale());
-  const t = getMessages(locale).hero;
+  const t = content || getMessages(locale).hero;
   const withLocale = (path: string) => localePath(locale, path);
-  const slides = [
-    {
-      image: "/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6821-Bearbeitet.jpg",
-      position: "center 13%",
-    },
-    {
-      image: "/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6699.jpg",
-      position: "center 45%",
-    },
-    {
-      image: "/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6709.jpg",
-      position: "center 35%",
-    },
-    {
-      image: "/images/Europaplatz_Fotos/_DSC6714.jpg",
-      position: "center 35%",
-    },
+  const resolveHref = (value: string, fallback: string) => {
+    const raw = String(value || '').trim() || fallback;
+    if (/^https?:\/\//i.test(raw)) return raw;
+    if (raw.startsWith('/')) return withLocale(raw);
+    return withLocale(fallback);
+  };
+  const locationsHref = resolveHref((t as typeof t & { ctaLocationsHref?: string }).ctaLocationsHref || '', '/hotels');
+  const quoteHref = resolveHref((t as typeof t & { ctaQuoteHref?: string }).ctaQuoteHref || '', '/contact');
+  const slides = content?.slides || [
+    { image: "/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6821-Bearbeitet.jpg", position: "center 13%" },
+    { image: "/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6699.jpg", position: "center 45%" },
+    { image: "/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6709.jpg", position: "center 35%" },
+    { image: "/images/Europaplatz_Fotos/_DSC6714.jpg", position: "center 35%" },
   ];
   return (
     <section className="text-light no-top no-bottom relative rounded-1 overflow-hidden mt-80 mt-sm-50 mx-2 hero-section">
@@ -50,14 +49,14 @@ export default async function Hero({ locale: localeProp }: HeroProps = {}) {
                 </p>
                 <div className="d-flex align-items-center gap-3 flex-wrap">
                   <Link
-                    href={withLocale("/hotels")}
+                    href={locationsHref}
                     className="btn-main fx-slide hover-white wow fadeInUp"
                     data-wow-delay=".8s"
                   >
                     <span>{t.ctaLocations}</span>
                   </Link>
                   <Link
-                    href={withLocale("/contact")}
+                    href={quoteHref}
                     className="btn-main btn-hero-quote fx-slide hover-white wow fadeInUp"
                     data-wow-delay=".9s"
                     data-hover={t.ctaQuote}

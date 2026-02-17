@@ -127,6 +127,7 @@ export default async function HotelDynamicPage({ params }: HotelDynamicPageProps
       ? hotel.gallery.map(item => ({
           id: item.id,
           src: withApiHost(item.url || fallbackHotelImage),
+          thumbSrc: withApiHost(item.thumbnailUrl || item.url || fallbackHotelImage),
           category: item.category || 'other',
           alt: item.alt || `${hotel.name} gallery`,
           meta: {
@@ -137,6 +138,7 @@ export default async function HotelDynamicPage({ params }: HotelDynamicPageProps
           {
             id: 'fallback',
             src: fallbackHotelImage,
+            thumbSrc: fallbackHotelImage,
             category: 'rooms',
             alt: `${hotel.name} gallery`,
             meta: { sections: [] }

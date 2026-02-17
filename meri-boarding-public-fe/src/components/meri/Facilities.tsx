@@ -1,14 +1,22 @@
 import type { Locale } from "@/i18n/getLocale";
 import { getLocale } from "@/i18n/getLocale";
 import { getMessages } from "@/i18n/messages";
+import type { HomeResolvedContent } from "@/lib/homeContentApi";
 
 type FacilitiesProps = {
   locale?: Locale;
+  content?: HomeResolvedContent["facilities"];
 };
 
-export default async function Facilities({ locale: localeProp }: FacilitiesProps = {}) {
+export default async function Facilities({ locale: localeProp, content }: FacilitiesProps = {}) {
   const locale = localeProp ?? (await getLocale());
-  const t = getMessages(locale).facilities;
+  const base = getMessages(locale).facilities;
+  const t = {
+    ...base,
+    primaryImage: content?.primaryImage || "/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6629.jpg",
+    secondaryImage: content?.secondaryImage || "/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6639.jpg",
+    statsNumbers: content?.statsNumbers || [256, 3, 3]
+  };
   return (
     <section>
       <div className="container">
@@ -28,7 +36,7 @@ export default async function Facilities({ locale: localeProp }: FacilitiesProps
               <div className="col-md-6">
                 <div
                   className="h-100 rounded-1 mh-300 wow fadeInUp"
-                  data-bgimage="url(/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6629.jpg) center"
+                  data-bgimage={`url(${t.primaryImage || "/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6629.jpg"}) center`}
                 ></div>
               </div>
 
@@ -40,7 +48,7 @@ export default async function Facilities({ locale: localeProp }: FacilitiesProps
                   <div className="sm-hide spacer-double"></div>
                   <div className="spacer-double"></div>
                   <h2 className="mb-0">
-                    <span className="timer" data-to="256" data-speed="3000">
+                    <span className="timer" data-to={t.statsNumbers?.[0] ?? 256} data-speed="3000">
                       0
                     </span>
                     <span className="id-color">+</span>
@@ -55,7 +63,7 @@ export default async function Facilities({ locale: localeProp }: FacilitiesProps
                   <div className="sm-hide spacer-double"></div>
                   <div className="spacer-double"></div>
                   <h2 className="mb-0">
-                    <span className="timer" data-to="3" data-speed="3000">
+                    <span className="timer" data-to={t.statsNumbers?.[1] ?? 3} data-speed="3000">
                       0
                     </span>
                     <span className="id-color">+</span>
@@ -70,7 +78,7 @@ export default async function Facilities({ locale: localeProp }: FacilitiesProps
                   <div className="sm-hide spacer-double"></div>
                   <div className="spacer-double"></div>
                   <h2 className="mb-0">
-                    <span className="timer" data-to="3" data-speed="3000">
+                    <span className="timer" data-to={t.statsNumbers?.[2] ?? 3} data-speed="3000">
                       0
                     </span>
                     <span className="id-color">+</span>
@@ -82,7 +90,7 @@ export default async function Facilities({ locale: localeProp }: FacilitiesProps
                   <div className="col-md-6 wow fadeInUp sm-hide d-md-block d-xs-none" data-wow-delay=".6s">
                     <div
                       className="p-30 bg-dark-2 rounded-1 h-100"
-                      data-bgimage="url(/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6639.jpg) center"
+                      data-bgimage={`url(${t.secondaryImage || "/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6639.jpg"}) center`}
                     ></div>
                   </div>
             </div>

@@ -38,6 +38,7 @@ export type PublicHotelDetail = {
   gallery: Array<{
     id: string
     url: string
+    thumbnailUrl?: string
     category: 'rooms' | 'dining' | 'facilities' | 'other'
     alt: string
     sortOrder: number
@@ -150,6 +151,7 @@ export async function fetchPublicHotelBySlug(locale: Locale, slug: string): Prom
     gallery: (hotel.gallery || []).map(image => ({
       ...image,
       url: withApiBaseIfNeeded(image.url),
+      thumbnailUrl: withApiBaseIfNeeded(String(image.thumbnailUrl || image.url || '')),
       meta: normalizeGalleryMeta(image.meta)
     }))
   }

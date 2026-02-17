@@ -10,24 +10,40 @@ import Rooms from "@/components/meri/Rooms";
 import Testimonials from "@/components/meri/Testimonials";
 import VideoCta from "@/components/meri/VideoCta";
 import type { Locale } from "@/i18n/getLocale";
+import { fetchHomeResolvedContent } from "@/lib/homeContentApi";
+import { Fragment } from "react";
 
 type HomePageProps = {
   locale: Locale;
 };
 
-export default function HomePage({ locale }: HomePageProps) {
+export default async function HomePage({ locale }: HomePageProps) {
+  const content = await fetchHomeResolvedContent(locale);
+  const orderedSections = Object.entries(content.sections)
+    .sort(([, a], [, b]) => Number(a.order || 0) - Number(b.order || 0))
+    .map(([key]) => key as keyof typeof content.sections);
+
+  const sectionNode = (sectionKey: keyof typeof content.sections) => {
+    if (!content.sections[sectionKey].enabled) return null;
+
+    if (sectionKey === "hero") return <Hero locale={locale} content={content.hero} />;
+    if (sectionKey === "rooms") return <Rooms locale={locale} content={content.rooms} />;
+    if (sectionKey === "testimonials") return <Testimonials locale={locale} content={content.testimonials} />;
+    if (sectionKey === "facilities") return <Facilities locale={locale} content={content.facilities} />;
+    if (sectionKey === "gallery") return <Gallery locale={locale} content={content.gallery} />;
+    if (sectionKey === "offers") return <Offers locale={locale} content={content.offers} />;
+    if (sectionKey === "faq") return <Faq locale={locale} content={content.faq} />;
+    return null;
+  };
+
   return (
     <>
       <Header locale={locale} />
       <main>
         <a href="#" id="back-to-top"></a>
-        <Hero locale={locale} />
-        <Rooms locale={locale} />
-        <Testimonials locale={locale} />
-        <Facilities locale={locale} />
-        <Gallery locale={locale} />
-        <Offers locale={locale} />
-        <Faq locale={locale} />
+        {orderedSections.map((sectionKey) => (
+          <Fragment key={sectionKey}>{sectionNode(sectionKey)}</Fragment>
+        ))}
         <VideoCta />
       </main>
       <Footer locale={locale} />

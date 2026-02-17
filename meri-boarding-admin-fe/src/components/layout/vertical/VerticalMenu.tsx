@@ -11,7 +11,7 @@ import PerfectScrollbar from 'react-perfect-scrollbar'
 import type { VerticalMenuContextProps } from '@menu/components/vertical-menu/Menu'
 
 // Component Imports
-import { Menu, MenuItem } from '@menu/vertical-menu'
+import { Menu, MenuItem, SubMenu } from '@menu/vertical-menu'
 
 // Hook Imports
 import useVerticalNav from '@menu/hooks/useVerticalNav'
@@ -95,6 +95,17 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         <MenuItem href='/hotels' icon={<i className='bx-building-house' />}>
           Hotels
         </MenuItem>
+        <SubMenu label='Home Content' icon={<i className='bx-edit-alt' />}>
+          <MenuItem href='/content-home' icon={<i className='bx-sort' />}>
+            Section Order
+          </MenuItem>
+          <MenuItem href='/content-home/hero' icon={<i className='bx-image' />}>
+            Hero Settings
+          </MenuItem>
+          <MenuItem href='/content-home/rooms' icon={<i className='bx-layout' />}>
+            Rooms Settings
+          </MenuItem>
+        </SubMenu>
         {isSuperAdmin ? (
           <MenuItem href='/users' icon={<i className='bx-group' />}>
             Users

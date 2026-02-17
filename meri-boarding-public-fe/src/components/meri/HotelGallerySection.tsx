@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 type GalleryItem = {
   id: string
   src: string
+  thumbSrc?: string
   category: string
   alt: string
   meta?: {
@@ -204,7 +205,7 @@ export default function HotelGallerySection({ items, labels }: HotelGallerySecti
                   </span>
                 </div>
                 <div className='absolute start-0 w-100 h-100 overlay-black-5 hover-op-1 z-2'></div>
-                <img src={item.src} className='w-100' alt={item.alt || `Hotel gallery ${index + 1}`} />
+                <img src={item.thumbSrc || item.src} className='w-100' alt={item.alt || `Hotel gallery ${index + 1}`} />
               </div>
             </button>
           </div>

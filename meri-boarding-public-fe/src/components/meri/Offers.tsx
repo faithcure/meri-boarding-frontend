@@ -2,15 +2,22 @@ import type { Locale } from "@/i18n/getLocale";
 import { getLocale } from "@/i18n/getLocale";
 import { localePath } from "@/i18n/localePath";
 import { getMessages } from "@/i18n/messages";
+import type { HomeResolvedContent } from "@/lib/homeContentApi";
 import Link from "next/link";
 
 type OffersProps = {
   locale?: Locale;
+  content?: HomeResolvedContent["offers"];
 };
 
-export default async function Offers({ locale: localeProp }: OffersProps = {}) {
+export default async function Offers({ locale: localeProp, content }: OffersProps = {}) {
   const locale = localeProp ?? (await getLocale());
   const t = getMessages(locale).offers;
+  const cardImages = [
+    content?.cards?.[0]?.image || "/images/Europaplatz_Fotos/_DSC6629.jpg",
+    content?.cards?.[1]?.image || "/images/Europaplatz_Fotos/_DSC6634.jpg",
+    content?.cards?.[2]?.image || "/images/Europaplatz_Fotos/_DSC6639.jpg"
+  ];
   const withLocale = (path: string) => localePath(locale, path);
   return (
     <section className="bg-color-op-1 rounded-1 mx-2">
@@ -31,7 +38,7 @@ export default async function Offers({ locale: localeProp }: OffersProps = {}) {
                     {t.cards[0].badge}
                   </h3>
                 ) : null}
-                <img src="/images/Europaplatz_Fotos/_DSC6629.jpg" className="w-100 hover-scale-1-1" alt="" />
+                <img src={cardImages[0]} className="w-100 hover-scale-1-1" alt="" />
                 <Link
                   href={withLocale("/offer-single")}
                   className="d-block abs w-100 h-100 top-0 start-0"
@@ -61,7 +68,7 @@ export default async function Offers({ locale: localeProp }: OffersProps = {}) {
                     {t.cards[1].badge}
                   </h3>
                 ) : null}
-                <img src="/images/Europaplatz_Fotos/_DSC6634.jpg" className="w-100 hover-scale-1-1" alt="" />
+                <img src={cardImages[1]} className="w-100 hover-scale-1-1" alt="" />
                 <Link
                   href={withLocale("/offer-single")}
                   className="d-block abs w-100 h-100 top-0 start-0"
@@ -74,7 +81,7 @@ export default async function Offers({ locale: localeProp }: OffersProps = {}) {
           <div className="col-lg-4 wow fadeInUp" data-wow-delay=".6s">
             <div className="overflow-hidden rounded-1">
               <div className="hover relative media-frame">
-                <img src="/images/Europaplatz_Fotos/_DSC6639.jpg" className="w-100 hover-scale-1-1" alt="" />
+                <img src={cardImages[2]} className="w-100 hover-scale-1-1" alt="" />
                 <Link
                   href={withLocale("/offer-single")}
                   className="d-block abs w-100 h-100 top-0 start-0"

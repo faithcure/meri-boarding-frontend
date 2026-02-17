@@ -13,6 +13,11 @@ const verticalMenuData = (): VerticalMenuDataType[] => [
     icon: 'bx-building-house'
   },
   {
+    label: 'Home Content',
+    href: '/content-home',
+    icon: 'bx-edit-alt'
+  },
+  {
     label: 'About',
     href: '/about',
     icon: 'bx-info-circle'

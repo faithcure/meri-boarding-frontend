@@ -27,6 +27,7 @@ type GalleryCategory = 'rooms' | 'dining' | 'facilities' | 'other'
 type GalleryImage = {
   id: string
   url: string
+  thumbnailUrl?: string
   alt: string
   category: GalleryCategory
   sortOrder: number
@@ -497,6 +498,28 @@ export default function HotelDetailPage({ params }: HotelDetailPageProps) {
       reader.readAsDataURL(file)
     })
 
+  const toThumbnailDataUrl = async (file: File) => {
+    const source = await toDataUrl(file)
+    const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const img = new Image()
+      img.onload = () => resolve(img)
+      img.onerror = () => reject(new Error('Image load failed'))
+      img.src = source
+    })
+
+    const maxWidth = 640
+    const ratio = image.naturalWidth > maxWidth ? maxWidth / image.naturalWidth : 1
+    const width = Math.max(1, Math.round(image.naturalWidth * ratio))
+    const height = Math.max(1, Math.round(image.naturalHeight * ratio))
+    const canvas = document.createElement('canvas')
+    canvas.width = width
+    canvas.height = height
+    const ctx = canvas.getContext('2d')
+    if (!ctx) throw new Error('Canvas not available')
+    ctx.drawImage(image, 0, 0, width, height)
+    return canvas.toDataURL('image/jpeg', 0.82)
+  }
+
   const handleUploadGalleryImages = async (files: File[]) => {
     if (!selectedHotel || files.length === 0) return
 
@@ -526,6 +549,7 @@ export default function HotelDetailPage({ params }: HotelDetailPageProps) {
       for (const file of files) {
         try {
           const dataUrl = await toDataUrl(file)
+          const thumbnailDataUrl = await toThumbnailDataUrl(file)
 
           const response = await fetch(`${apiBaseUrl}/api/v1/admin/hotels/${selectedHotel.id}/gallery`, {
             method: 'POST',
@@ -537,6 +561,7 @@ export default function HotelDetailPage({ params }: HotelDetailPageProps) {
               locale,
               fileName: file.name,
               dataUrl,
+              thumbnailDataUrl,
               category: galleryCategory,
               alt: galleryAlt
             })

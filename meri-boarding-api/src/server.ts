@@ -3,7 +3,7 @@ import cors from '@fastify/cors';
 import dotenv from 'dotenv';
 import { createHmac, randomBytes, scryptSync, timingSafeEqual } from 'node:crypto';
 import { createReadStream } from 'node:fs';
-import { mkdir, stat, unlink, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, stat, unlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { MongoClient, ObjectId } from 'mongodb';
 
@@ -73,6 +73,7 @@ type ContentEntry<T> = {
 type HotelGalleryImage = {
   id: string;
   url: string;
+  thumbnailUrl?: string;
   category: 'rooms' | 'dining' | 'facilities' | 'other';
   alt: string;
   sortOrder: number;
@@ -118,8 +119,176 @@ type HotelEntity = {
   updatedBy?: ObjectId;
 };
 
+type HomeSectionKey = 'hero' | 'rooms' | 'testimonials' | 'facilities' | 'gallery' | 'offers' | 'faq';
+
+type HomeSectionState = {
+  enabled: boolean;
+  order: number;
+};
+
+type HomeHeroSlide = {
+  image: string;
+  position: string;
+};
+
+type HomeGalleryItem = {
+  image: string;
+  category: 'rooms' | 'dining' | 'facilities';
+  alt: string;
+};
+
+type HomeOfferCard = {
+  image: string;
+};
+
+type HomeCmsContent = {
+  sections: Record<HomeSectionKey, HomeSectionState>;
+  hero: {
+    titleLead: string;
+    titleHighlight: string;
+    titleTail: string;
+    description: string;
+    ctaLocations: string;
+    ctaLocationsHref: string;
+    ctaQuote: string;
+    ctaQuoteHref: string;
+    slides: HomeHeroSlide[];
+  };
+  rooms: {
+    subtitle: string;
+    title: string;
+    description: string;
+    allAmenities: string;
+    allAmenitiesHref: string;
+    request: string;
+    requestHref: string;
+    cards: Array<{
+      title: string;
+      icon: string;
+      image: string;
+      description: string;
+      highlights: string[];
+    }>;
+  };
+  testimonials: {
+    apartmentsCount: number;
+    backgroundImage: string;
+  };
+  facilities: {
+    primaryImage: string;
+    secondaryImage: string;
+    statsNumbers: [number, number, number];
+  };
+  gallery: {
+    items: HomeGalleryItem[];
+  };
+  offers: {
+    cards: HomeOfferCard[];
+  };
+};
+
 const allowedLocales: ContentLocale[] = ['de', 'en', 'tr'];
 const allowedGalleryCategories: HotelGalleryImage['category'][] = ['rooms', 'dining', 'facilities', 'other'];
+const homeSectionKeys: HomeSectionKey[] = ['hero', 'rooms', 'testimonials', 'facilities', 'gallery', 'offers', 'faq'];
+const defaultHomeContent: HomeCmsContent = {
+  sections: {
+    hero: { enabled: true, order: 1 },
+    rooms: { enabled: true, order: 2 },
+    testimonials: { enabled: true, order: 3 },
+    facilities: { enabled: true, order: 4 },
+    gallery: { enabled: true, order: 5 },
+    offers: { enabled: true, order: 6 },
+    faq: { enabled: true, order: 7 },
+  },
+  hero: {
+    titleLead: 'In Stuttgart,',
+    titleHighlight: 'live, stay, and work',
+    titleTail: 'in one place',
+    description:
+      '256 apartments across 3 locations: 1-3 rooms, fully furnished, and ideal for short or long stays. Smart TV, fast Wi-Fi, and fully equipped kitchens for a comfortable experience.',
+    ctaLocations: 'See Locations',
+    ctaLocationsHref: '/hotels',
+    ctaQuote: 'Request a Quote Now',
+    ctaQuoteHref: '/contact',
+    slides: [
+      { image: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6821-Bearbeitet.jpg', position: 'center 13%' },
+      { image: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6699.jpg', position: 'center 45%' },
+      { image: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6709.jpg', position: 'center 35%' },
+      { image: '/images/Europaplatz_Fotos/_DSC6714.jpg', position: 'center 35%' },
+    ],
+  },
+  rooms: {
+    subtitle: 'Meri Boarding Amenities',
+    title: 'Apartment Amenities',
+    description: 'Fully furnished apartments with thoughtful details for everyday living, work, and family stays.',
+    allAmenities: 'View all amenities',
+    allAmenitiesHref: '/amenities',
+    request: 'Request availability',
+    requestHref: '/contact',
+    cards: [
+      {
+        title: 'Card 1',
+        icon: 'fa fa-home',
+        image: '/images/placeholders/room.svg',
+        description: 'Card description',
+        highlights: [],
+      },
+      {
+        title: 'Card 2',
+        icon: 'fa fa-home',
+        image: '/images/placeholders/room.svg',
+        description: 'Card description',
+        highlights: [],
+      },
+      {
+        title: 'Card 3',
+        icon: 'fa fa-home',
+        image: '/images/placeholders/room.svg',
+        description: 'Card description',
+        highlights: [],
+      },
+      {
+        title: 'Card 4',
+        icon: 'fa fa-home',
+        image: '/images/placeholders/room.svg',
+        description: 'Card description',
+        highlights: [],
+      },
+    ],
+  },
+  testimonials: {
+    apartmentsCount: 256,
+    backgroundImage: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6629.jpg',
+  },
+  facilities: {
+    primaryImage: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6629.jpg',
+    secondaryImage: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6639.jpg',
+    statsNumbers: [256, 3, 3],
+  },
+  gallery: {
+    items: [
+      { image: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6699.jpg', category: 'rooms', alt: '' },
+      { image: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6844.jpg', category: 'dining', alt: '' },
+      { image: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6861.jpg', category: 'facilities', alt: '' },
+      { image: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6754.jpg', category: 'rooms', alt: '' },
+      { image: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6856-Bearbeitet.jpg', category: 'dining', alt: '' },
+      { image: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6821-Bearbeitet.jpg', category: 'rooms', alt: '' },
+      { image: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6716.jpg', category: 'facilities', alt: '' },
+      { image: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6744.jpg', category: 'rooms', alt: '' },
+      { image: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6709.jpg', category: 'facilities', alt: '' },
+      { image: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6756.jpg', category: 'rooms', alt: '' },
+      { image: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6846.jpg', category: 'dining', alt: '' },
+      { image: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6726.jpg', category: 'facilities', alt: '' },
+    ],
+  },
+  offers: {
+    cards: [
+      { image: '/images/Europaplatz_Fotos/_DSC6629.jpg' },
+      { image: '/images/Europaplatz_Fotos/_DSC6634.jpg' },
+      { image: '/images/Europaplatz_Fotos/_DSC6639.jpg' },
+    ],
+  },
+};
 const defaultHeaderContent: Record<ContentLocale, HeaderContent> = {
   de: {
     home: 'Startseite',
@@ -170,8 +339,10 @@ const server = Fastify({
 });
 
 let mongoClient: MongoClient | null = null;
+const homeFallbackCache: Partial<Record<ContentLocale, HomeCmsContent>> = {};
 const avatarUploadDir = path.resolve(process.cwd(), 'uploads', 'avatars');
 const hotelUploadDir = path.resolve(process.cwd(), 'uploads', 'hotels');
+const homeUploadDir = path.resolve(process.cwd(), 'uploads', 'home');
 const defaultAvatarPath = '/images/avatars/user-silhouette.svg';
 
 function hashPassword(password: string) {
@@ -335,6 +506,212 @@ function parseGalleryCategory(input?: string): HotelGalleryImage['category'] {
     : 'other';
 }
 
+function parseHomeGalleryCategory(input?: string): HomeGalleryItem['category'] {
+  const normalized = String(input || '').trim().toLowerCase();
+  return normalized === 'rooms' || normalized === 'dining' || normalized === 'facilities'
+    ? (normalized as HomeGalleryItem['category'])
+    : 'rooms';
+}
+
+function isValidBackgroundPosition(input: string) {
+  const value = String(input || '').trim();
+  if (!value) return false;
+  if (value.length > 48) return false;
+  const partRegex = /^(left|center|right|top|bottom|\d{1,3}%|\d{1,4}px)$/i;
+  const parts = value.split(/\s+/).filter(Boolean);
+  if (parts.length < 1 || parts.length > 2) return false;
+  return parts.every((part) => partRegex.test(part));
+}
+
+function isValidLink(input: string) {
+  const value = String(input || '').trim();
+  if (!value || value.length > 400) return false;
+  if (value.startsWith('/')) return true;
+  return /^https?:\/\//i.test(value);
+}
+
+const genericRoomsCardTitleByLocale: Record<ContentLocale, string> = {
+  en: 'Card',
+  de: 'Karte',
+  tr: 'Kart',
+};
+
+const genericRoomsCardDescriptionByLocale: Record<ContentLocale, string> = {
+  en: 'Update this card title and description from admin panel.',
+  de: 'Aktualisieren Sie Titel und Beschreibung dieser Karte im Admin-Panel.',
+  tr: 'Bu kartin basligini ve aciklamasini admin panelden guncelleyin.',
+};
+
+function getLocalizedGenericRoomsCards(locale: ContentLocale): HomeCmsContent['rooms']['cards'] {
+  const baseImages = [
+    '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6699.jpg',
+    '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6744.jpg',
+    '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6754.jpg',
+    '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6756.jpg',
+  ];
+
+  return baseImages.map((image, index) => ({
+    title: `${genericRoomsCardTitleByLocale[locale]} ${index + 1}`,
+    icon: 'fa fa-home',
+    image,
+    description: genericRoomsCardDescriptionByLocale[locale],
+    highlights: [],
+  }));
+}
+
+function normalizeHomeContent(input: Partial<HomeCmsContent> | undefined, fallback: HomeCmsContent): HomeCmsContent {
+  const fallbackSections = fallback.sections || defaultHomeContent.sections;
+  const sections = homeSectionKeys.reduce((acc, key) => {
+    acc[key] = {
+      enabled: Boolean(input?.sections?.[key]?.enabled ?? fallbackSections[key]?.enabled ?? true),
+      order: Number(input?.sections?.[key]?.order) || Number(fallbackSections[key]?.order) || homeSectionKeys.indexOf(key) + 1,
+    };
+    return acc;
+  }, {} as Record<HomeSectionKey, HomeSectionState>);
+
+  const heroSlidesSource = Array.isArray(input?.hero?.slides) ? input?.hero?.slides : fallback.hero.slides;
+  const gallerySource = Array.isArray(input?.gallery?.items) ? input?.gallery?.items : fallback.gallery.items;
+  const offersSource = Array.isArray(input?.offers?.cards) ? input?.offers?.cards : fallback.offers.cards;
+  const statsSource = Array.isArray(input?.facilities?.statsNumbers) ? input?.facilities?.statsNumbers : fallback.facilities.statsNumbers;
+
+  const statsNumbers: [number, number, number] = [
+    Number(statsSource[0]) || fallback.facilities.statsNumbers[0],
+    Number(statsSource[1]) || fallback.facilities.statsNumbers[1],
+    Number(statsSource[2]) || fallback.facilities.statsNumbers[2],
+  ];
+
+  return {
+    sections,
+    hero: {
+      titleLead: String(input?.hero?.titleLead ?? fallback.hero.titleLead ?? '').trim(),
+      titleHighlight: String(input?.hero?.titleHighlight ?? fallback.hero.titleHighlight ?? '').trim(),
+      titleTail: String(input?.hero?.titleTail ?? fallback.hero.titleTail ?? '').trim(),
+      description: String(input?.hero?.description ?? fallback.hero.description ?? '').trim(),
+      ctaLocations: String(input?.hero?.ctaLocations ?? fallback.hero.ctaLocations ?? '').trim(),
+      ctaLocationsHref: String(input?.hero?.ctaLocationsHref ?? fallback.hero.ctaLocationsHref ?? '').trim(),
+      ctaQuote: String(input?.hero?.ctaQuote ?? fallback.hero.ctaQuote ?? '').trim(),
+      ctaQuoteHref: String(input?.hero?.ctaQuoteHref ?? fallback.hero.ctaQuoteHref ?? '').trim(),
+      slides: heroSlidesSource
+        .map((item) => ({
+          image: String(item?.image || '').trim(),
+          position: String(item?.position || 'center center').trim() || 'center center',
+        }))
+        .filter((item) => Boolean(item.image)),
+    },
+    rooms: {
+      subtitle: String(input?.rooms?.subtitle ?? fallback.rooms.subtitle ?? '').trim(),
+      title: String(input?.rooms?.title ?? fallback.rooms.title ?? '').trim(),
+      description: String(input?.rooms?.description ?? fallback.rooms.description ?? '').trim(),
+      allAmenities: String(input?.rooms?.allAmenities ?? fallback.rooms.allAmenities ?? '').trim(),
+      allAmenitiesHref: String(input?.rooms?.allAmenitiesHref ?? fallback.rooms.allAmenitiesHref ?? '').trim(),
+      request: String(input?.rooms?.request ?? fallback.rooms.request ?? '').trim(),
+      requestHref: String(input?.rooms?.requestHref ?? fallback.rooms.requestHref ?? '').trim(),
+      cards: (Array.isArray(input?.rooms?.cards) ? input?.rooms?.cards : fallback.rooms.cards)
+        .map((item) => {
+          return {
+            title: String(item?.title || '').trim(),
+            icon: String(item?.icon || '').trim() || 'fa fa-home',
+            image: String(item?.image || '').trim(),
+            description: String(item?.description || '').trim(),
+            highlights: Array.isArray(item?.highlights)
+              ? item.highlights.map((v) => String(v || '').trim()).filter(Boolean)
+              : [],
+          };
+        })
+        .filter((item) => Boolean(item.title) || Boolean(item.image) || Boolean(item.description)),
+    },
+    testimonials: {
+      apartmentsCount: Number(input?.testimonials?.apartmentsCount) || Number(fallback.testimonials.apartmentsCount) || 256,
+      backgroundImage: String(input?.testimonials?.backgroundImage ?? fallback.testimonials.backgroundImage ?? '').trim(),
+    },
+    facilities: {
+      primaryImage: String(input?.facilities?.primaryImage ?? fallback.facilities.primaryImage ?? '').trim(),
+      secondaryImage: String(input?.facilities?.secondaryImage ?? fallback.facilities.secondaryImage ?? '').trim(),
+      statsNumbers,
+    },
+    gallery: {
+      items: gallerySource
+        .map((item) => ({
+          image: String(item?.image || '').trim(),
+          category: parseHomeGalleryCategory(item?.category),
+          alt: String(item?.alt || '').trim(),
+        }))
+        .filter((item) => Boolean(item.image)),
+    },
+    offers: {
+      cards: offersSource
+        .map((item) => ({ image: String(item?.image || '').trim() }))
+        .filter((item) => Boolean(item.image)),
+    },
+  };
+}
+
+function validateHomeContent(input: HomeCmsContent) {
+  if (!input.hero.titleLead || !input.hero.titleHighlight || !input.hero.titleTail) {
+    return 'Hero title fields are required';
+  }
+  if (!input.hero.description || !input.hero.ctaLocations || !input.hero.ctaQuote) {
+    return 'Hero description and CTA fields are required';
+  }
+  if (!input.hero.ctaLocationsHref || !input.hero.ctaQuoteHref) {
+    return 'Hero CTA link fields are required';
+  }
+  if (!isValidLink(input.hero.ctaLocationsHref) || !isValidLink(input.hero.ctaQuoteHref)) {
+    return 'Hero CTA links must start with "/" or "http(s)://"';
+  }
+  if (input.hero.slides.length < 1) {
+    return 'At least one hero slide is required';
+  }
+  if (input.hero.slides.length > 8) {
+    return 'Hero slide limit is 8';
+  }
+  for (const slide of input.hero.slides) {
+    if (!slide.image) return 'Hero slide image is required';
+    if (!isValidBackgroundPosition(slide.position)) {
+      return 'Hero slide position is invalid. Example: "center 35%"';
+    }
+  }
+
+  if (!input.rooms.subtitle || !input.rooms.title || !input.rooms.description) {
+    return 'Rooms section title/description fields are required';
+  }
+  if (!input.rooms.allAmenities || !input.rooms.request) {
+    return 'Rooms CTA text fields are required';
+  }
+  if (!input.rooms.allAmenitiesHref || !input.rooms.requestHref) {
+    return 'Rooms CTA link fields are required';
+  }
+  if (!isValidLink(input.rooms.allAmenitiesHref) || !isValidLink(input.rooms.requestHref)) {
+    return 'Rooms CTA links must start with "/" or "http(s)://"';
+  }
+  if (!Array.isArray(input.rooms.cards) || input.rooms.cards.length < 1) {
+    return 'Rooms cards are required (at least 1)';
+  }
+  if (input.rooms.cards.length > 8) {
+    return 'Rooms card limit is 8';
+  }
+  for (const [index, card] of input.rooms.cards.entries()) {
+    if (!card.title || !card.image || !card.description) {
+      return `Rooms card ${index + 1}: title, image and description are required`;
+    }
+  }
+  return null;
+}
+
+function mergeRoomsCardsWithSharedMedia(
+  cards: HomeCmsContent['rooms']['cards'],
+  sharedMediaCards: HomeCmsContent['rooms']['cards'],
+) {
+  return cards.map((card, index) => {
+    const shared = sharedMediaCards[index];
+    return {
+      ...card,
+      icon: String(shared?.icon || card.icon || 'fa fa-home').trim() || 'fa fa-home',
+      image: String(shared?.image || card.image || '').trim(),
+    };
+  });
+}
+
 function normalizeHotelFact(input: unknown): HotelFact {
   if (typeof input === 'string') {
     return { text: input.trim(), icon: 'fa fa-check' };
@@ -448,6 +825,7 @@ function normalizeHotelLocaleContent(
       .map((item, index) => ({
         id: String(item?.id || '').trim() || randomBytes(12).toString('hex'),
         url: String(item?.url || '').trim(),
+        thumbnailUrl: String(item?.thumbnailUrl || '').trim(),
         category: parseGalleryCategory(item?.category),
         alt: String(item?.alt || '').trim(),
         sortOrder: Number.isFinite(item?.sortOrder) ? Number(item?.sortOrder) : index + 1,
@@ -475,6 +853,125 @@ async function getHeaderContent(locale: ContentLocale) {
     {
       $set: { value: fallback, updatedAt: now },
       $setOnInsert: { _id: new ObjectId(), key: 'shared.header', locale, createdAt: now },
+    },
+    { upsert: true },
+  );
+
+  return fallback;
+}
+
+async function getLocalizedDefaultHomeContent(locale: ContentLocale): Promise<HomeCmsContent> {
+  if (homeFallbackCache[locale]) {
+    return JSON.parse(JSON.stringify(homeFallbackCache[locale])) as HomeCmsContent;
+  }
+
+  const fallback = JSON.parse(JSON.stringify(defaultHomeContent)) as HomeCmsContent;
+  const localePath = path.resolve(process.cwd(), '..', 'meri-boarding-public-fe', 'src', 'i18n', 'locales', `${locale}.json`);
+  fallback.rooms.cards = getLocalizedGenericRoomsCards(locale);
+
+  try {
+    const raw = await readFile(localePath, 'utf8');
+    const parsed = JSON.parse(raw) as { hero?: Record<string, unknown>; rooms?: Record<string, unknown> };
+    const hero = parsed?.hero || {};
+    const rooms = parsed?.rooms || {};
+    fallback.hero.titleLead = String(hero.titleLead ?? fallback.hero.titleLead).trim();
+    fallback.hero.titleHighlight = String(hero.titleHighlight ?? fallback.hero.titleHighlight).trim();
+    fallback.hero.titleTail = String(hero.titleTail ?? fallback.hero.titleTail).trim();
+    fallback.hero.description = String(hero.description ?? fallback.hero.description).trim();
+    fallback.hero.ctaLocations = String(hero.ctaLocations ?? fallback.hero.ctaLocations).trim();
+    fallback.hero.ctaQuote = String(hero.ctaQuote ?? fallback.hero.ctaQuote).trim();
+    fallback.rooms.subtitle = String(rooms.subtitle ?? fallback.rooms.subtitle).trim();
+    fallback.rooms.title = String(rooms.title ?? fallback.rooms.title).trim();
+    fallback.rooms.description = String(rooms.description ?? fallback.rooms.description).trim();
+    fallback.rooms.allAmenities = String(rooms.allAmenities ?? fallback.rooms.allAmenities).trim();
+    fallback.rooms.request = String(rooms.request ?? fallback.rooms.request).trim();
+  } catch {
+    // Keep hardcoded fallback when locale file cannot be read.
+  }
+
+  homeFallbackCache[locale] = fallback;
+  return JSON.parse(JSON.stringify(fallback)) as HomeCmsContent;
+}
+
+async function getHomeContent(locale: ContentLocale) {
+  const db = await getDb();
+  const contents = db.collection<ContentEntry<HomeCmsContent>>('content_entries');
+  await contents.createIndex({ key: 1, locale: 1 }, { unique: true });
+  const localizedFallback = await getLocalizedDefaultHomeContent(locale);
+
+  const content = await contents.findOne({ key: 'page.home', locale });
+  if (content) {
+    let normalized = normalizeHomeContent(content.value, localizedFallback);
+    const hasLegacyEnglishHero =
+      locale !== 'en' &&
+      normalized.hero.titleLead === defaultHomeContent.hero.titleLead &&
+      normalized.hero.titleHighlight === defaultHomeContent.hero.titleHighlight &&
+      normalized.hero.titleTail === defaultHomeContent.hero.titleTail &&
+      normalized.hero.description === defaultHomeContent.hero.description &&
+      normalized.hero.ctaLocations === defaultHomeContent.hero.ctaLocations &&
+      normalized.hero.ctaQuote === defaultHomeContent.hero.ctaQuote;
+
+    if (hasLegacyEnglishHero) {
+      normalized = normalizeHomeContent({ ...normalized, hero: localizedFallback.hero }, normalized);
+      await contents.updateOne(
+        { _id: content._id },
+        { $set: { value: normalized, updatedAt: new Date() } },
+      );
+    }
+
+    const shouldBackfillRooms = !Array.isArray(normalized.rooms.cards) || normalized.rooms.cards.length < 1;
+
+    if (shouldBackfillRooms) {
+      normalized = normalizeHomeContent(
+        {
+          ...normalized,
+          rooms: {
+            ...normalized.rooms,
+            cards: localizedFallback.rooms.cards,
+            subtitle: normalized.rooms.subtitle || localizedFallback.rooms.subtitle,
+            title: normalized.rooms.title || localizedFallback.rooms.title,
+            description: normalized.rooms.description || localizedFallback.rooms.description,
+            allAmenities: normalized.rooms.allAmenities || localizedFallback.rooms.allAmenities,
+            request: normalized.rooms.request || localizedFallback.rooms.request,
+          },
+        },
+        normalized,
+      );
+      await contents.updateOne(
+        { _id: content._id },
+        { $set: { value: normalized, updatedAt: new Date() } },
+      );
+    }
+
+    if (locale === 'en') {
+      return normalized;
+    }
+
+    // Section visibility/order is global across locales, sourced from EN.
+    const enContent = await contents.findOne({ key: 'page.home', locale: 'en' });
+    if (enContent) {
+      const enNormalized = normalizeHomeContent(enContent.value, defaultHomeContent);
+      const mergedCards = mergeRoomsCardsWithSharedMedia(normalized.rooms.cards, enNormalized.rooms.cards);
+      return {
+        ...normalized,
+        sections: enNormalized.sections,
+        rooms: {
+          ...normalized.rooms,
+          cards: mergedCards,
+        },
+      };
+    }
+
+    return normalized;
+  }
+
+  const fallback = localizedFallback;
+  const now = new Date();
+  await contents.updateOne(
+    { key: 'page.home', locale },
+    {
+      $set: { value: fallback, updatedAt: now },
+      $setOnInsert: { _id: new ObjectId(), key: 'page.home', locale, createdAt: now },
     },
     { upsert: true },
   );
@@ -527,6 +1024,12 @@ async function seedSuperAdmin() {
 async function seedHeaderContents() {
   for (const locale of allowedLocales) {
     await getHeaderContent(locale);
+  }
+}
+
+async function seedHomeContents() {
+  for (const locale of allowedLocales) {
+    await getHomeContent(locale);
   }
 }
 
@@ -628,6 +1131,7 @@ async function seedHotels() {
 async function ensureStorageFolders() {
   await mkdir(avatarUploadDir, { recursive: true });
   await mkdir(hotelUploadDir, { recursive: true });
+  await mkdir(homeUploadDir, { recursive: true });
 }
 
 async function getRequestAdmin(authorization?: string) {
@@ -680,6 +1184,13 @@ server.get('/api/v1/public/content/header', async (request, reply) => {
   const locale = parseLocale(query?.locale);
   const content = await getHeaderContent(locale);
   return reply.send({ key: 'shared.header', locale, content });
+});
+
+server.get('/api/v1/public/content/home', async (request, reply) => {
+  const query = request.query as { locale?: string } | undefined;
+  const locale = parseLocale(query?.locale);
+  const content = await getHomeContent(locale);
+  return reply.send({ key: 'page.home', locale, content });
 });
 
 server.get('/api/v1/public/hotels', async (request, reply) => {
@@ -776,6 +1287,24 @@ server.get('/api/v1/assets/hotels/:fileName', async (request, reply) => {
   }
 
   const filePath = path.join(hotelUploadDir, fileName);
+
+  try {
+    await stat(filePath);
+    return reply.type('image/*').send(createReadStream(filePath));
+  } catch {
+    return reply.code(404).send({ error: 'File not found' });
+  }
+});
+
+server.get('/api/v1/assets/home/:fileName', async (request, reply) => {
+  const params = request.params as { fileName?: string };
+  const fileName = sanitizeFilename(String(params.fileName || ''));
+
+  if (!fileName) {
+    return reply.code(404).send({ error: 'File not found' });
+  }
+
+  const filePath = path.join(homeUploadDir, fileName);
 
   try {
     await stat(filePath);
@@ -1342,10 +1871,11 @@ server.post('/api/v1/admin/hotels/:hotelId/gallery', async (request, reply) => {
   }
 
   const body = request.body as
-    | { locale?: ContentLocale; fileName?: string; dataUrl?: string; category?: string; alt?: string }
+    | { locale?: ContentLocale; fileName?: string; dataUrl?: string; thumbnailDataUrl?: string; category?: string; alt?: string }
     | undefined;
   const locale = parseLocale(body?.locale);
   const parsed = parseDataUrl(String(body?.dataUrl || ''));
+  const thumbnailParsed = body?.thumbnailDataUrl ? parseDataUrl(String(body.thumbnailDataUrl || '')) : null;
 
   if (!parsed) {
     return reply.code(400).send({ error: 'Invalid image format. Use PNG, JPG or WEBP data URL.' });
@@ -1353,6 +1883,12 @@ server.post('/api/v1/admin/hotels/:hotelId/gallery', async (request, reply) => {
 
   if (parsed.buffer.length > 8 * 1024 * 1024) {
     return reply.code(400).send({ error: 'Image size cannot exceed 8MB' });
+  }
+  if (body?.thumbnailDataUrl && !thumbnailParsed) {
+    return reply.code(400).send({ error: 'Invalid thumbnail image format. Use PNG, JPG or WEBP data URL.' });
+  }
+  if (thumbnailParsed && thumbnailParsed.buffer.length > 2 * 1024 * 1024) {
+    return reply.code(400).send({ error: 'Thumbnail size cannot exceed 2MB' });
   }
 
   const db = await getDb();
@@ -1366,11 +1902,19 @@ server.post('/api/v1/admin/hotels/:hotelId/gallery', async (request, reply) => {
   const fileName = `${row.slug}-${Date.now()}-${requestedName}`.replace(/\.+/g, '.');
   const filePath = path.join(hotelUploadDir, fileName);
   await writeFile(filePath, parsed.buffer);
+  let thumbnailUrl = '';
+  if (thumbnailParsed) {
+    const thumbName = `${row.slug}-${Date.now()}-thumb-${requestedName}`.replace(/\.+/g, '.');
+    const thumbPath = path.join(hotelUploadDir, thumbName);
+    await writeFile(thumbPath, thumbnailParsed.buffer);
+    thumbnailUrl = `/api/v1/assets/hotels/${thumbName}`;
+  }
 
   const current = normalizeHotelLocaleContent('en', row.locales?.en, row.locales?.[locale]);
   const image: HotelGalleryImage = {
     id: randomBytes(12).toString('hex'),
     url: `/api/v1/assets/hotels/${fileName}`,
+    thumbnailUrl: thumbnailUrl || `/api/v1/assets/hotels/${fileName}`,
     category: parseGalleryCategory(body?.category),
     alt: String(body?.alt || `${current.name} image`).trim(),
     sortOrder: current.gallery.length + 1,
@@ -1504,6 +2048,11 @@ server.delete('/api/v1/admin/hotels/:hotelId/gallery/:imageId', async (request, 
     const filePath = path.join(hotelUploadDir, sanitizeFilename(localFile));
     await unlink(filePath).catch(() => undefined);
   }
+  const localThumb = String(target.thumbnailUrl || '').split('/api/v1/assets/hotels/')[1];
+  if (localThumb && localThumb !== localFile) {
+    const thumbPath = path.join(hotelUploadDir, sanitizeFilename(localThumb));
+    await unlink(thumbPath).catch(() => undefined);
+  }
 
   return reply.send({ ok: true });
 });
@@ -1561,6 +2110,171 @@ server.put('/api/v1/admin/content/header', async (request, reply) => {
   return reply.send({ ok: true, locale, content: nextContent });
 });
 
+server.get('/api/v1/admin/content/home', async (request, reply) => {
+  const admin = await getRequestAdmin(request.headers.authorization);
+  if (!admin || (admin.role !== 'super_admin' && admin.role !== 'moderator')) {
+    return reply.code(403).send({ error: 'Only super_admin or moderator can access this route' });
+  }
+
+  const query = request.query as { locale?: string } | undefined;
+  const locale = parseLocale(query?.locale);
+  const content = await getHomeContent(locale);
+
+  return reply.send({ key: 'page.home', locale, content });
+});
+
+server.put('/api/v1/admin/content/home', async (request, reply) => {
+  const admin = await getRequestAdmin(request.headers.authorization);
+  if (!admin || (admin.role !== 'super_admin' && admin.role !== 'moderator')) {
+    return reply.code(403).send({ error: 'Only super_admin or moderator can update this route' });
+  }
+
+  const body = request.body as { locale?: string; content?: Partial<HomeCmsContent> } | undefined;
+  const locale = parseLocale(body?.locale);
+
+  const db = await getDb();
+  const contents = db.collection<ContentEntry<HomeCmsContent>>('content_entries');
+  await contents.createIndex({ key: 1, locale: 1 }, { unique: true });
+  const existing = await contents.findOne({ key: 'page.home', locale });
+  const fallbackContent = existing ? normalizeHomeContent(existing.value, defaultHomeContent) : defaultHomeContent;
+  const nextContent = normalizeHomeContent(body?.content, fallbackContent);
+  const validationError = validateHomeContent(nextContent);
+  if (validationError) {
+    return reply.code(400).send({ error: validationError });
+  }
+
+  const now = new Date();
+  await contents.updateOne(
+    { key: 'page.home', locale },
+    {
+      $set: {
+        value: nextContent,
+        updatedAt: now,
+        updatedBy: admin._id,
+      },
+      $setOnInsert: {
+        _id: new ObjectId(),
+        key: 'page.home',
+        locale,
+        createdAt: now,
+      },
+    },
+    { upsert: true },
+  );
+
+  // Keep sections shared for all locales.
+  if (body?.content?.sections) {
+    for (const localeKey of allowedLocales) {
+      if (localeKey === locale) continue;
+      const row = await contents.findOne({ key: 'page.home', locale: localeKey });
+      const current = row ? normalizeHomeContent(row.value, defaultHomeContent) : defaultHomeContent;
+      const patched = normalizeHomeContent({ ...current, sections: nextContent.sections }, current);
+      await contents.updateOne(
+        { key: 'page.home', locale: localeKey },
+        {
+          $set: {
+            value: patched,
+            updatedAt: now,
+            updatedBy: admin._id,
+          },
+          $setOnInsert: {
+            _id: new ObjectId(),
+            key: 'page.home',
+            locale: localeKey,
+            createdAt: now,
+          },
+        },
+        { upsert: true },
+      );
+    }
+  }
+
+  // Keep rooms card image + icon shared for all locales.
+  if (body?.content?.rooms?.cards) {
+    for (const localeKey of allowedLocales) {
+      if (localeKey === locale) continue;
+      const row = await contents.findOne({ key: 'page.home', locale: localeKey });
+      const current = row ? normalizeHomeContent(row.value, defaultHomeContent) : defaultHomeContent;
+      const mergedCards = mergeRoomsCardsWithSharedMedia(current.rooms.cards, nextContent.rooms.cards);
+      const patched = normalizeHomeContent(
+        {
+          ...current,
+          rooms: {
+            ...current.rooms,
+            cards: mergedCards,
+          },
+        },
+        current,
+      );
+      await contents.updateOne(
+        { key: 'page.home', locale: localeKey },
+        {
+          $set: {
+            value: patched,
+            updatedAt: now,
+            updatedBy: admin._id,
+          },
+          $setOnInsert: {
+            _id: new ObjectId(),
+            key: 'page.home',
+            locale: localeKey,
+            createdAt: now,
+          },
+        },
+        { upsert: true },
+      );
+    }
+  }
+
+  return reply.send({ ok: true, locale, content: nextContent });
+});
+
+server.post('/api/v1/admin/content/home/hero-image', async (request, reply) => {
+  const admin = await getRequestAdmin(request.headers.authorization);
+  if (!admin || (admin.role !== 'super_admin' && admin.role !== 'moderator')) {
+    return reply.code(403).send({ error: 'Only super_admin or moderator can upload hero images' });
+  }
+
+  const body = request.body as { fileName?: string; dataUrl?: string } | undefined;
+  const parsed = parseDataUrl(String(body?.dataUrl || ''));
+  if (!parsed) {
+    return reply.code(400).send({ error: 'Invalid image format. Use PNG, JPG or WEBP data URL.' });
+  }
+  if (parsed.buffer.length > 8 * 1024 * 1024) {
+    return reply.code(400).send({ error: 'Image size cannot exceed 8MB' });
+  }
+
+  const requestedName = sanitizeFilename(String(body?.fileName || `home-hero-${Date.now()}.${parsed.ext}`));
+  const fileName = `home-hero-${Date.now()}-${requestedName}`.replace(/\.+/g, '.');
+  const filePath = path.join(homeUploadDir, fileName);
+  await writeFile(filePath, parsed.buffer);
+
+  return reply.send({ ok: true, imageUrl: `/api/v1/assets/home/${fileName}` });
+});
+
+server.post('/api/v1/admin/content/home/rooms-image', async (request, reply) => {
+  const admin = await getRequestAdmin(request.headers.authorization);
+  if (!admin || (admin.role !== 'super_admin' && admin.role !== 'moderator')) {
+    return reply.code(403).send({ error: 'Only super_admin or moderator can upload rooms images' });
+  }
+
+  const body = request.body as { fileName?: string; dataUrl?: string } | undefined;
+  const parsed = parseDataUrl(String(body?.dataUrl || ''));
+  if (!parsed) {
+    return reply.code(400).send({ error: 'Invalid image format. Use PNG, JPG or WEBP data URL.' });
+  }
+  if (parsed.buffer.length > 8 * 1024 * 1024) {
+    return reply.code(400).send({ error: 'Image size cannot exceed 8MB' });
+  }
+
+  const requestedName = sanitizeFilename(String(body?.fileName || `home-rooms-${Date.now()}.${parsed.ext}`));
+  const fileName = `home-rooms-${Date.now()}-${requestedName}`.replace(/\.+/g, '.');
+  const filePath = path.join(homeUploadDir, fileName);
+  await writeFile(filePath, parsed.buffer);
+
+  return reply.send({ ok: true, imageUrl: `/api/v1/assets/home/${fileName}` });
+});
+
 server.post('/api/v1/admin/users', async (request, reply) => {
   const currentAdmin = await getRequestAdmin(request.headers.authorization);
 
@@ -1611,6 +2325,7 @@ const start = async () => {
     await ensureStorageFolders();
     await seedSuperAdmin();
     await seedHeaderContents();
+    await seedHomeContents();
     if (seedHotelsOnStart) {
       await seedHotels();
       server.log.info('Default hotels seed completed (SEED_HOTELS_ON_START=true).');
