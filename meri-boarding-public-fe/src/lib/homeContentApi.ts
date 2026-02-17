@@ -35,17 +35,37 @@ type CmsHomeContent = {
   testimonials?: {
     apartmentsCount?: number
     backgroundImage?: string
+    apartments?: string
+    locations?: string
+    slides?: Array<{ badge?: string; text?: string }>
   }
   facilities?: {
+    subtitle?: string
+    title?: string
+    description?: string
+    stats?: Array<{ label?: string; suffix?: string }>
     primaryImage?: string
     secondaryImage?: string
     statsNumbers?: [number, number, number]
   }
   gallery?: {
-    items?: Array<{ image?: string; category?: 'rooms' | 'dining' | 'facilities'; alt?: string }>
+    subtitle?: string
+    title?: string
+    description?: string
+    view?: string
+    categories?: Array<{ key?: string; label?: string }>
+    items?: Array<{ image?: string; category?: string; alt?: string }>
   }
   offers?: {
-    cards?: Array<{ image?: string }>
+    subtitle?: string
+    title?: string
+    cards?: Array<{ id?: string; badge?: string; title?: string; text?: string; image?: string }>
+  }
+  faq?: {
+    subtitle?: string
+    title?: string
+    cta?: string
+    items?: Array<{ title?: string; body?: string }>
   }
 }
 
@@ -70,48 +90,39 @@ export type HomeResolvedContent = {
   testimonials: ReturnType<typeof getMessages>['testimonials'] & {
     apartmentsCount: number
     backgroundImage: string
+    apartments: string
+    locations: string
+    slides: Array<{ badge: string; text: string }>
   }
   facilities: ReturnType<typeof getMessages>['facilities'] & {
+    subtitle: string
+    title: string
+    description: string
+    stats: Array<{ label: string; suffix: string }>
     primaryImage: string
     secondaryImage: string
     statsNumbers: [number, number, number]
   }
   gallery: ReturnType<typeof getMessages>['gallery'] & {
-    items: Array<{ image: string; category: 'rooms' | 'dining' | 'facilities'; alt: string }>
+    subtitle: string
+    title: string
+    description: string
+    view: string
+    categories: Array<{ key: string; label: string }>
+    items: Array<{ image: string; category: string; alt: string }>
   }
-  offers: ReturnType<typeof getMessages>['offers'] & {
-    cards: Array<ReturnType<typeof getMessages>['offers']['cards'][number] & { image: string }>
+  offers: {
+    subtitle: string
+    title: string
+    cards: Array<{ id: string; badge: string; title: string; text: string; image: string }>
   }
-  faq: ReturnType<typeof getMessages>['faq']
+  faq: {
+    subtitle: string
+    title: string
+    cta: string
+    items: Array<{ title: string; body: string }>
+  }
 }
-
-const defaultSlides = [
-  { image: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6821-Bearbeitet.jpg', position: 'center 13%' },
-  { image: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6699.jpg', position: 'center 45%' },
-  { image: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6709.jpg', position: 'center 35%' },
-  { image: '/images/Europaplatz_Fotos/_DSC6714.jpg', position: 'center 35%' }
-] as const
-
-const defaultGalleryItems = [
-  { image: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6699.jpg', category: 'rooms', alt: '' },
-  { image: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6844.jpg', category: 'dining', alt: '' },
-  { image: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6861.jpg', category: 'facilities', alt: '' },
-  { image: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6754.jpg', category: 'rooms', alt: '' },
-  { image: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6856-Bearbeitet.jpg', category: 'dining', alt: '' },
-  { image: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6821-Bearbeitet.jpg', category: 'rooms', alt: '' },
-  { image: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6716.jpg', category: 'facilities', alt: '' },
-  { image: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6744.jpg', category: 'rooms', alt: '' },
-  { image: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6709.jpg', category: 'facilities', alt: '' },
-  { image: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6756.jpg', category: 'rooms', alt: '' },
-  { image: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6846.jpg', category: 'dining', alt: '' },
-  { image: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6726.jpg', category: 'facilities', alt: '' }
-] as const
-
-const defaultOfferImages = [
-  '/images/Europaplatz_Fotos/_DSC6629.jpg',
-  '/images/Europaplatz_Fotos/_DSC6634.jpg',
-  '/images/Europaplatz_Fotos/_DSC6639.jpg'
-] as const
 
 const sectionKeys: SectionKey[] = ['hero', 'rooms', 'testimonials', 'facilities', 'gallery', 'offers', 'faq']
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? process.env.API_BASE_URL ?? 'http://localhost:4000'
@@ -124,9 +135,14 @@ function withApiBaseIfNeeded(url: string) {
   return `${normalizedApiBaseUrl}${value}`
 }
 
-function toSafeCategory(input?: string): 'rooms' | 'dining' | 'facilities' {
-  if (input === 'rooms' || input === 'dining' || input === 'facilities') return input
-  return 'rooms'
+function sanitizeCategoryKey(input?: string): string {
+  const normalized = String(input || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 32)
+  return normalized || 'general'
 }
 
 function resolveContent(locale: Locale, cms?: CmsHomeContent): HomeResolvedContent {
@@ -143,7 +159,7 @@ function resolveContent(locale: Locale, cms?: CmsHomeContent): HomeResolvedConte
     {} as Record<SectionKey, { enabled: boolean; order: number }>
   )
 
-  const slidesSource = Array.isArray(cms?.hero?.slides) ? cms.hero.slides : defaultSlides
+  const slidesSource = Array.isArray(cms?.hero?.slides) ? cms.hero.slides : []
   const slides = slidesSource
     .map(item => ({
       image: withApiBaseIfNeeded(String(item?.image || '').trim()),
@@ -151,50 +167,67 @@ function resolveContent(locale: Locale, cms?: CmsHomeContent): HomeResolvedConte
     }))
     .filter(item => Boolean(item.image))
 
-  const gallerySource = Array.isArray(cms?.gallery?.items) ? cms.gallery.items : defaultGalleryItems
+  const galleryCategorySource = Array.isArray(cms?.gallery?.categories) ? cms.gallery.categories : []
+  const galleryCategories = galleryCategorySource
+    .map(item => ({
+      key: sanitizeCategoryKey(item?.key),
+      label: String(item?.label || '').trim()
+    }))
+    .filter(item => Boolean(item.key) && Boolean(item.label))
+  const safeGalleryCategories = galleryCategories.length > 0 ? galleryCategories : []
+  const defaultCategoryKey = safeGalleryCategories[0]?.key || 'general'
+
+  const gallerySource = Array.isArray(cms?.gallery?.items) ? cms.gallery.items : []
   const galleryItems = gallerySource
     .map(item => ({
       image: withApiBaseIfNeeded(String(item?.image || '').trim()),
-      category: toSafeCategory(item?.category),
+      category: sanitizeCategoryKey(item?.category),
       alt: String(item?.alt || '').trim()
+    }))
+    .map(item => ({
+      ...item,
+      category: safeGalleryCategories.some(category => category.key === item.category) ? item.category : defaultCategoryKey
     }))
     .filter(item => Boolean(item.image))
 
-  const offerCards = (messages.offers.cards || []).map((card, index) => ({
-    ...card,
-    image: withApiBaseIfNeeded(String(cms?.offers?.cards?.[index]?.image || defaultOfferImages[index] || defaultOfferImages[0]))
-  }))
+  const offerSource = Array.isArray(cms?.offers?.cards) ? cms?.offers?.cards : []
+  const offerCards = offerSource
+    .map((item, index) => ({
+      id: String(item?.id || `offer-${index + 1}`).trim() || `offer-${index + 1}`,
+      badge: String(item?.badge || '').trim(),
+      title: String(item?.title || '').trim(),
+      text: String(item?.text || '').trim(),
+      image: withApiBaseIfNeeded(String(item?.image || ''))
+    }))
+    .filter(item => Boolean(item.title) || Boolean(item.text) || Boolean(item.image))
+    .slice(0, 4)
 
-  const statsNumbers = Array.isArray(cms?.facilities?.statsNumbers) ? cms.facilities.statsNumbers : [256, 3, 3]
+  const statsNumbers = Array.isArray(cms?.facilities?.statsNumbers) ? cms.facilities.statsNumbers : [0, 0, 0]
 
   return {
     sections,
     hero: {
       ...messages.hero,
-      titleLead: String(cms?.hero?.titleLead || messages.hero.titleLead),
-      titleHighlight: String(cms?.hero?.titleHighlight || messages.hero.titleHighlight),
-      titleTail: String(cms?.hero?.titleTail || messages.hero.titleTail),
-      description: String(cms?.hero?.description || messages.hero.description),
-      ctaLocations: String(cms?.hero?.ctaLocations || messages.hero.ctaLocations),
+      titleLead: String(cms?.hero?.titleLead || ''),
+      titleHighlight: String(cms?.hero?.titleHighlight || ''),
+      titleTail: String(cms?.hero?.titleTail || ''),
+      description: String(cms?.hero?.description || ''),
+      ctaLocations: String(cms?.hero?.ctaLocations || ''),
       ctaLocationsHref: String(cms?.hero?.ctaLocationsHref || '/hotels'),
-      ctaQuote: String(cms?.hero?.ctaQuote || messages.hero.ctaQuote),
+      ctaQuote: String(cms?.hero?.ctaQuote || ''),
       ctaQuoteHref: String(cms?.hero?.ctaQuoteHref || '/contact'),
-      slides: slides.length > 0 ? slides : [...defaultSlides]
+      slides
     },
     rooms: {
       ...messages.rooms,
-      subtitle: String(cms?.rooms?.subtitle || messages.rooms.subtitle),
-      title: String(cms?.rooms?.title || messages.rooms.title),
-      description: String(cms?.rooms?.description || messages.rooms.description),
-      allAmenities: String(cms?.rooms?.allAmenities || messages.rooms.allAmenities),
+      subtitle: String(cms?.rooms?.subtitle || ''),
+      title: String(cms?.rooms?.title || ''),
+      description: String(cms?.rooms?.description || ''),
+      allAmenities: String(cms?.rooms?.allAmenities || ''),
       allAmenitiesHref: String(cms?.rooms?.allAmenitiesHref || '/amenities'),
-      request: String(cms?.rooms?.request || messages.rooms.request),
+      request: String(cms?.rooms?.request || ''),
       requestHref: String(cms?.rooms?.requestHref || '/contact'),
-      cards: (
-        Array.isArray(cms?.rooms?.cards) && cms?.rooms?.cards.length > 0
-          ? cms?.rooms?.cards
-          : (messages as unknown as { amenitiesData?: { cards?: Array<Record<string, unknown>> } }).amenitiesData?.cards || []
-      )
+      cards: (Array.isArray(cms?.rooms?.cards) ? cms?.rooms?.cards : [])
         .slice(0, 8)
         .map(item => ({
           title: String(item?.title || '').trim(),
@@ -207,45 +240,79 @@ function resolveContent(locale: Locale, cms?: CmsHomeContent): HomeResolvedConte
     },
     testimonials: {
       ...messages.testimonials,
-      apartmentsCount: Number(cms?.testimonials?.apartmentsCount) || 256,
-      backgroundImage: withApiBaseIfNeeded(
-        String(cms?.testimonials?.backgroundImage || '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6629.jpg')
-      )
+      apartmentsCount: Number(cms?.testimonials?.apartmentsCount) || 0,
+      backgroundImage: withApiBaseIfNeeded(String(cms?.testimonials?.backgroundImage || '')),
+      apartments: String(cms?.testimonials?.apartments || ''),
+      locations: String(cms?.testimonials?.locations || ''),
+      slides: (Array.isArray(cms?.testimonials?.slides) ? cms?.testimonials?.slides : [])
+        .map(item => ({
+          badge: String(item?.badge || '').trim(),
+          text: String(item?.text || '').trim()
+        }))
+        .filter(item => Boolean(item.badge) && Boolean(item.text))
+        .slice(0, 8)
     },
     facilities: {
       ...messages.facilities,
-      primaryImage: withApiBaseIfNeeded(String(cms?.facilities?.primaryImage || '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6629.jpg')),
-      secondaryImage: withApiBaseIfNeeded(String(cms?.facilities?.secondaryImage || '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6639.jpg')),
+      subtitle: String(cms?.facilities?.subtitle || ''),
+      title: String(cms?.facilities?.title || ''),
+      description: String(cms?.facilities?.description || ''),
+      stats: (Array.isArray(cms?.facilities?.stats) ? cms?.facilities?.stats : [])
+        .map(item => ({
+          label: String(item?.label || '').trim(),
+          suffix: String(item?.suffix || '').trim()
+        }))
+        .filter(item => Boolean(item.label) && Boolean(item.suffix))
+        .slice(0, 3),
+      primaryImage: withApiBaseIfNeeded(String(cms?.facilities?.primaryImage || '')),
+      secondaryImage: withApiBaseIfNeeded(String(cms?.facilities?.secondaryImage || '')),
       statsNumbers: [
-        Number(statsNumbers[0]) || 256,
-        Number(statsNumbers[1]) || 3,
-        Number(statsNumbers[2]) || 3
+        Number(statsNumbers[0]) || 0,
+        Number(statsNumbers[1]) || 0,
+        Number(statsNumbers[2]) || 0
       ]
     },
     gallery: {
       ...messages.gallery,
-      items: galleryItems.length > 0 ? galleryItems : [...defaultGalleryItems]
+      subtitle: String(cms?.gallery?.subtitle || ''),
+      title: String(cms?.gallery?.title || ''),
+      description: String(cms?.gallery?.description || ''),
+      view: String(cms?.gallery?.view || ''),
+      categories: safeGalleryCategories,
+      items: galleryItems
     },
     offers: {
-      ...messages.offers,
+      subtitle: String(cms?.offers?.subtitle || ''),
+      title: String(cms?.offers?.title || ''),
       cards: offerCards
     },
-    faq: messages.faq
+    faq: {
+      subtitle: String(cms?.faq?.subtitle || ''),
+      title: String(cms?.faq?.title || ''),
+      cta: String(cms?.faq?.cta || ''),
+      items: (Array.isArray(cms?.faq?.items) ? cms?.faq?.items : [])
+        .map(item => ({
+          title: String(item?.title || '').trim(),
+          body: String(item?.body || '').trim()
+        }))
+        .filter(item => Boolean(item.title) && Boolean(item.body))
+        .slice(0, 20)
+    }
   }
 }
 
 export async function fetchHomeResolvedContent(locale: Locale): Promise<HomeResolvedContent> {
   try {
     const response = await fetch(`${apiBaseUrl}/api/v1/public/content/home?locale=${locale}`, {
-      next: { revalidate: 60 }
+      cache: 'no-store'
     })
     if (!response.ok) {
-      return resolveContent(locale)
+      return resolveContent(locale, undefined)
     }
 
     const data = await response.json()
     return resolveContent(locale, data?.content || {})
   } catch {
-    return resolveContent(locale)
+    return resolveContent(locale, undefined)
   }
 }

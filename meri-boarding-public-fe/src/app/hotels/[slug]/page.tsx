@@ -37,7 +37,6 @@ export default async function HotelDynamicPage({ params }: HotelDynamicPageProps
   const hotel = await fetchPublicHotelBySlug(locale, slug)
   const allHotels = await fetchPublicHotels(locale)
   const messages = getMessages(locale)
-  const fallback = messages.hotels
   const hotelDetailMessages = messages.hotelDetail
   const detail = (hotelDetailMessages as Record<string, (typeof hotelDetailMessages)['flamingo']>)[slug] || hotelDetailMessages.europaplatz
   const withLocale = (path: string) => localePath(locale, path)
@@ -114,12 +113,9 @@ export default async function HotelDynamicPage({ params }: HotelDynamicPageProps
 
   const facts =
     (hotel.facts || []).map(item => normalizeFact(item)).filter(item => Boolean(item.text)) || []
-
-  const detailFacts = (detail.facts || []).map(item => ({ text: item.label, icon: item.icon || 'fa fa-check' }))
-  const viewFacts = facts.length > 0 ? facts : detailFacts
-
-  const viewDescription = hotel.description && hotel.description.length > 0 ? hotel.description : detail.description
-  const viewHighlights = hotel.highlights && hotel.highlights.length > 0 ? hotel.highlights : detail.highlights
+  const viewFacts = facts
+  const viewDescription = hotel.description || []
+  const viewHighlights = hotel.highlights || []
   const splitIndex = Math.ceil(viewHighlights.length / 2)
 
   const galleryItems =
@@ -200,10 +196,10 @@ export default async function HotelDynamicPage({ params }: HotelDynamicPageProps
           <div className='container relative z-2'>
             <div className='row justify-content-center'>
               <div className='col-lg-7 text-center'>
-                <div className='subtitle id-color wow fadeInUp mb-2'>{hotel.heroSubtitle || detail.heroSubtitle || fallback.hero.subtitle}</div>
+                <div className='subtitle id-color wow fadeInUp mb-2'>{hotel.heroSubtitle}</div>
                 <div className='clearfix'></div>
                 <h2 className='fs-60 fs-xs-8vw wow fadeInUp' data-wow-delay='.4s'>
-                  {hotel.heroTitle || detail.heroTitle || hotel.name}
+                  {hotel.heroTitle || hotel.name}
                 </h2>
               </div>
             </div>
@@ -293,7 +289,7 @@ export default async function HotelDynamicPage({ params }: HotelDynamicPageProps
                   <p key={paragraph}>{paragraph}</p>
                 ))}
 
-                <h3 className='mt-4 mb-3'>{hotel.amenitiesTitle || detail.amenitiesTitle || 'Amenities, services & highlights'}</h3>
+                <h3 className='mt-4 mb-3'>{hotel.amenitiesTitle}</h3>
                 <div className='row'>
                   <div className='col-md-6'>
                     <ul className='ul-check'>

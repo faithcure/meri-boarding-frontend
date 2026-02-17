@@ -2,7 +2,6 @@ import { Fragment } from "react";
 import type { Locale } from "@/i18n/getLocale";
 import { getLocale } from "@/i18n/getLocale";
 import { localePath } from "@/i18n/localePath";
-import { getMessages } from "@/i18n/messages";
 import type { HomeResolvedContent } from "@/lib/homeContentApi";
 import Link from "next/link";
 
@@ -13,7 +12,12 @@ type FaqProps = {
 
 export default async function Faq({ locale: localeProp, content }: FaqProps = {}) {
   const locale = localeProp ?? (await getLocale());
-  const t = content || getMessages(locale).faq;
+  const t = {
+    subtitle: String(content?.subtitle || ""),
+    title: String(content?.title || ""),
+    cta: String(content?.cta || ""),
+    items: content?.items || []
+  };
   const withLocale = (path: string) => localePath(locale, path);
   return (
     <section>

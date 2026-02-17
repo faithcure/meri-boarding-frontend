@@ -133,12 +133,31 @@ type HomeHeroSlide = {
 
 type HomeGalleryItem = {
   image: string;
-  category: 'rooms' | 'dining' | 'facilities';
+  category: string;
   alt: string;
 };
 
+type HomeGalleryCategory = {
+  key: string;
+  label: string;
+};
+
 type HomeOfferCard = {
+  id: string;
+  badge: string;
+  title: string;
+  text: string;
   image: string;
+};
+
+type HomeTestimonialSlide = {
+  badge: string;
+  text: string;
+};
+
+type HomeFaqItem = {
+  title: string;
+  body: string;
 };
 
 type HomeCmsContent = {
@@ -173,17 +192,40 @@ type HomeCmsContent = {
   testimonials: {
     apartmentsCount: number;
     backgroundImage: string;
+    apartments: string;
+    locations: string;
+    slides: HomeTestimonialSlide[];
   };
   facilities: {
+    subtitle: string;
+    title: string;
+    description: string;
+    stats: Array<{
+      label: string;
+      suffix: string;
+    }>;
     primaryImage: string;
     secondaryImage: string;
     statsNumbers: [number, number, number];
   };
   gallery: {
+    subtitle: string;
+    title: string;
+    description: string;
+    view: string;
+    categories: HomeGalleryCategory[];
     items: HomeGalleryItem[];
   };
   offers: {
+    subtitle: string;
+    title: string;
     cards: HomeOfferCard[];
+  };
+  faq: {
+    subtitle: string;
+    title: string;
+    cta: string;
+    items: HomeFaqItem[];
   };
 };
 
@@ -259,13 +301,52 @@ const defaultHomeContent: HomeCmsContent = {
   testimonials: {
     apartmentsCount: 256,
     backgroundImage: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6629.jpg',
+    apartments: 'Apartments',
+    locations: '3 locations in Stuttgart',
+    slides: [
+      {
+        badge: 'Fully furnished',
+        text: '1–3 room apartments designed for living and working on time, across three Stuttgart locations.',
+      },
+      {
+        badge: 'Comfort first',
+        text: 'Smart layouts with balcony or terrace, fully equipped kitchens for international cooking, and Smart-TV.',
+      },
+      {
+        badge: 'Work ready',
+        text: 'Fast WLAN and excellent conditions for communication and mobile work in every apartment.',
+      },
+      {
+        badge: 'Move-in support',
+        text: 'Registration support and a smooth arrival, including help with official registration documents.',
+      },
+    ],
   },
   facilities: {
+    subtitle: 'Welcome to Meri Boarding',
+    title: 'Facilities & Services',
+    description:
+      'Fully furnished 1-3 room apartments across 3 locations in Stuttgart with a total of 256 apartments. Enjoy smart layouts, balconies or terraces, fully equipped kitchens for international cooking, Smart-TV, and fast WLAN.',
+    stats: [
+      { label: 'TOTAL APARTMENTS', suffix: 'furnished apartments' },
+      { label: 'LOCATIONS', suffix: 'in Stuttgart' },
+      { label: 'APARTMENT TYPES', suffix: '1-3 room layouts' },
+    ],
     primaryImage: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6629.jpg',
     secondaryImage: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6639.jpg',
     statsNumbers: [256, 3, 3],
   },
   gallery: {
+    subtitle: 'Welcome',
+    title: 'Experience Comfort, Elegance, and Exceptional Hospitality',
+    description:
+      'Welcome to our hotel, where comfort meets refined elegance in a setting designed for relaxation and unforgettable stays.',
+    view: 'View',
+    categories: [
+      { key: 'rooms', label: 'Rooms' },
+      { key: 'dining', label: 'Dining' },
+      { key: 'facilities', label: 'Facilities' },
+    ],
     items: [
       { image: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6699.jpg', category: 'rooms', alt: '' },
       { image: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6844.jpg', category: 'dining', alt: '' },
@@ -282,10 +363,77 @@ const defaultHomeContent: HomeCmsContent = {
     ],
   },
   offers: {
+    subtitle: 'Exclusive Deals',
+    title: 'Latest Hotel Offers',
     cards: [
-      { image: '/images/Europaplatz_Fotos/_DSC6629.jpg' },
-      { image: '/images/Europaplatz_Fotos/_DSC6634.jpg' },
-      { image: '/images/Europaplatz_Fotos/_DSC6639.jpg' },
+      {
+        id: 'offer-1',
+        badge: '20% OFF',
+        title: 'Romantic Stay',
+        text: '20% Off Weekend Packages',
+        image: '/images/Europaplatz_Fotos/_DSC6629.jpg',
+      },
+      {
+        id: 'offer-2',
+        badge: '30% OFF',
+        title: 'Early Bird Deal',
+        text: 'Save Up to 30% on Rooms',
+        image: '/images/Europaplatz_Fotos/_DSC6634.jpg',
+      },
+      {
+        id: 'offer-3',
+        badge: '',
+        title: 'Family Getaway',
+        text: 'Kids Stay & Eat Free',
+        image: '/images/Europaplatz_Fotos/_DSC6639.jpg',
+      },
+    ],
+  },
+  faq: {
+    subtitle: 'Services',
+    title: 'Everything You Need to Know About Staying With Us',
+    cta: 'Request a quote now',
+    items: [
+      {
+        title: 'Vacant apartments are available for immediate move-in',
+        body: 'Available apartments can be occupied immediately, with a smooth move-in process and clear onboarding guidance.',
+      },
+      {
+        title: 'Registration confirmation and housing certificate',
+        body: 'We provide the official registration confirmation and housing certificate needed for local registration.',
+      },
+      {
+        title: 'Nameplate on the door at move-in',
+        body: 'Your nameplate is prepared ahead of time, so your apartment is ready from day one.',
+      },
+      {
+        title: 'Multicultural orientation, atmosphere, and specialization',
+        body: 'A welcoming, multicultural atmosphere tailored to international residents and project teams.',
+      },
+      {
+        title: 'Child-friendly and private atmosphere',
+        body: 'Enjoy a child-friendly environment with privacy and quiet living spaces for families.',
+      },
+      {
+        title: 'Visitors possible for only EUR 10 per person per month',
+        body: 'Visitors are welcome for a monthly fee of EUR 10 per person, with clear and transparent rules.',
+      },
+      {
+        title: 'Pets possible on request',
+        body: 'Pets are possible on request, depending on apartment availability and house rules.',
+      },
+      {
+        title: '24-hour caretaker service',
+        body: '24/7 caretaker service ensures quick support whenever you need assistance.',
+      },
+      {
+        title: 'Facility and cleaning service on request',
+        body: 'Facility and cleaning services are available on request to keep your stay effortless.',
+      },
+      {
+        title: 'Quiet living without service on request',
+        body: 'If preferred, you can opt for disturbance-free living without additional services.',
+      },
     ],
   },
 };
@@ -506,11 +654,14 @@ function parseGalleryCategory(input?: string): HotelGalleryImage['category'] {
     : 'other';
 }
 
-function parseHomeGalleryCategory(input?: string): HomeGalleryItem['category'] {
-  const normalized = String(input || '').trim().toLowerCase();
-  return normalized === 'rooms' || normalized === 'dining' || normalized === 'facilities'
-    ? (normalized as HomeGalleryItem['category'])
-    : 'rooms';
+function sanitizeHomeGalleryCategoryKey(input?: string): string {
+  const normalized = String(input || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 32);
+  return normalized || 'general';
 }
 
 function isValidBackgroundPosition(input: string) {
@@ -571,14 +722,54 @@ function normalizeHomeContent(input: Partial<HomeCmsContent> | undefined, fallba
 
   const heroSlidesSource = Array.isArray(input?.hero?.slides) ? input?.hero?.slides : fallback.hero.slides;
   const gallerySource = Array.isArray(input?.gallery?.items) ? input?.gallery?.items : fallback.gallery.items;
+  const galleryCategoriesSource = Array.isArray(input?.gallery?.categories) ? input?.gallery?.categories : fallback.gallery.categories;
   const offersSource = Array.isArray(input?.offers?.cards) ? input?.offers?.cards : fallback.offers.cards;
+  const faqSource = Array.isArray(input?.faq?.items) ? input?.faq?.items : fallback.faq.items;
   const statsSource = Array.isArray(input?.facilities?.statsNumbers) ? input?.facilities?.statsNumbers : fallback.facilities.statsNumbers;
+  const facilitiesStatsSource = Array.isArray(input?.facilities?.stats) ? input?.facilities?.stats : fallback.facilities.stats;
 
   const statsNumbers: [number, number, number] = [
     Number(statsSource[0]) || fallback.facilities.statsNumbers[0],
     Number(statsSource[1]) || fallback.facilities.statsNumbers[1],
     Number(statsSource[2]) || fallback.facilities.statsNumbers[2],
   ];
+  const facilitiesStats = [0, 1, 2].map((index) => ({
+    label: String(facilitiesStatsSource[index]?.label ?? fallback.facilities.stats[index]?.label ?? '').trim(),
+    suffix: String(facilitiesStatsSource[index]?.suffix ?? fallback.facilities.stats[index]?.suffix ?? '').trim(),
+  }));
+  const galleryCategories = galleryCategoriesSource
+    .map((item) => ({
+      key: sanitizeHomeGalleryCategoryKey(item?.key),
+      label: String(item?.label || '').trim(),
+    }))
+    .filter((item) => Boolean(item.key) && Boolean(item.label))
+    .reduce((acc, item) => {
+      if (acc.some((row) => row.key === item.key)) return acc;
+      acc.push(item);
+      return acc;
+    }, [] as HomeGalleryCategory[]);
+  const normalizedGalleryCategories = galleryCategories.length > 0 ? galleryCategories : fallback.gallery.categories;
+  const defaultGalleryCategory = normalizedGalleryCategories[0]?.key || 'general';
+
+  const normalizedOfferCards = offersSource
+    .map((item, index) => {
+      const fallbackCard = fallback.offers.cards[index] || fallback.offers.cards[0];
+      const normalizedId = String(item?.id || `offer-${index + 1}`)
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9-]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .slice(0, 40);
+      return {
+        id: normalizedId || `offer-${index + 1}`,
+        badge: String(item?.badge ?? fallbackCard?.badge ?? '').trim(),
+        title: String(item?.title ?? fallbackCard?.title ?? '').trim(),
+        text: String(item?.text ?? fallbackCard?.text ?? '').trim(),
+        image: String(item?.image || '').trim(),
+      };
+    })
+    .filter((item) => Boolean(item.title) || Boolean(item.text) || Boolean(item.image))
+    .slice(0, 4);
 
   return {
     sections,
@@ -623,25 +814,58 @@ function normalizeHomeContent(input: Partial<HomeCmsContent> | undefined, fallba
     testimonials: {
       apartmentsCount: Number(input?.testimonials?.apartmentsCount) || Number(fallback.testimonials.apartmentsCount) || 256,
       backgroundImage: String(input?.testimonials?.backgroundImage ?? fallback.testimonials.backgroundImage ?? '').trim(),
+      apartments: String(input?.testimonials?.apartments ?? fallback.testimonials.apartments ?? '').trim(),
+      locations: String(input?.testimonials?.locations ?? fallback.testimonials.locations ?? '').trim(),
+      slides: (Array.isArray(input?.testimonials?.slides) ? input?.testimonials?.slides : fallback.testimonials.slides)
+        .map((item) => ({
+          badge: String(item?.badge || '').trim(),
+          text: String(item?.text || '').trim(),
+        }))
+        .filter((item) => Boolean(item.badge) || Boolean(item.text)),
     },
     facilities: {
+      subtitle: String(input?.facilities?.subtitle ?? fallback.facilities.subtitle ?? '').trim(),
+      title: String(input?.facilities?.title ?? fallback.facilities.title ?? '').trim(),
+      description: String(input?.facilities?.description ?? fallback.facilities.description ?? '').trim(),
+      stats: facilitiesStats,
       primaryImage: String(input?.facilities?.primaryImage ?? fallback.facilities.primaryImage ?? '').trim(),
       secondaryImage: String(input?.facilities?.secondaryImage ?? fallback.facilities.secondaryImage ?? '').trim(),
       statsNumbers,
     },
     gallery: {
+      subtitle: String(input?.gallery?.subtitle ?? fallback.gallery.subtitle ?? '').trim(),
+      title: String(input?.gallery?.title ?? fallback.gallery.title ?? '').trim(),
+      description: String(input?.gallery?.description ?? fallback.gallery.description ?? '').trim(),
+      view: String(input?.gallery?.view ?? fallback.gallery.view ?? '').trim(),
+      categories: normalizedGalleryCategories,
       items: gallerySource
         .map((item) => ({
           image: String(item?.image || '').trim(),
-          category: parseHomeGalleryCategory(item?.category),
+          category: sanitizeHomeGalleryCategoryKey(item?.category),
           alt: String(item?.alt || '').trim(),
+        }))
+        .map((item) => ({
+          ...item,
+          category: normalizedGalleryCategories.some((category) => category.key === item.category) ? item.category : defaultGalleryCategory,
         }))
         .filter((item) => Boolean(item.image)),
     },
     offers: {
-      cards: offersSource
-        .map((item) => ({ image: String(item?.image || '').trim() }))
-        .filter((item) => Boolean(item.image)),
+      subtitle: String(input?.offers?.subtitle ?? fallback.offers.subtitle ?? '').trim(),
+      title: String(input?.offers?.title ?? fallback.offers.title ?? '').trim(),
+      cards: normalizedOfferCards.length > 0 ? normalizedOfferCards : fallback.offers.cards,
+    },
+    faq: {
+      subtitle: String(input?.faq?.subtitle ?? fallback.faq.subtitle ?? '').trim(),
+      title: String(input?.faq?.title ?? fallback.faq.title ?? '').trim(),
+      cta: String(input?.faq?.cta ?? fallback.faq.cta ?? '').trim(),
+      items: faqSource
+        .map((item) => ({
+          title: String(item?.title || '').trim(),
+          body: String(item?.body || '').trim(),
+        }))
+        .filter((item) => Boolean(item.title) || Boolean(item.body))
+        .slice(0, 20),
     },
   };
 }
@@ -693,6 +917,115 @@ function validateHomeContent(input: HomeCmsContent) {
   for (const [index, card] of input.rooms.cards.entries()) {
     if (!card.title || !card.image || !card.description) {
       return `Rooms card ${index + 1}: title, image and description are required`;
+    }
+  }
+
+  if (!input.testimonials.backgroundImage) {
+    return 'Testimonials background image is required';
+  }
+  if (!input.testimonials.apartments || !input.testimonials.locations) {
+    return 'Testimonials label fields are required';
+  }
+  if (!Array.isArray(input.testimonials.slides) || input.testimonials.slides.length < 1) {
+    return 'Testimonials slides are required (at least 1)';
+  }
+  if (input.testimonials.slides.length > 8) {
+    return 'Testimonials slide limit is 8';
+  }
+  for (const [index, slide] of input.testimonials.slides.entries()) {
+    if (!slide.badge || !slide.text) {
+      return `Testimonials slide ${index + 1}: badge and text are required`;
+    }
+  }
+
+  if (!input.facilities.subtitle || !input.facilities.title || !input.facilities.description) {
+    return 'Facilities header fields are required';
+  }
+  if (!Array.isArray(input.facilities.stats) || input.facilities.stats.length !== 3) {
+    return 'Facilities stats must include exactly 3 items';
+  }
+  for (const [index, stat] of input.facilities.stats.entries()) {
+    if (!stat.label || !stat.suffix) {
+      return `Facilities stat ${index + 1}: label and suffix are required`;
+    }
+  }
+  if (!input.facilities.primaryImage || !input.facilities.secondaryImage) {
+    return 'Facilities images are required';
+  }
+  if (!input.gallery.subtitle || !input.gallery.title || !input.gallery.description || !input.gallery.view) {
+    return 'Gallery text fields are required';
+  }
+  if (!Array.isArray(input.gallery.categories) || input.gallery.categories.length < 1) {
+    return 'Gallery categories are required (at least 1)';
+  }
+  const categoryKeySet = new Set<string>();
+  for (const [index, category] of input.gallery.categories.entries()) {
+    if (!category.key || !category.label) {
+      return `Gallery category ${index + 1}: key and label are required`;
+    }
+    if (categoryKeySet.has(category.key)) {
+      return `Gallery category ${index + 1}: duplicate key "${category.key}"`;
+    }
+    categoryKeySet.add(category.key);
+  }
+  if (!Array.isArray(input.gallery.items) || input.gallery.items.length < 1) {
+    return 'Gallery items are required (at least 1)';
+  }
+  if (input.gallery.items.length > 24) {
+    return 'Gallery item limit is 24';
+  }
+  for (const [index, item] of input.gallery.items.entries()) {
+    if (!item.image) {
+      return `Gallery item ${index + 1}: image is required`;
+    }
+    if (!item.category || !categoryKeySet.has(item.category)) {
+      return `Gallery item ${index + 1}: category is invalid`;
+    }
+  }
+  const categoryItemCounts = new Map<string, number>();
+  for (const item of input.gallery.items) {
+    const currentCount = categoryItemCounts.get(item.category) || 0;
+    const nextCount = currentCount + 1;
+    categoryItemCounts.set(item.category, nextCount);
+    if (nextCount > 8) {
+      return `Gallery category "${item.category}" can contain at most 8 images`;
+    }
+  }
+
+  if (!input.offers.subtitle || !input.offers.title) {
+    return 'Offers subtitle and title are required';
+  }
+  if (!Array.isArray(input.offers.cards) || input.offers.cards.length < 1) {
+    return 'Offers must include at least 1 card';
+  }
+  if (input.offers.cards.length > 4) {
+    return 'Offers card limit is 4';
+  }
+  const offerIdSet = new Set<string>();
+  for (const [index, card] of input.offers.cards.entries()) {
+    if (!card.id) {
+      return `Offers card ${index + 1}: id is required`;
+    }
+    if (offerIdSet.has(card.id)) {
+      return `Offers card ${index + 1}: duplicate id "${card.id}"`;
+    }
+    offerIdSet.add(card.id);
+    if (!card.title || !card.text || !card.image) {
+      return `Offers card ${index + 1}: title, text and image are required`;
+    }
+  }
+  if (!input.faq.subtitle || !input.faq.title || !input.faq.cta) {
+    return 'FAQ subtitle, title and CTA are required';
+  }
+  if (!Array.isArray(input.faq.items) || input.faq.items.length < 1) {
+    return 'FAQ must include at least 1 item';
+  }
+  if (input.faq.items.length > 20) {
+    return 'FAQ item limit is 20';
+  }
+  for (const [index, item] of input.faq.items.entries()) {
+    if (!item.title || !item.body) {
+      return `FAQ item ${index + 1}: title and body are required`;
     }
   }
   return null;
@@ -871,9 +1204,21 @@ async function getLocalizedDefaultHomeContent(locale: ContentLocale): Promise<Ho
 
   try {
     const raw = await readFile(localePath, 'utf8');
-    const parsed = JSON.parse(raw) as { hero?: Record<string, unknown>; rooms?: Record<string, unknown> };
+    const parsed = JSON.parse(raw) as {
+      hero?: Record<string, unknown>;
+      rooms?: Record<string, unknown>;
+      testimonials?: { apartments?: unknown; locations?: unknown; slides?: Array<{ badge?: unknown; text?: unknown }> };
+      facilities?: {
+        subtitle?: unknown;
+        title?: unknown;
+        description?: unknown;
+        stats?: Array<{ label?: unknown; suffix?: unknown }>;
+      };
+    };
     const hero = parsed?.hero || {};
     const rooms = parsed?.rooms || {};
+    const testimonials = parsed?.testimonials || {};
+    const facilities = parsed?.facilities || {};
     fallback.hero.titleLead = String(hero.titleLead ?? fallback.hero.titleLead).trim();
     fallback.hero.titleHighlight = String(hero.titleHighlight ?? fallback.hero.titleHighlight).trim();
     fallback.hero.titleTail = String(hero.titleTail ?? fallback.hero.titleTail).trim();
@@ -885,6 +1230,29 @@ async function getLocalizedDefaultHomeContent(locale: ContentLocale): Promise<Ho
     fallback.rooms.description = String(rooms.description ?? fallback.rooms.description).trim();
     fallback.rooms.allAmenities = String(rooms.allAmenities ?? fallback.rooms.allAmenities).trim();
     fallback.rooms.request = String(rooms.request ?? fallback.rooms.request).trim();
+    fallback.testimonials.apartments = String(testimonials.apartments ?? fallback.testimonials.apartments).trim();
+    fallback.testimonials.locations = String(testimonials.locations ?? fallback.testimonials.locations).trim();
+    if (Array.isArray(testimonials.slides) && testimonials.slides.length > 0) {
+      fallback.testimonials.slides = testimonials.slides
+        .map((item) => ({
+          badge: String(item?.badge || '').trim(),
+          text: String(item?.text || '').trim(),
+        }))
+        .filter((item) => Boolean(item.badge) && Boolean(item.text))
+        .slice(0, 8);
+    }
+    fallback.facilities.subtitle = String(facilities.subtitle ?? fallback.facilities.subtitle).trim();
+    fallback.facilities.title = String(facilities.title ?? fallback.facilities.title).trim();
+    fallback.facilities.description = String(facilities.description ?? fallback.facilities.description).trim();
+    if (Array.isArray(facilities.stats) && facilities.stats.length > 0) {
+      fallback.facilities.stats = facilities.stats
+        .map((item) => ({
+          label: String(item?.label || '').trim(),
+          suffix: String(item?.suffix || '').trim(),
+        }))
+        .filter((item) => Boolean(item.label) && Boolean(item.suffix))
+        .slice(0, 3);
+    }
   } catch {
     // Keep hardcoded fallback when locale file cannot be read.
   }
@@ -2226,6 +2594,163 @@ server.put('/api/v1/admin/content/home', async (request, reply) => {
     }
   }
 
+  // Keep testimonials media + numeric stat shared for all locales.
+  if (body?.content?.testimonials) {
+    for (const localeKey of allowedLocales) {
+      if (localeKey === locale) continue;
+      const row = await contents.findOne({ key: 'page.home', locale: localeKey });
+      const current = row ? normalizeHomeContent(row.value, defaultHomeContent) : defaultHomeContent;
+      const patched = normalizeHomeContent(
+        {
+          ...current,
+          testimonials: {
+            ...current.testimonials,
+            apartmentsCount: nextContent.testimonials.apartmentsCount,
+            backgroundImage: nextContent.testimonials.backgroundImage,
+          },
+        },
+        current,
+      );
+      await contents.updateOne(
+        { key: 'page.home', locale: localeKey },
+        {
+          $set: {
+            value: patched,
+            updatedAt: now,
+            updatedBy: admin._id,
+          },
+          $setOnInsert: {
+            _id: new ObjectId(),
+            key: 'page.home',
+            locale: localeKey,
+            createdAt: now,
+          },
+        },
+        { upsert: true },
+      );
+    }
+  }
+
+  // Keep facilities media + numeric stats shared for all locales.
+  if (body?.content?.facilities) {
+    for (const localeKey of allowedLocales) {
+      if (localeKey === locale) continue;
+      const row = await contents.findOne({ key: 'page.home', locale: localeKey });
+      const current = row ? normalizeHomeContent(row.value, defaultHomeContent) : defaultHomeContent;
+      const patched = normalizeHomeContent(
+        {
+          ...current,
+          facilities: {
+            ...current.facilities,
+            primaryImage: nextContent.facilities.primaryImage,
+            secondaryImage: nextContent.facilities.secondaryImage,
+            statsNumbers: nextContent.facilities.statsNumbers,
+          },
+        },
+        current,
+      );
+      await contents.updateOne(
+        { key: 'page.home', locale: localeKey },
+        {
+          $set: {
+            value: patched,
+            updatedAt: now,
+            updatedBy: admin._id,
+          },
+          $setOnInsert: {
+            _id: new ObjectId(),
+            key: 'page.home',
+            locale: localeKey,
+            createdAt: now,
+          },
+        },
+        { upsert: true },
+      );
+    }
+  }
+
+  // Keep gallery structure (categories + items) shared for all locales.
+  if (body?.content?.gallery) {
+    for (const localeKey of allowedLocales) {
+      if (localeKey === locale) continue;
+      const row = await contents.findOne({ key: 'page.home', locale: localeKey });
+      const current = row ? normalizeHomeContent(row.value, defaultHomeContent) : defaultHomeContent;
+      const patched = normalizeHomeContent(
+        {
+          ...current,
+          gallery: {
+            ...current.gallery,
+            categories: nextContent.gallery.categories,
+            items: nextContent.gallery.items,
+          },
+        },
+        current,
+      );
+      await contents.updateOne(
+        { key: 'page.home', locale: localeKey },
+        {
+          $set: {
+            value: patched,
+            updatedAt: now,
+            updatedBy: admin._id,
+          },
+          $setOnInsert: {
+            _id: new ObjectId(),
+            key: 'page.home',
+            locale: localeKey,
+            createdAt: now,
+          },
+        },
+        { upsert: true },
+      );
+    }
+  }
+
+  // Keep offers card images shared for all locales.
+  if (body?.content?.offers) {
+    for (const localeKey of allowedLocales) {
+      if (localeKey === locale) continue;
+      const row = await contents.findOne({ key: 'page.home', locale: localeKey });
+      const current = row ? normalizeHomeContent(row.value, defaultHomeContent) : defaultHomeContent;
+      const patched = normalizeHomeContent(
+        {
+          ...current,
+          offers: {
+            ...current.offers,
+            cards: nextContent.offers.cards.map((card) => {
+              const currentCard = current.offers.cards.find((item) => item.id === card.id);
+              return {
+                ...card,
+                badge: String(currentCard?.badge ?? card.badge ?? '').trim(),
+                title: String(currentCard?.title ?? card.title ?? '').trim(),
+                text: String(currentCard?.text ?? card.text ?? '').trim(),
+                image: card.image || currentCard?.image || '',
+              };
+            }),
+          },
+        },
+        current,
+      );
+      await contents.updateOne(
+        { key: 'page.home', locale: localeKey },
+        {
+          $set: {
+            value: patched,
+            updatedAt: now,
+            updatedBy: admin._id,
+          },
+          $setOnInsert: {
+            _id: new ObjectId(),
+            key: 'page.home',
+            locale: localeKey,
+            createdAt: now,
+          },
+        },
+        { upsert: true },
+      );
+    }
+  }
+
   return reply.send({ ok: true, locale, content: nextContent });
 });
 
@@ -2269,6 +2794,98 @@ server.post('/api/v1/admin/content/home/rooms-image', async (request, reply) => 
 
   const requestedName = sanitizeFilename(String(body?.fileName || `home-rooms-${Date.now()}.${parsed.ext}`));
   const fileName = `home-rooms-${Date.now()}-${requestedName}`.replace(/\.+/g, '.');
+  const filePath = path.join(homeUploadDir, fileName);
+  await writeFile(filePath, parsed.buffer);
+
+  return reply.send({ ok: true, imageUrl: `/api/v1/assets/home/${fileName}` });
+});
+
+server.post('/api/v1/admin/content/home/testimonials-image', async (request, reply) => {
+  const admin = await getRequestAdmin(request.headers.authorization);
+  if (!admin || (admin.role !== 'super_admin' && admin.role !== 'moderator')) {
+    return reply.code(403).send({ error: 'Only super_admin or moderator can upload testimonials images' });
+  }
+
+  const body = request.body as { fileName?: string; dataUrl?: string } | undefined;
+  const parsed = parseDataUrl(String(body?.dataUrl || ''));
+  if (!parsed) {
+    return reply.code(400).send({ error: 'Invalid image format. Use PNG, JPG or WEBP data URL.' });
+  }
+  if (parsed.buffer.length > 8 * 1024 * 1024) {
+    return reply.code(400).send({ error: 'Image size cannot exceed 8MB' });
+  }
+
+  const requestedName = sanitizeFilename(String(body?.fileName || `home-testimonials-${Date.now()}.${parsed.ext}`));
+  const fileName = `home-testimonials-${Date.now()}-${requestedName}`.replace(/\.+/g, '.');
+  const filePath = path.join(homeUploadDir, fileName);
+  await writeFile(filePath, parsed.buffer);
+
+  return reply.send({ ok: true, imageUrl: `/api/v1/assets/home/${fileName}` });
+});
+
+server.post('/api/v1/admin/content/home/facilities-image', async (request, reply) => {
+  const admin = await getRequestAdmin(request.headers.authorization);
+  if (!admin || (admin.role !== 'super_admin' && admin.role !== 'moderator')) {
+    return reply.code(403).send({ error: 'Only super_admin or moderator can upload facilities images' });
+  }
+
+  const body = request.body as { fileName?: string; dataUrl?: string } | undefined;
+  const parsed = parseDataUrl(String(body?.dataUrl || ''));
+  if (!parsed) {
+    return reply.code(400).send({ error: 'Invalid image format. Use PNG, JPG or WEBP data URL.' });
+  }
+  if (parsed.buffer.length > 8 * 1024 * 1024) {
+    return reply.code(400).send({ error: 'Image size cannot exceed 8MB' });
+  }
+
+  const requestedName = sanitizeFilename(String(body?.fileName || `home-facilities-${Date.now()}.${parsed.ext}`));
+  const fileName = `home-facilities-${Date.now()}-${requestedName}`.replace(/\.+/g, '.');
+  const filePath = path.join(homeUploadDir, fileName);
+  await writeFile(filePath, parsed.buffer);
+
+  return reply.send({ ok: true, imageUrl: `/api/v1/assets/home/${fileName}` });
+});
+
+server.post('/api/v1/admin/content/home/gallery-image', async (request, reply) => {
+  const admin = await getRequestAdmin(request.headers.authorization);
+  if (!admin || (admin.role !== 'super_admin' && admin.role !== 'moderator')) {
+    return reply.code(403).send({ error: 'Only super_admin or moderator can upload gallery images' });
+  }
+
+  const body = request.body as { fileName?: string; dataUrl?: string } | undefined;
+  const parsed = parseDataUrl(String(body?.dataUrl || ''));
+  if (!parsed) {
+    return reply.code(400).send({ error: 'Invalid image format. Use PNG, JPG or WEBP data URL.' });
+  }
+  if (parsed.buffer.length > 8 * 1024 * 1024) {
+    return reply.code(400).send({ error: 'Image size cannot exceed 8MB' });
+  }
+
+  const requestedName = sanitizeFilename(String(body?.fileName || `home-gallery-${Date.now()}.${parsed.ext}`));
+  const fileName = `home-gallery-${Date.now()}-${requestedName}`.replace(/\.+/g, '.');
+  const filePath = path.join(homeUploadDir, fileName);
+  await writeFile(filePath, parsed.buffer);
+
+  return reply.send({ ok: true, imageUrl: `/api/v1/assets/home/${fileName}` });
+});
+
+server.post('/api/v1/admin/content/home/offers-image', async (request, reply) => {
+  const admin = await getRequestAdmin(request.headers.authorization);
+  if (!admin || (admin.role !== 'super_admin' && admin.role !== 'moderator')) {
+    return reply.code(403).send({ error: 'Only super_admin or moderator can upload offers images' });
+  }
+
+  const body = request.body as { fileName?: string; dataUrl?: string } | undefined;
+  const parsed = parseDataUrl(String(body?.dataUrl || ''));
+  if (!parsed) {
+    return reply.code(400).send({ error: 'Invalid image format. Use PNG, JPG or WEBP data URL.' });
+  }
+  if (parsed.buffer.length > 8 * 1024 * 1024) {
+    return reply.code(400).send({ error: 'Image size cannot exceed 8MB' });
+  }
+
+  const requestedName = sanitizeFilename(String(body?.fileName || `home-offers-${Date.now()}.${parsed.ext}`));
+  const fileName = `home-offers-${Date.now()}-${requestedName}`.replace(/\.+/g, '.');
   const filePath = path.join(homeUploadDir, fileName);
   await writeFile(filePath, parsed.buffer);
 

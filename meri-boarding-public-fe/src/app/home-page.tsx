@@ -28,9 +28,9 @@ export default async function HomePage({ locale }: HomePageProps) {
 
     if (sectionKey === "hero") return <Hero locale={locale} content={content.hero} />;
     if (sectionKey === "rooms") return <Rooms locale={locale} content={content.rooms} />;
-    if (sectionKey === "testimonials") return <Testimonials locale={locale} content={content.testimonials} />;
-    if (sectionKey === "facilities") return <Facilities locale={locale} content={content.facilities} />;
-    if (sectionKey === "gallery") return <Gallery locale={locale} content={content.gallery} />;
+    if (sectionKey === "testimonials") return <Testimonials content={content.testimonials} />;
+    if (sectionKey === "facilities") return <Facilities content={content.facilities} />;
+    if (sectionKey === "gallery") return <Gallery content={content.gallery} />;
     if (sectionKey === "offers") return <Offers locale={locale} content={content.offers} />;
     if (sectionKey === "faq") return <Faq locale={locale} content={content.faq} />;
     return null;

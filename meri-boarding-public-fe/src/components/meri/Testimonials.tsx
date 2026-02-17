@@ -1,29 +1,25 @@
-import type { Locale } from "@/i18n/getLocale";
-import { getLocale } from "@/i18n/getLocale";
-import { getMessages } from "@/i18n/messages";
 import type { HomeResolvedContent } from "@/lib/homeContentApi";
 
 type TestimonialsProps = {
-  locale?: Locale;
   content?: HomeResolvedContent["testimonials"];
 };
 
-export default async function Testimonials({ locale: localeProp, content }: TestimonialsProps = {}) {
-  const locale = localeProp ?? (await getLocale());
-  const base = getMessages(locale).testimonials;
+export default function Testimonials({ content }: TestimonialsProps = {}) {
   const t = {
-    ...base,
-    apartmentsCount: content?.apartmentsCount ?? 256,
-    backgroundImage: content?.backgroundImage || "/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6629.jpg"
+    apartmentsCount: content?.apartmentsCount ?? 0,
+    backgroundImage: content?.backgroundImage || '',
+    apartments: content?.apartments || '',
+    locations: content?.locations || '',
+    slides: content?.slides || []
   };
   return (
     <section className="text-light jarallax mx-2 rounded-1 overflow-hidden">
-      <img src={t.backgroundImage || "/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6629.jpg"} className="jarallax-img" alt="" />
+      {t.backgroundImage ? <img src={t.backgroundImage} className="jarallax-img" alt="" /> : null}
       <div className="sw-overlay op-6"></div>
       <div className="container relative z-2">
         <div className="row g-4 gx-5 align-items-center">
           <div className="col-lg-5 text-center">
-            <h2 className="fs-96 mb-0">{t.apartmentsCount || 256}</h2>
+            <h2 className="fs-96 mb-0">{t.apartmentsCount}</h2>
             <span className="d-block id-color wow fadeInUp">{t.apartments}</span>
             {t.locations}
           </div>
@@ -31,7 +27,22 @@ export default async function Testimonials({ locale: localeProp, content }: Test
             <div className="owl-single-dots owl-carousel owl-theme">
               {t.slides.map((slide) => (
                 <div className="item" key={slide.badge}>
-                  <span className="d-stars id-color d-block mb-3">{slide.badge}</span>
+                  <span
+                    className="d-inline-flex align-items-center mb-3"
+                    style={{
+                      background: 'var(--primary-color)',
+                      color: '#fff',
+                      border: '1px solid color-mix(in srgb, var(--primary-color) 85%, #fff)',
+                      borderRadius: 0,
+                      padding: '4px 10px',
+                      fontSize: 12,
+                      fontWeight: 600,
+                      letterSpacing: 0.2,
+                      textTransform: 'uppercase'
+                    }}
+                  >
+                    {slide.badge}
+                  </span>
                   <h3 className="mb-4 wow fadeInUp fs-40">{slide.text}</h3>
                   <span className="wow fadeInUp">Meri Boarding Group</span>
                 </div>

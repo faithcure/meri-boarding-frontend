@@ -259,6 +259,44 @@ header.smaller .logo-scroll {
   box-shadow: 0 12px 28px rgba(29, 29, 31, 0.08);
 }
 
+.gallery-parallax-section {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.gallery-parallax-bg {
+  position: absolute;
+  inset: -8%;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transform: translate3d(0, var(--gallery-parallax-offset, 0px), 0) scale(1.08);
+  will-change: transform;
+  filter: blur(10px) saturate(1.02);
+  opacity: 0.18;
+  pointer-events: none;
+}
+
+.gallery-parallax-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.06) 0%, rgba(0, 0, 0, 0.03) 45%, rgba(0, 0, 0, 0.06) 100%);
+  pointer-events: none;
+}
+
+.gallery-parallax-section > .container {
+  z-index: 2;
+}
+
+@media (max-width: 991px) {
+  .gallery-parallax-bg {
+    transform: translate3d(0, calc(var(--gallery-parallax-offset, 0px) * 0.8), 0) scale(1.08);
+  }
+}
+
 .amenities-toggle-btn {
   border: 0;
   background: transparent;

@@ -105,6 +105,21 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           <MenuItem href='/content-home/rooms' icon={<i className='bx-layout' />}>
             Rooms Settings
           </MenuItem>
+          <MenuItem href='/content-home/testimonials' icon={<i className='bx-message-rounded-dots' />}>
+            Testimonials Settings
+          </MenuItem>
+          <MenuItem href='/content-home/facilities' icon={<i className='bx-bar-chart-alt-2' />}>
+            Facilities Settings
+          </MenuItem>
+          <MenuItem href='/content-home/gallery' icon={<i className='bx-images' />}>
+            Gallery Settings
+          </MenuItem>
+          <MenuItem href='/content-home/offers' icon={<i className='bx-purchase-tag-alt' />}>
+            Offers Settings
+          </MenuItem>
+          <MenuItem href='/content-home/faq' icon={<i className='bx-help-circle' />}>
+            FAQ Settings
+          </MenuItem>
         </SubMenu>
         {isSuperAdmin ? (
           <MenuItem href='/users' icon={<i className='bx-group' />}>

@@ -10,10 +10,7 @@ import { useRouter } from 'next/navigation'
 import Typography from '@mui/material/Typography'
 import IconButton from '@mui/material/IconButton'
 import InputAdornment from '@mui/material/InputAdornment'
-import Checkbox from '@mui/material/Checkbox'
 import Button from '@mui/material/Button'
-import FormControlLabel from '@mui/material/FormControlLabel'
-import Divider from '@mui/material/Divider'
 import Alert from '@mui/material/Alert'
 import { styled, useTheme } from '@mui/material/styles'
 
@@ -24,9 +21,6 @@ import classnames from 'classnames'
 import Link from '@components/Link'
 import Logo from '@components/layout/shared/Logo'
 import CustomTextField from '@core/components/mui/TextField'
-
-// Config Imports
-import themeConfig from '@configs/themeConfig'
 
 // Hook Imports
 import { useSettings } from '@core/hooks/useSettings'
@@ -91,8 +85,13 @@ const LoginV2 = () => {
           <Logo />
         </Link>
         <div className='flex flex-col gap-6 is-full sm:is-auto md:is-full sm:max-is-[400px] md:max-is-[unset] mbs-11 sm:mbs-14 md:mbs-0'>
-          <div className='flex flex-col gap-1'>
-            <Typography variant='h4'>{`Welcome to ${themeConfig.templateName}! 👋🏻`}</Typography>
+          <div className='flex flex-col gap-1 items-start text-left'>
+            <img
+              src='/images/branding/meri-logo-mark.svg'
+              alt='Meri mark'
+              style={{ width: 200, height: 200, objectFit: 'contain', marginTop: -72, marginBottom: -10, alignSelf: 'center' }}
+            />
+            <Typography variant='h4'>Welcome back 👋🏻</Typography>
             <Typography>Please sign-in to your account and start the adventure</Typography>
           </div>
           <form
@@ -171,12 +170,6 @@ const LoginV2 = () => {
                 }
               }}
             />
-            <div className='flex justify-between items-center flex-wrap gap-x-3 gap-y-1'>
-              <FormControlLabel control={<Checkbox />} label='Remember me' />
-              <Typography className='text-end' color='primary.main' component={Link}>
-                Forgot password?
-              </Typography>
-            </div>
             <Button fullWidth variant='contained' type='submit' disabled={isSubmitting}>
               {isSubmitting ? 'Signing in...' : 'Login'}
             </Button>
@@ -185,21 +178,6 @@ const LoginV2 = () => {
               <Typography component={Link} href='/register' color='primary.main'>
                 Create an account
               </Typography>
-            </div>
-            <Divider className='gap-2 text-textPrimary'>or</Divider>
-            <div className='flex justify-center items-center gap-1.5'>
-              <IconButton className='text-facebook' size='small'>
-                <i className='bx-bxl-facebook-circle' />
-              </IconButton>
-              <IconButton className='text-twitter' size='small'>
-                <i className='bx-bxl-twitter' />
-              </IconButton>
-              <IconButton className='text-textPrimary' size='small'>
-                <i className='bx-bxl-github' />
-              </IconButton>
-              <IconButton className='text-error' size='small'>
-                <i className='bx-bxl-google' />
-              </IconButton>
             </div>
           </form>
         </div>

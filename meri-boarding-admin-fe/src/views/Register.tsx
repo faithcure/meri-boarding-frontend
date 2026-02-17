@@ -6,14 +6,12 @@ import Typography from '@mui/material/Typography'
 import IconButton from '@mui/material/IconButton'
 import InputAdornment from '@mui/material/InputAdornment'
 import Button from '@mui/material/Button'
-import Divider from '@mui/material/Divider'
 import Alert from '@mui/material/Alert'
 import { styled, useTheme } from '@mui/material/styles'
 import classnames from 'classnames'
 import Link from '@components/Link'
 import Logo from '@components/layout/shared/Logo'
 import CustomTextField from '@core/components/mui/TextField'
-import themeConfig from '@configs/themeConfig'
 import { useSettings } from '@core/hooks/useSettings'
 
 const RegisterIllustration = styled('img')(({ theme }) => ({
@@ -67,8 +65,13 @@ const RegisterView = () => {
           <Logo />
         </Link>
         <div className='flex flex-col gap-6 is-full sm:is-auto md:is-full sm:max-is-[420px] md:max-is-[unset] mbs-11 sm:mbs-14 md:mbs-0'>
-          <div className='flex flex-col gap-1'>
-            <Typography variant='h4'>{`Create account for ${themeConfig.templateName}`}</Typography>
+          <div className='flex flex-col gap-1 items-start text-left'>
+            <img
+              src='/images/branding/meri-logo-mark.svg'
+              alt='Meri mark'
+              style={{ width: 200, height: 200, objectFit: 'contain', marginTop: -72, marginBottom: -10, alignSelf: 'center' }}
+            />
+            <Typography variant='h4'>Create account</Typography>
             <Typography>Your account will be reviewed by admin before login is allowed.</Typography>
           </div>
 
@@ -156,8 +159,6 @@ const RegisterView = () => {
                 Sign in
               </Typography>
             </div>
-
-            <Divider className='gap-2 text-textPrimary'>or</Divider>
           </form>
         </div>
       </div>

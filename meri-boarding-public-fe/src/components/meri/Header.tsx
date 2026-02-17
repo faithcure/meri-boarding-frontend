@@ -3,7 +3,6 @@ import MainMenuActive from "@/components/meri/MainMenuActive";
 import type { Locale } from "@/i18n/getLocale";
 import { getLocale } from "@/i18n/getLocale";
 import { localePath } from "@/i18n/localePath";
-import { getMessages } from "@/i18n/messages";
 import { fetchPublicHotels } from "@/lib/hotelsApi";
 import Link from "next/link";
 
@@ -13,9 +12,16 @@ type HeaderProps = {
 
 export default async function Header({ locale: localeProp }: HeaderProps = {}) {
   const locale = localeProp ?? (await getLocale());
-  const fallbackHeader = getMessages(locale).header;
   const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? process.env.API_BASE_URL ?? "http://localhost:4000";
-  let t = fallbackHeader;
+  let t = {
+    home: "",
+    hotels: "",
+    services: "",
+    ourServices: "",
+    ourAmenities: "",
+    contact: "",
+    reservation: "",
+  };
   let hotelLinks: Array<{ slug: string; menuName: string; available: boolean }> = [];
   const fullLabel = locale === "de" ? "Voll" : locale === "tr" ? "Dolu" : "Full";
 
@@ -27,12 +33,10 @@ export default async function Header({ locale: localeProp }: HeaderProps = {}) {
     if (response.ok) {
       const data = await response.json();
       if (data?.content) {
-        t = { ...fallbackHeader, ...data.content };
+        t = { ...t, ...data.content };
       }
     }
-  } catch {
-    t = fallbackHeader;
-  }
+  } catch {}
 
   try {
     const hotels = await fetchPublicHotels(locale);

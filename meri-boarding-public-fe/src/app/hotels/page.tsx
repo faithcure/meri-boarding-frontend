@@ -37,22 +37,15 @@ export default async function HotelsPage({ params }: HotelsPageProps = {}) {
     return { text: "", icon: "fa fa-check" };
   };
   const apiHotels = await fetchPublicHotels(locale).catch(() => []);
-  const hotelCards =
-    apiHotels.length > 0
-      ? apiHotels.map((item) => ({
-          slug: item.slug,
-          image: withApiHost(item.coverImageUrl || fallbackHotelImage),
-          name: item.name,
-          location: item.location,
-          description: item.shortDescription,
-          facts: (item.facts || []).map((fact) => normalizeFact(fact)).filter((fact) => Boolean(fact.text)),
-          available: item.available !== false,
-        }))
-      : t.hotelCards.map((item) => ({
-          ...item,
-          facts: (item.facts || []).map((fact) => normalizeFact(fact)).filter((fact) => Boolean(fact.text)),
-          available: true,
-        }));
+  const hotelCards = apiHotels.map((item) => ({
+    slug: item.slug,
+    image: withApiHost(item.coverImageUrl || fallbackHotelImage),
+    name: item.name,
+    location: item.location,
+    description: item.shortDescription,
+    facts: (item.facts || []).map((fact) => normalizeFact(fact)).filter((fact) => Boolean(fact.text)),
+    available: item.available !== false,
+  }));
   const overviewFacts = t.overviewFacts;
   const sharedHighlights = t.sharedHighlights;
   const staySteps = t.staySteps;

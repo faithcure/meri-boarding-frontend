@@ -50,9 +50,9 @@ export type Config = {
 }
 
 const themeConfig: Config = {
-  templateName: 'sneat',
+  templateName: 'Meri Admin',
   homePageUrl: '/home',
-  settingsCookieName: 'sneat-mui-next-demo-1',
+  settingsCookieName: 'meri-admin-theme-v2',
   mode: 'system', // 'system', 'light', 'dark'
   skin: 'default', // 'default', 'bordered'
   semiDark: false, // true, false
