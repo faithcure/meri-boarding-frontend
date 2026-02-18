@@ -2,16 +2,38 @@
 
 import { useEffect, useRef, useState } from "react";
 import AmenityCard from "./AmenityCard";
-import { getAmenityCards, getAmenityOverviewItems } from "./amenitiesData";
+import type { Locale } from "@/i18n/getLocale";
 import { localePath } from "@/i18n/localePath";
 import { useLocale } from "@/i18n/useLocale";
 import { getMessages } from "@/i18n/messages";
+import type { AmenitiesResolvedContent } from "@/lib/amenitiesContentApi";
 
-export default function AmenitiesContent() {
-  const locale = useLocale();
-  const t = getMessages(locale).amenitiesContent;
-  const cards = getAmenityCards(locale);
-  const overviewItems = getAmenityOverviewItems(locale);
+type AmenitiesContentProps = {
+  locale?: Locale;
+  content?: AmenitiesResolvedContent;
+};
+
+export default function AmenitiesContent({ locale: localeProp, content }: AmenitiesContentProps = {}) {
+  const detectedLocale = useLocale();
+  const locale = localeProp ?? detectedLocale;
+  const messages = getMessages(locale);
+  const fallbackContent = messages.amenitiesContent;
+  const t = {
+    layoutSubtitle: String(content?.content?.layoutSubtitle || fallbackContent.layoutSubtitle || ""),
+    layoutTitle: String(content?.content?.layoutTitle || fallbackContent.layoutTitle || ""),
+    layoutDesc: String(content?.content?.layoutDesc || fallbackContent.layoutDesc || ""),
+    layoutOptions: Array.isArray(content?.content?.layoutOptions) ? content.content.layoutOptions : fallbackContent.layoutOptions,
+    amenitiesSubtitle: String(content?.content?.amenitiesSubtitle || fallbackContent.amenitiesSubtitle || ""),
+    amenitiesTitle: String(content?.content?.amenitiesTitle || fallbackContent.amenitiesTitle || ""),
+    toggleLabel: String(content?.content?.toggleLabel || fallbackContent.toggleLabel || ""),
+    cardView: String(content?.content?.cardView || fallbackContent.cardView || ""),
+    listView: String(content?.content?.listView || fallbackContent.listView || ""),
+    switchHelp: String(content?.content?.switchHelp || fallbackContent.switchHelp || ""),
+    includedTitle: String(content?.content?.includedTitle || fallbackContent.includedTitle || ""),
+    request: String(content?.content?.request || fallbackContent.request || ""),
+  };
+  const cards = Array.isArray(content?.data?.cards) ? content.data.cards : messages.amenitiesData.cards;
+  const overviewItems = Array.isArray(content?.data?.overviewItems) ? content.data.overviewItems : messages.amenitiesData.overviewItems;
   const layouts = t.layoutOptions;
   const contactHref = localePath(locale, "/contact");
   const [view, setView] = useState<"grid" | "list">("grid");

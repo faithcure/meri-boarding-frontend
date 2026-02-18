@@ -110,6 +110,18 @@ const HorizontalMenu = () => {
             FAQ Settings
           </MenuItem>
         </SubMenu>
+        <MenuItem href='/content-services' icon={<i className='bx-briefcase-alt-2' />}>
+          Services Content
+        </MenuItem>
+        <MenuItem href='/content-reservation' icon={<i className='bx-calendar' />}>
+          Reservation Content
+        </MenuItem>
+        <MenuItem href='/content-amenities' icon={<i className='bx-grid-alt' />}>
+          Amenities Content
+        </MenuItem>
+        <MenuItem href='/content-contact' icon={<i className='bx-envelope' />}>
+          Contact Content
+        </MenuItem>
         <MenuItem href='/about' icon={<i className='bx-info-circle' />}>
           About
         </MenuItem>

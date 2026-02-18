@@ -18,6 +18,26 @@ const verticalMenuData = (): VerticalMenuDataType[] => [
     icon: 'bx-edit-alt'
   },
   {
+    label: 'Services Content',
+    href: '/content-services',
+    icon: 'bx-briefcase-alt-2'
+  },
+  {
+    label: 'Reservation Content',
+    href: '/content-reservation',
+    icon: 'bx-calendar'
+  },
+  {
+    label: 'Amenities Content',
+    href: '/content-amenities',
+    icon: 'bx-grid-alt'
+  },
+  {
+    label: 'Contact Content',
+    href: '/content-contact',
+    icon: 'bx-envelope'
+  },
+  {
     label: 'About',
     href: '/about',
     icon: 'bx-info-circle'

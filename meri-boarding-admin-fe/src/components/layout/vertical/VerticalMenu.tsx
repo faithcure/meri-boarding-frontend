@@ -1,8 +1,8 @@
-// MUI Imports
-import { useTheme } from '@mui/material/styles'
-
 // React Imports
 import { useEffect, useState } from 'react'
+
+// MUI Imports
+import { useTheme } from '@mui/material/styles'
 
 // Third-party Imports
 import PerfectScrollbar from 'react-perfect-scrollbar'
@@ -55,11 +55,13 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
 
     if (!profileRaw) {
       setIsSuperAdmin(false)
+
       return
     }
 
     try {
       const profile = JSON.parse(profileRaw) as { role?: string }
+
       setIsSuperAdmin(profile.role === 'super_admin')
     } catch {
       setIsSuperAdmin(false)
@@ -121,6 +123,18 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             FAQ Settings
           </MenuItem>
         </SubMenu>
+        <MenuItem href='/content-services' icon={<i className='bx-briefcase-alt-2' />}>
+          Services Content
+        </MenuItem>
+        <MenuItem href='/content-reservation' icon={<i className='bx-calendar' />}>
+          Reservation Content
+        </MenuItem>
+        <MenuItem href='/content-amenities' icon={<i className='bx-grid-alt' />}>
+          Amenities Content
+        </MenuItem>
+        <MenuItem href='/content-contact' icon={<i className='bx-envelope' />}>
+          Contact Content
+        </MenuItem>
         {isSuperAdmin ? (
           <MenuItem href='/users' icon={<i className='bx-group' />}>
             Users

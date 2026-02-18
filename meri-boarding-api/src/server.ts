@@ -160,6 +160,55 @@ type HomeFaqItem = {
   body: string;
 };
 
+type ServicesStat = {
+  label: string;
+  value: string;
+  note: string;
+};
+
+type ServicesHighlight = {
+  icon: string;
+  title: string;
+  description: string;
+};
+
+type AmenitiesLayoutOption = {
+  title: string;
+  icon: string;
+  description: string;
+  highlights: string[];
+};
+
+type AmenitiesCard = {
+  title: string;
+  icon: string;
+  image: string;
+  description: string;
+  highlights: string[];
+};
+
+type ContactDetailItem = {
+  icon: string;
+  title: string;
+  value: string;
+};
+
+type ContactSocialLink = {
+  icon: string;
+  label: string;
+  url: string;
+};
+
+type ReservationHelpContact = {
+  icon: string;
+  value: string;
+};
+
+type ReservationInquiryPurpose = {
+  value: string;
+  label: string;
+};
+
 type HomeCmsContent = {
   sections: Record<HomeSectionKey, HomeSectionState>;
   hero: {
@@ -226,6 +275,168 @@ type HomeCmsContent = {
     title: string;
     cta: string;
     items: HomeFaqItem[];
+  };
+};
+
+type ServicesCmsContent = {
+  hero: {
+    subtitle: string;
+    title: string;
+    home: string;
+    crumb: string;
+    backgroundImage: string;
+  };
+  content: {
+    heroSubtitle: string;
+    heroTitle: string;
+    heroDescription: string;
+    ctaAvailability: string;
+    ctaContact: string;
+    stats: ServicesStat[];
+    statsImage: string;
+    essentialsSubtitle: string;
+    essentialsTitle: string;
+    highlights: ServicesHighlight[];
+    supportSubtitle: string;
+    supportTitle: string;
+    supportDescription: string;
+    ctaStart: string;
+    supportList: string[];
+  };
+};
+
+type AmenitiesCmsContent = {
+  hero: {
+    subtitle: string;
+    title: string;
+    home: string;
+    crumb: string;
+    backgroundImage: string;
+  };
+  content: {
+    layoutSubtitle: string;
+    layoutTitle: string;
+    layoutDesc: string;
+    layoutOptions: AmenitiesLayoutOption[];
+    amenitiesSubtitle: string;
+    amenitiesTitle: string;
+    toggleLabel: string;
+    cardView: string;
+    listView: string;
+    switchHelp: string;
+    includedTitle: string;
+    request: string;
+  };
+  data: {
+    cards: AmenitiesCard[];
+    overviewItems: string[];
+  };
+};
+
+type ContactCmsContent = {
+  hero: {
+    subtitle: string;
+    title: string;
+    home: string;
+    crumb: string;
+    backgroundImage: string;
+  };
+  details: {
+    subtitle: string;
+    title: string;
+    description: string;
+    items: ContactDetailItem[];
+    socials: ContactSocialLink[];
+  };
+  form: {
+    action: string;
+    name: string;
+    email: string;
+    phone: string;
+    message: string;
+    send: string;
+    success: string;
+    error: string;
+    namePlaceholder: string;
+    emailPlaceholder: string;
+    phonePlaceholder: string;
+    messagePlaceholder: string;
+  };
+};
+
+type ReservationCmsContent = {
+  hero: {
+    subtitle: string;
+    title: string;
+    description: string;
+    backgroundImage: string;
+  };
+  crumb: {
+    home: string;
+    current: string;
+  };
+  shortStay: {
+    subtitle: string;
+    title: string;
+    description: string;
+    helper: string;
+  };
+  form: {
+    action: string;
+    checkIn: string;
+    checkOut: string;
+    boarding: string;
+    select: string;
+    rooms: string;
+    guests: string;
+    availability: string;
+    boardingOptions: string[];
+    roomOptions: string[];
+    guestOptions: string[];
+  };
+  longStay: {
+    title: string;
+    description: string;
+    bullets: string[];
+    ctaQuote: string;
+    ctaContact: string;
+  };
+  help: {
+    title: string;
+    description: string;
+    hoursTitle: string;
+    hoursDay: string;
+    contacts: ReservationHelpContact[];
+    hours: string[];
+  };
+  why: {
+    title: string;
+    bullets: string[];
+  };
+  inquiry: {
+    action: string;
+    subtitle: string;
+    title: string;
+    firstName: string;
+    lastName: string;
+    company: string;
+    email: string;
+    phone: string;
+    purpose: string;
+    nationality: string;
+    guests: string;
+    rooms: string;
+    boarding: string;
+    moveIn: string;
+    message: string;
+    select: string;
+    send: string;
+    policy: string;
+    policyLink: string;
+    moveInPlaceholder: string;
+    stayPurposes: ReservationInquiryPurpose[];
+    boardingOptions: string[];
+    roomOptions: string[];
   };
 };
 
@@ -437,6 +648,329 @@ const defaultHomeContent: HomeCmsContent = {
     ],
   },
 };
+const defaultServicesContent: ServicesCmsContent = {
+  hero: {
+    subtitle: 'Meri Boarding',
+    title: 'Services',
+    home: 'Home',
+    crumb: 'Services',
+    backgroundImage: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6629.jpg',
+  },
+  content: {
+    heroSubtitle: 'Serviced apartments',
+    heroTitle: 'Everything you need to live, work, and settle in quickly',
+    heroDescription:
+      'Meri Boarding provides fully equipped 1-3 room apartments across three locations in Stuttgart. In Hildesheim, about 30 minutes south of Hannover, guests can also stay in smaller buildings with the same serviced-apartment feel.',
+    ctaAvailability: 'Request availability',
+    ctaContact: 'Contact us',
+    stats: [
+      { label: 'Total apartments', value: '256+', note: 'Across 3 locations in Stuttgart' },
+      { label: 'Apartment layouts', value: '1-3 rooms', note: 'Smart, fully equipped layouts' },
+      { label: 'Move-in ready', value: 'Available now', note: 'Immediate occupancy is possible' },
+    ],
+    statsImage: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6639.jpg',
+    essentialsSubtitle: 'Included in every stay',
+    essentialsTitle: 'Apartment essentials, ready from day one',
+    highlights: [
+      {
+        icon: 'fa fa-home',
+        title: 'Furnished living rooms',
+        description: 'High-quality furniture, a modern Smart TV with satellite channels, and a sofa that converts into a bed.',
+      },
+      {
+        icon: 'fa fa-bed',
+        title: 'Restful bedrooms',
+        description: 'Large double beds with quality mattresses, built-in wardrobes, and optional extra beds. Bedding is provided.',
+      },
+      {
+        icon: 'fa fa-cutlery',
+        title: 'International-ready kitchens',
+        description: 'Fully equipped kitchens with dishwasher, coffee machine, microwave, rice cooker, and Chapati board.',
+      },
+      {
+        icon: 'fa fa-coffee',
+        title: 'Dining essentials',
+        description: 'Complete sets of dishes, cutlery, and glasses for everyday meals and hosting.',
+      },
+      {
+        icon: 'fa fa-sun-o',
+        title: 'Balcony or terrace',
+        description: 'Every apartment includes a furnished balcony or terrace to relax outdoors.',
+      },
+      {
+        icon: 'fa fa-wifi',
+        title: 'Connectivity',
+        description: 'Fast, free WLAN and DSL plus a private phone line with flat-rate calls to German landlines.',
+      },
+      {
+        icon: 'fa fa-refresh',
+        title: 'Laundry options',
+        description: 'A washing machine in the bathroom or shared laundry with washer and dryer.',
+      },
+      {
+        icon: 'fa fa-child',
+        title: 'Family & mobility',
+        description: 'Playground, baby and child beds available, plus parking or underground garage on request.',
+      },
+    ],
+    supportSubtitle: 'Resident support',
+    supportTitle: 'Services that make moving simple',
+    supportDescription:
+      'From registration support to on-request services, Meri Boarding makes every stay smooth for individuals, families, and corporate guests.',
+    ctaStart: 'Start your stay',
+    supportList: [
+      'Move-in ready apartments with immediate availability.',
+      'Registration support with confirmation documents for residents.',
+      'Name door sign prepared on arrival.',
+      '24-hour caretaker service on site.',
+      'Facility and cleaning services available on request.',
+      'Option for disturbance-free living without additional services.',
+      'Visitor access can be arranged and pets are welcome on request.',
+      'Multicultural, child-friendly, private living atmosphere.',
+    ],
+  },
+};
+const defaultAmenitiesContent: AmenitiesCmsContent = {
+  hero: {
+    subtitle: 'Meri Boarding',
+    title: 'Amenities',
+    crumb: 'Amenities',
+    home: 'Home',
+    backgroundImage: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6639.jpg',
+  },
+  content: {
+    layoutSubtitle: 'Layout options',
+    layoutTitle: 'Choose the layout that fits your stay',
+    layoutDesc: 'From compact studios to spacious multi-room apartments.',
+    layoutOptions: [
+      {
+        title: 'Studio / 1-Room',
+        icon: 'fa fa-square-o',
+        description: 'Open-plan layouts that keep everything close and practical.',
+        highlights: ['Living and sleeping in one space', 'Compact dining and storage'],
+      },
+      {
+        title: '2-Room',
+        icon: 'fa fa-columns',
+        description: 'Separate sleeping area for extra privacy and comfort.',
+        highlights: ['Distinct living and bedroom zones', 'Ideal for couples or remote work'],
+      },
+      {
+        title: '3-Room',
+        icon: 'fa fa-th-large',
+        description: 'More space for families, longer stays, or sharing.',
+        highlights: ['Extra room for guests or a workspace', 'Great for longer stays'],
+      },
+    ],
+    amenitiesSubtitle: 'All amenities',
+    amenitiesTitle: 'Everything included for everyday living',
+    toggleLabel: 'View options',
+    cardView: 'Card view',
+    listView: 'List view',
+    switchHelp: 'Switch between card and list views to scan details your way.',
+    includedTitle: 'Included in your stay',
+    request: 'Request availability',
+  },
+  data: {
+    cards: [
+      {
+        title: 'Living Room',
+        icon: 'fa fa-home',
+        image: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6699.jpg',
+        description: 'Quality furnishings create a relaxed atmosphere in every apartment, with space to unwind.',
+        highlights: ['Smart TV with satellite channels', 'Sofa converts into an extra bed'],
+      },
+      {
+        title: 'Bedroom',
+        icon: 'fa fa-bed',
+        image: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6744.jpg',
+        description: 'Large double beds with quality mattresses and built-in wardrobes keep things comfortable and tidy.',
+        highlights: ['Extra beds available for adults or children', 'Bedding provided and refreshed on request'],
+      },
+      {
+        title: 'Kitchen',
+        icon: 'fa fa-cutlery',
+        image: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6754.jpg',
+        description: 'Fully equipped kitchens for European and international cooking, ready for everyday use.',
+        highlights: ['Dishwasher, coffee machine, microwave, rice cooker', 'Chapati board and a shopping trolley for groceries'],
+      },
+      {
+        title: 'Dining Area',
+        icon: 'fa fa-coffee',
+        image: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6756.jpg',
+        description: 'Complete dining setup for daily meals and shared moments.',
+        highlights: ['Full set of tableware, cutlery, and glasses'],
+      },
+      {
+        title: 'Balcony / Terrace',
+        icon: 'fa fa-sun-o',
+        image: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6821-Bearbeitet.jpg',
+        description: 'Every apartment includes a furnished balcony or terrace for fresh-air breaks.',
+        highlights: ['Plenty of space to relax outdoors'],
+      },
+      {
+        title: 'Connectivity',
+        icon: 'fa fa-wifi',
+        image: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6844.jpg',
+        description: 'Stay connected with fast, reliable internet and a private phone line.',
+        highlights: ['Free WiFi and DSL', 'Phone line with flat rate to German landlines'],
+      },
+      {
+        title: 'For Little Guests',
+        icon: 'fa fa-child',
+        image: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6846.jpg',
+        description: 'Family-friendly touches make traveling with kids easy and comfortable.',
+        highlights: ['Play area and playground on site', 'Baby, kids, and extra beds bookable anytime'],
+      },
+      {
+        title: 'Parking / Underground Garage',
+        icon: 'fa fa-car',
+        image: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6856-Bearbeitet.jpg',
+        description: 'Parking options are available on request, with added bike facilities in some locations.',
+        highlights: ['Parking or underground spaces on request', 'Bicycle parking or storage where available'],
+      },
+    ],
+    overviewItems: [
+      'Washing machine in the bathroom or shared laundry room with dryer',
+      'Heat-resistant blackout curtains',
+      'Playroom with table tennis table',
+      'Fully furnished apartments with quality furniture',
+    ],
+  },
+};
+const defaultContactContent: ContactCmsContent = {
+  hero: {
+    subtitle: 'Enjoy Your Stay',
+    title: 'Contact',
+    crumb: 'Contact',
+    home: 'Home',
+    backgroundImage: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6629.jpg',
+  },
+  details: {
+    subtitle: 'Write a Message',
+    title: 'Get In Touch',
+    description:
+      'Have a question, suggestion, or just want to say hi? We are here and happy to hear from you! Office hours are Monday to Friday, 08:00-12:00 and 13:00-17:00. Weekend by appointment.',
+    items: [
+      { icon: 'icofont-location-pin', title: 'Address', value: 'Flamingoweg 70\nD-70378 Stuttgart' },
+      { icon: 'icofont-envelope', title: 'Email', value: 'info@meri-boarding.de' },
+      { icon: 'icofont-phone', title: 'Phone', value: '+49 (0) 711 54 89 84 - 0' },
+      { icon: 'icofont-brand-whatsapp', title: 'WhatsApp', value: '+49 (0) 152 06419253' },
+    ],
+    socials: [
+      { icon: 'fa-brands fa-instagram', label: 'Instagram', url: 'https://www.instagram.com/' },
+      { icon: 'fa-brands fa-linkedin-in', label: 'LinkedIn', url: 'https://www.linkedin.com/' },
+    ],
+  },
+  form: {
+    action: 'https://meri-boarding.de/boarding-booking.php',
+    name: 'Name',
+    email: 'Email',
+    phone: 'Phone',
+    message: 'Message',
+    send: 'Send Message',
+    success: 'Your message has been sent successfully. Refresh this page if you want to send more messages.',
+    error: 'Sorry there was an error sending your form.',
+    namePlaceholder: 'Your Name',
+    emailPlaceholder: 'Your Email',
+    phonePlaceholder: 'Your Phone',
+    messagePlaceholder: 'Your Message',
+  },
+};
+const defaultReservationContent: ReservationCmsContent = {
+  hero: {
+    subtitle: 'Plan Your Stay',
+    title: 'Reservation',
+    description: 'Short stays can be reserved online. For stays longer than 1 month or annual allocations, our team prepares a tailored offer.',
+    backgroundImage: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6629.jpg',
+  },
+  crumb: {
+    home: 'Home',
+    current: 'Reservation',
+  },
+  shortStay: {
+    subtitle: 'Short stays (up to 30 nights)',
+    title: 'Instant reservation',
+    description: 'Ideal for business trips, short-term projects, or temporary housing. Choose your dates and request availability.',
+    helper: 'For stays longer than 30 nights, please use the long-stay inquiry below.',
+  },
+  form: {
+    action: '#',
+    checkIn: 'Check In',
+    checkOut: 'Check Out',
+    boarding: 'Boarding House',
+    select: 'Please select',
+    rooms: 'Rooms',
+    guests: 'Guests',
+    availability: 'Check Availability',
+    boardingOptions: ['Flamingo', 'Europaplatz', 'Hildesheim'],
+    roomOptions: ['1', '2', '3', '4', '5'],
+    guestOptions: ['1', '2', '3', '4', '5', '6'],
+  },
+  longStay: {
+    title: 'Long-term & corporate stays',
+    description:
+      'For 1+ month stays, annual allocations, or corporate partnerships (employees and students), we provide tailored offers, fixed rates, and block bookings.',
+    bullets: [
+      'Dedicated account support for companies and institutions',
+      'Flexible move-in dates and custom invoicing',
+      'Optional services and quiet-living packages',
+    ],
+    ctaQuote: 'Request long-stay quote',
+    ctaContact: 'Contact the team',
+  },
+  help: {
+    title: 'Need help?',
+    description: 'Our reservation team helps with availability, invoicing, and customized agreements for longer stays.',
+    hoursTitle: 'Office hours',
+    hoursDay: 'Monday - Friday',
+    contacts: [
+      { icon: 'fa fa-phone', value: '+49 (0) 711 54 89 84 - 0' },
+      { icon: 'fa fa-whatsapp', value: '+49 (0) 152 06419253' },
+      { icon: 'fa fa-envelope', value: 'info@meri-boarding.de' },
+    ],
+    hours: ['08:00 - 12:00', '13:00 - 17:00'],
+  },
+  why: {
+    title: 'Why companies book with us',
+    bullets: [
+      'Reliable capacity for project teams and interns',
+      'Furnished apartments ready for immediate move-in',
+      'Custom agreements for long-term housing',
+    ],
+  },
+  inquiry: {
+    action: 'https://meri-boarding.de/boarding-booking.php',
+    subtitle: 'Non-binding booking inquiry',
+    title: 'Request a Quote',
+    firstName: 'First Name',
+    lastName: 'Last Name',
+    company: 'Company (for business requests)',
+    email: 'Email',
+    phone: 'Phone',
+    purpose: 'Purpose of Stay',
+    nationality: 'Nationality',
+    guests: 'Number of Guests',
+    rooms: 'Number of Rooms',
+    boarding: 'Boarding House',
+    moveIn: 'Move-in Date',
+    message: 'Your Message',
+    select: 'Please select',
+    send: 'Send Request',
+    policy: '* By submitting this form, you agree that we may use your data to process your request. Information about data protection can be found ',
+    policyLink: 'here',
+    moveInPlaceholder: 'mm/dd/yyyy',
+    stayPurposes: [
+      { value: 'Business', label: 'Business' },
+      { value: 'Private', label: 'Private' },
+      { value: 'Project', label: 'Project' },
+      { value: 'Relocation', label: 'Relocation' },
+      { value: 'Other', label: 'Other' },
+    ],
+    boardingOptions: ['Flamingo', 'Europaplatz', 'Hildesheim'],
+    roomOptions: ['1', '2', '3'],
+  },
+};
 const defaultHeaderContent: Record<ContentLocale, HeaderContent> = {
   de: {
     home: 'Startseite',
@@ -488,6 +1022,10 @@ const server = Fastify({
 
 let mongoClient: MongoClient | null = null;
 const homeFallbackCache: Partial<Record<ContentLocale, HomeCmsContent>> = {};
+const servicesFallbackCache: Partial<Record<ContentLocale, ServicesCmsContent>> = {};
+const amenitiesFallbackCache: Partial<Record<ContentLocale, AmenitiesCmsContent>> = {};
+const contactFallbackCache: Partial<Record<ContentLocale, ContactCmsContent>> = {};
+const reservationFallbackCache: Partial<Record<ContentLocale, ReservationCmsContent>> = {};
 const avatarUploadDir = path.resolve(process.cwd(), 'uploads', 'avatars');
 const hotelUploadDir = path.resolve(process.cwd(), 'uploads', 'hotels');
 const homeUploadDir = path.resolve(process.cwd(), 'uploads', 'home');
@@ -1031,6 +1569,638 @@ function validateHomeContent(input: HomeCmsContent) {
   return null;
 }
 
+function normalizeServicesContent(
+  input: Partial<ServicesCmsContent> | undefined,
+  fallback: ServicesCmsContent,
+): ServicesCmsContent {
+  const statsSource = Array.isArray(input?.content?.stats) ? input?.content?.stats : fallback.content.stats;
+  const highlightsSource = Array.isArray(input?.content?.highlights) ? input?.content?.highlights : fallback.content.highlights;
+  const supportListSource = Array.isArray(input?.content?.supportList) ? input?.content?.supportList : fallback.content.supportList;
+
+  const normalizedStats = statsSource
+    .map((item) => ({
+      label: String(item?.label || '').trim(),
+      value: String(item?.value || '').trim(),
+      note: String(item?.note || '').trim(),
+    }))
+    .filter((item) => Boolean(item.label) || Boolean(item.value) || Boolean(item.note))
+    .slice(0, 6);
+
+  const normalizedHighlights = highlightsSource
+    .map((item) => ({
+      icon: String(item?.icon || '').trim() || 'fa fa-home',
+      title: String(item?.title || '').trim(),
+      description: String(item?.description || '').trim(),
+    }))
+    .filter((item) => Boolean(item.icon) || Boolean(item.title) || Boolean(item.description))
+    .slice(0, 12);
+
+  const normalizedSupportList = supportListSource
+    .map((item) => String(item || '').trim())
+    .filter(Boolean)
+    .slice(0, 20);
+
+  return {
+    hero: {
+      subtitle: String(input?.hero?.subtitle ?? fallback.hero.subtitle ?? '').trim(),
+      title: String(input?.hero?.title ?? fallback.hero.title ?? '').trim(),
+      home: String(input?.hero?.home ?? fallback.hero.home ?? '').trim(),
+      crumb: String(input?.hero?.crumb ?? fallback.hero.crumb ?? '').trim(),
+      backgroundImage: String(input?.hero?.backgroundImage ?? fallback.hero.backgroundImage ?? '').trim(),
+    },
+    content: {
+      heroSubtitle: String(input?.content?.heroSubtitle ?? fallback.content.heroSubtitle ?? '').trim(),
+      heroTitle: String(input?.content?.heroTitle ?? fallback.content.heroTitle ?? '').trim(),
+      heroDescription: String(input?.content?.heroDescription ?? fallback.content.heroDescription ?? '').trim(),
+      ctaAvailability: String(input?.content?.ctaAvailability ?? fallback.content.ctaAvailability ?? '').trim(),
+      ctaContact: String(input?.content?.ctaContact ?? fallback.content.ctaContact ?? '').trim(),
+      stats: normalizedStats.length > 0 ? normalizedStats : fallback.content.stats,
+      statsImage: String(input?.content?.statsImage ?? fallback.content.statsImage ?? '').trim(),
+      essentialsSubtitle: String(input?.content?.essentialsSubtitle ?? fallback.content.essentialsSubtitle ?? '').trim(),
+      essentialsTitle: String(input?.content?.essentialsTitle ?? fallback.content.essentialsTitle ?? '').trim(),
+      highlights: normalizedHighlights.length > 0 ? normalizedHighlights : fallback.content.highlights,
+      supportSubtitle: String(input?.content?.supportSubtitle ?? fallback.content.supportSubtitle ?? '').trim(),
+      supportTitle: String(input?.content?.supportTitle ?? fallback.content.supportTitle ?? '').trim(),
+      supportDescription: String(input?.content?.supportDescription ?? fallback.content.supportDescription ?? '').trim(),
+      ctaStart: String(input?.content?.ctaStart ?? fallback.content.ctaStart ?? '').trim(),
+      supportList: normalizedSupportList.length > 0 ? normalizedSupportList : fallback.content.supportList,
+    },
+  };
+}
+
+function validateServicesContent(input: ServicesCmsContent) {
+  if (!input.hero.subtitle || !input.hero.title || !input.hero.home || !input.hero.crumb) {
+    return 'Services hero fields are required';
+  }
+  if (!input.hero.backgroundImage) {
+    return 'Services hero background image is required';
+  }
+  if (!input.content.heroSubtitle || !input.content.heroTitle || !input.content.heroDescription) {
+    return 'Services intro title/description fields are required';
+  }
+  if (!input.content.ctaAvailability || !input.content.ctaContact || !input.content.ctaStart) {
+    return 'Services CTA fields are required';
+  }
+  if (!Array.isArray(input.content.stats) || input.content.stats.length < 1) {
+    return 'Services stats are required (at least 1)';
+  }
+  if (input.content.stats.length > 6) {
+    return 'Services stats limit is 6';
+  }
+  for (const [index, item] of input.content.stats.entries()) {
+    if (!item.label || !item.value || !item.note) {
+      return `Services stat ${index + 1}: label, value and note are required`;
+    }
+  }
+  if (!input.content.statsImage) {
+    return 'Services stats image is required';
+  }
+  if (!input.content.essentialsSubtitle || !input.content.essentialsTitle) {
+    return 'Services essentials title fields are required';
+  }
+  if (!Array.isArray(input.content.highlights) || input.content.highlights.length < 1) {
+    return 'Services highlights are required (at least 1)';
+  }
+  if (input.content.highlights.length > 12) {
+    return 'Services highlights limit is 12';
+  }
+  for (const [index, item] of input.content.highlights.entries()) {
+    if (!item.icon || !item.title || !item.description) {
+      return `Services highlight ${index + 1}: icon, title and description are required`;
+    }
+  }
+  if (!input.content.supportSubtitle || !input.content.supportTitle || !input.content.supportDescription) {
+    return 'Services support title/description fields are required';
+  }
+  if (!Array.isArray(input.content.supportList) || input.content.supportList.length < 1) {
+    return 'Services support list is required (at least 1)';
+  }
+  if (input.content.supportList.length > 20) {
+    return 'Services support list item limit is 20';
+  }
+  for (const [index, item] of input.content.supportList.entries()) {
+    if (!item) {
+      return `Services support item ${index + 1} is required`;
+    }
+  }
+  return null;
+}
+
+function normalizeAmenitiesContent(
+  input: Partial<AmenitiesCmsContent> | undefined,
+  fallback: AmenitiesCmsContent,
+): AmenitiesCmsContent {
+  const layoutOptionsSource = Array.isArray(input?.content?.layoutOptions) ? input?.content?.layoutOptions : fallback.content.layoutOptions;
+  const cardsSource = Array.isArray(input?.data?.cards) ? input?.data?.cards : fallback.data.cards;
+  const overviewItemsSource = Array.isArray(input?.data?.overviewItems) ? input?.data?.overviewItems : fallback.data.overviewItems;
+
+  const normalizedLayoutOptions = layoutOptionsSource
+    .map((item) => ({
+      title: String(item?.title || '').trim(),
+      icon: String(item?.icon || '').trim() || 'fa fa-square-o',
+      description: String(item?.description || '').trim(),
+      highlights: Array.isArray(item?.highlights) ? item.highlights.map((row) => String(row || '').trim()).filter(Boolean).slice(0, 10) : [],
+    }))
+    .filter((item) => Boolean(item.title) || Boolean(item.description) || Boolean(item.highlights.length))
+    .slice(0, 8);
+
+  const normalizedCards = cardsSource
+    .map((item) => ({
+      title: String(item?.title || '').trim(),
+      icon: String(item?.icon || '').trim() || 'fa fa-home',
+      image: String(item?.image || '').trim(),
+      description: String(item?.description || '').trim(),
+      highlights: Array.isArray(item?.highlights) ? item.highlights.map((row) => String(row || '').trim()).filter(Boolean).slice(0, 10) : [],
+    }))
+    .filter((item) => Boolean(item.title) || Boolean(item.description) || Boolean(item.image) || Boolean(item.highlights.length))
+    .slice(0, 24);
+
+  const normalizedOverviewItems = overviewItemsSource.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 40);
+
+  return {
+    hero: {
+      subtitle: String(input?.hero?.subtitle ?? fallback.hero.subtitle ?? '').trim(),
+      title: String(input?.hero?.title ?? fallback.hero.title ?? '').trim(),
+      home: String(input?.hero?.home ?? fallback.hero.home ?? '').trim(),
+      crumb: String(input?.hero?.crumb ?? fallback.hero.crumb ?? '').trim(),
+      backgroundImage: String(input?.hero?.backgroundImage ?? fallback.hero.backgroundImage ?? '').trim(),
+    },
+    content: {
+      layoutSubtitle: String(input?.content?.layoutSubtitle ?? fallback.content.layoutSubtitle ?? '').trim(),
+      layoutTitle: String(input?.content?.layoutTitle ?? fallback.content.layoutTitle ?? '').trim(),
+      layoutDesc: String(input?.content?.layoutDesc ?? fallback.content.layoutDesc ?? '').trim(),
+      layoutOptions: normalizedLayoutOptions.length > 0 ? normalizedLayoutOptions : fallback.content.layoutOptions,
+      amenitiesSubtitle: String(input?.content?.amenitiesSubtitle ?? fallback.content.amenitiesSubtitle ?? '').trim(),
+      amenitiesTitle: String(input?.content?.amenitiesTitle ?? fallback.content.amenitiesTitle ?? '').trim(),
+      toggleLabel: String(input?.content?.toggleLabel ?? fallback.content.toggleLabel ?? '').trim(),
+      cardView: String(input?.content?.cardView ?? fallback.content.cardView ?? '').trim(),
+      listView: String(input?.content?.listView ?? fallback.content.listView ?? '').trim(),
+      switchHelp: String(input?.content?.switchHelp ?? fallback.content.switchHelp ?? '').trim(),
+      includedTitle: String(input?.content?.includedTitle ?? fallback.content.includedTitle ?? '').trim(),
+      request: String(input?.content?.request ?? fallback.content.request ?? '').trim(),
+    },
+    data: {
+      cards: normalizedCards.length > 0 ? normalizedCards : fallback.data.cards,
+      overviewItems: normalizedOverviewItems.length > 0 ? normalizedOverviewItems : fallback.data.overviewItems,
+    },
+  };
+}
+
+function validateAmenitiesContent(input: AmenitiesCmsContent) {
+  if (!input.hero.subtitle || !input.hero.title || !input.hero.home || !input.hero.crumb) {
+    return 'Amenities hero fields are required';
+  }
+  if (!input.hero.backgroundImage) {
+    return 'Amenities hero background image is required';
+  }
+  if (!input.content.layoutSubtitle || !input.content.layoutTitle || !input.content.layoutDesc) {
+    return 'Amenities layout title/description fields are required';
+  }
+  if (!Array.isArray(input.content.layoutOptions) || input.content.layoutOptions.length < 1) {
+    return 'Amenities layout options are required (at least 1)';
+  }
+  if (input.content.layoutOptions.length > 8) {
+    return 'Amenities layout option limit is 8';
+  }
+  for (const [index, option] of input.content.layoutOptions.entries()) {
+    if (!option.title || !option.icon || !option.description) {
+      return `Amenities layout option ${index + 1}: title, icon and description are required`;
+    }
+    if (!Array.isArray(option.highlights) || option.highlights.length < 1) {
+      return `Amenities layout option ${index + 1}: at least 1 highlight is required`;
+    }
+    if (option.highlights.length > 10) {
+      return `Amenities layout option ${index + 1}: highlight limit is 10`;
+    }
+    if (option.highlights.some((item) => !item)) {
+      return `Amenities layout option ${index + 1}: highlight rows cannot be empty`;
+    }
+  }
+  if (!input.content.amenitiesSubtitle || !input.content.amenitiesTitle) {
+    return 'Amenities section title fields are required';
+  }
+  if (!input.content.toggleLabel || !input.content.cardView || !input.content.listView || !input.content.switchHelp) {
+    return 'Amenities toggle/view fields are required';
+  }
+  if (!input.content.includedTitle || !input.content.request) {
+    return 'Amenities included title and request CTA are required';
+  }
+  if (!Array.isArray(input.data.cards) || input.data.cards.length < 1) {
+    return 'Amenities cards are required (at least 1)';
+  }
+  if (input.data.cards.length > 24) {
+    return 'Amenities card limit is 24';
+  }
+  for (const [index, card] of input.data.cards.entries()) {
+    if (!card.title || !card.icon || !card.image || !card.description) {
+      return `Amenities card ${index + 1}: title, icon, image and description are required`;
+    }
+    if (!Array.isArray(card.highlights) || card.highlights.length < 1) {
+      return `Amenities card ${index + 1}: at least 1 highlight is required`;
+    }
+    if (card.highlights.length > 10) {
+      return `Amenities card ${index + 1}: highlight limit is 10`;
+    }
+    if (card.highlights.some((item) => !item)) {
+      return `Amenities card ${index + 1}: highlight rows cannot be empty`;
+    }
+  }
+  if (!Array.isArray(input.data.overviewItems) || input.data.overviewItems.length < 1) {
+    return 'Amenities overview items are required (at least 1)';
+  }
+  if (input.data.overviewItems.length > 40) {
+    return 'Amenities overview item limit is 40';
+  }
+  if (input.data.overviewItems.some((item) => !item)) {
+    return 'Amenities overview items cannot be empty';
+  }
+  return null;
+}
+
+function normalizeContactContent(
+  input: Partial<ContactCmsContent> | undefined,
+  fallback: ContactCmsContent,
+): ContactCmsContent {
+  const detailItemsSource = Array.isArray(input?.details?.items) ? input?.details?.items : fallback.details.items;
+  const socialsSource = Array.isArray(input?.details?.socials) ? input?.details?.socials : fallback.details.socials;
+
+  const normalizedItems = detailItemsSource
+    .map((item) => ({
+      icon: String(item?.icon || '').trim() || 'icofont-info-circle',
+      title: String(item?.title || '').trim(),
+      value: String(item?.value || '').trim(),
+    }))
+    .filter((item) => Boolean(item.title) || Boolean(item.value))
+    .slice(0, 12);
+
+  const normalizedSocials = socialsSource
+    .map((item) => ({
+      icon: String(item?.icon || '').trim() || 'fa-brands fa-linkedin-in',
+      label: String(item?.label || '').trim(),
+      url: String(item?.url || '').trim(),
+    }))
+    .filter((item) => Boolean(item.label) || Boolean(item.url))
+    .slice(0, 12);
+
+  return {
+    hero: {
+      subtitle: String(input?.hero?.subtitle ?? fallback.hero.subtitle ?? '').trim(),
+      title: String(input?.hero?.title ?? fallback.hero.title ?? '').trim(),
+      home: String(input?.hero?.home ?? fallback.hero.home ?? '').trim(),
+      crumb: String(input?.hero?.crumb ?? fallback.hero.crumb ?? '').trim(),
+      backgroundImage: String(input?.hero?.backgroundImage ?? fallback.hero.backgroundImage ?? '').trim(),
+    },
+    details: {
+      subtitle: String(input?.details?.subtitle ?? fallback.details.subtitle ?? '').trim(),
+      title: String(input?.details?.title ?? fallback.details.title ?? '').trim(),
+      description: String(input?.details?.description ?? fallback.details.description ?? '').trim(),
+      items: normalizedItems.length > 0 ? normalizedItems : fallback.details.items,
+      socials: normalizedSocials.length > 0 ? normalizedSocials : fallback.details.socials,
+    },
+    form: {
+      action: String(input?.form?.action ?? fallback.form.action ?? '').trim(),
+      name: String(input?.form?.name ?? fallback.form.name ?? '').trim(),
+      email: String(input?.form?.email ?? fallback.form.email ?? '').trim(),
+      phone: String(input?.form?.phone ?? fallback.form.phone ?? '').trim(),
+      message: String(input?.form?.message ?? fallback.form.message ?? '').trim(),
+      send: String(input?.form?.send ?? fallback.form.send ?? '').trim(),
+      success: String(input?.form?.success ?? fallback.form.success ?? '').trim(),
+      error: String(input?.form?.error ?? fallback.form.error ?? '').trim(),
+      namePlaceholder: String(input?.form?.namePlaceholder ?? fallback.form.namePlaceholder ?? '').trim(),
+      emailPlaceholder: String(input?.form?.emailPlaceholder ?? fallback.form.emailPlaceholder ?? '').trim(),
+      phonePlaceholder: String(input?.form?.phonePlaceholder ?? fallback.form.phonePlaceholder ?? '').trim(),
+      messagePlaceholder: String(input?.form?.messagePlaceholder ?? fallback.form.messagePlaceholder ?? '').trim(),
+    },
+  };
+}
+
+function validateContactContent(input: ContactCmsContent) {
+  if (!input.hero.subtitle || !input.hero.title || !input.hero.home || !input.hero.crumb) {
+    return 'Contact hero fields are required';
+  }
+  if (!input.hero.backgroundImage) {
+    return 'Contact hero background image is required';
+  }
+  if (!input.details.subtitle || !input.details.title || !input.details.description) {
+    return 'Contact details section fields are required';
+  }
+  if (!Array.isArray(input.details.items) || input.details.items.length < 1) {
+    return 'Contact detail items are required (at least 1)';
+  }
+  if (input.details.items.length > 12) {
+    return 'Contact detail item limit is 12';
+  }
+  for (const [index, item] of input.details.items.entries()) {
+    if (!item.icon || !item.title || !item.value) {
+      return `Contact detail item ${index + 1}: icon, title and value are required`;
+    }
+  }
+  if (!Array.isArray(input.details.socials) || input.details.socials.length < 1) {
+    return 'Contact social links are required (at least 1)';
+  }
+  if (input.details.socials.length > 12) {
+    return 'Contact social link limit is 12';
+  }
+  for (const [index, item] of input.details.socials.entries()) {
+    if (!item.icon || !item.label || !item.url) {
+      return `Contact social link ${index + 1}: icon, label and URL are required`;
+    }
+  }
+  if (
+    !input.form.action ||
+    !input.form.name ||
+    !input.form.email ||
+    !input.form.phone ||
+    !input.form.message ||
+    !input.form.send ||
+    !input.form.success ||
+    !input.form.error ||
+    !input.form.namePlaceholder ||
+    !input.form.emailPlaceholder ||
+    !input.form.phonePlaceholder ||
+    !input.form.messagePlaceholder
+  ) {
+    return 'Contact form fields are required';
+  }
+  return null;
+}
+
+function normalizeReservationContent(
+  input: Partial<ReservationCmsContent> | undefined,
+  fallback: ReservationCmsContent,
+): ReservationCmsContent {
+  const formBoardingOptionsSource = Array.isArray(input?.form?.boardingOptions)
+    ? input?.form?.boardingOptions
+    : fallback.form.boardingOptions;
+  const formRoomOptionsSource = Array.isArray(input?.form?.roomOptions) ? input?.form?.roomOptions : fallback.form.roomOptions;
+  const formGuestOptionsSource = Array.isArray(input?.form?.guestOptions) ? input?.form?.guestOptions : fallback.form.guestOptions;
+  const longStayBulletsSource = Array.isArray(input?.longStay?.bullets) ? input?.longStay?.bullets : fallback.longStay.bullets;
+  const helpContactsSource = Array.isArray(input?.help?.contacts) ? input?.help?.contacts : fallback.help.contacts;
+  const helpHoursSource = Array.isArray(input?.help?.hours) ? input?.help?.hours : fallback.help.hours;
+  const whyBulletsSource = Array.isArray(input?.why?.bullets) ? input?.why?.bullets : fallback.why.bullets;
+  const inquiryPurposesSource = Array.isArray(input?.inquiry?.stayPurposes)
+    ? input?.inquiry?.stayPurposes
+    : fallback.inquiry.stayPurposes;
+  const inquiryBoardingOptionsSource = Array.isArray(input?.inquiry?.boardingOptions)
+    ? input?.inquiry?.boardingOptions
+    : fallback.inquiry.boardingOptions;
+  const inquiryRoomOptionsSource = Array.isArray(input?.inquiry?.roomOptions) ? input?.inquiry?.roomOptions : fallback.inquiry.roomOptions;
+
+  const normalizedFormBoardingOptions = formBoardingOptionsSource.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 20);
+  const normalizedFormRoomOptions = formRoomOptionsSource.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 20);
+  const normalizedFormGuestOptions = formGuestOptionsSource.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 20);
+  const normalizedLongStayBullets = longStayBulletsSource.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 20);
+  const normalizedHelpContacts = helpContactsSource
+    .map((item) => ({
+      icon: String(item?.icon || '').trim() || 'fa fa-info-circle',
+      value: String(item?.value || '').trim(),
+    }))
+    .filter((item) => Boolean(item.value))
+    .slice(0, 10);
+  const normalizedHelpHours = helpHoursSource.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 10);
+  const normalizedWhyBullets = whyBulletsSource.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 20);
+  const normalizedInquiryPurposes = inquiryPurposesSource
+    .map((item) => ({
+      value: String(item?.value || '').trim(),
+      label: String(item?.label || '').trim(),
+    }))
+    .filter((item) => Boolean(item.value) || Boolean(item.label))
+    .slice(0, 15);
+  const normalizedInquiryBoardingOptions = inquiryBoardingOptionsSource.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 20);
+  const normalizedInquiryRoomOptions = inquiryRoomOptionsSource.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 20);
+
+  return {
+    hero: {
+      subtitle: String(input?.hero?.subtitle ?? fallback.hero.subtitle ?? '').trim(),
+      title: String(input?.hero?.title ?? fallback.hero.title ?? '').trim(),
+      description: String(input?.hero?.description ?? fallback.hero.description ?? '').trim(),
+      backgroundImage: String(input?.hero?.backgroundImage ?? fallback.hero.backgroundImage ?? '').trim(),
+    },
+    crumb: {
+      home: String(input?.crumb?.home ?? fallback.crumb.home ?? '').trim(),
+      current: String(input?.crumb?.current ?? fallback.crumb.current ?? '').trim(),
+    },
+    shortStay: {
+      subtitle: String(input?.shortStay?.subtitle ?? fallback.shortStay.subtitle ?? '').trim(),
+      title: String(input?.shortStay?.title ?? fallback.shortStay.title ?? '').trim(),
+      description: String(input?.shortStay?.description ?? fallback.shortStay.description ?? '').trim(),
+      helper: String(input?.shortStay?.helper ?? fallback.shortStay.helper ?? '').trim(),
+    },
+    form: {
+      action: String(input?.form?.action ?? fallback.form.action ?? '').trim(),
+      checkIn: String(input?.form?.checkIn ?? fallback.form.checkIn ?? '').trim(),
+      checkOut: String(input?.form?.checkOut ?? fallback.form.checkOut ?? '').trim(),
+      boarding: String(input?.form?.boarding ?? fallback.form.boarding ?? '').trim(),
+      select: String(input?.form?.select ?? fallback.form.select ?? '').trim(),
+      rooms: String(input?.form?.rooms ?? fallback.form.rooms ?? '').trim(),
+      guests: String(input?.form?.guests ?? fallback.form.guests ?? '').trim(),
+      availability: String(input?.form?.availability ?? fallback.form.availability ?? '').trim(),
+      boardingOptions: normalizedFormBoardingOptions.length > 0 ? normalizedFormBoardingOptions : fallback.form.boardingOptions,
+      roomOptions: normalizedFormRoomOptions.length > 0 ? normalizedFormRoomOptions : fallback.form.roomOptions,
+      guestOptions: normalizedFormGuestOptions.length > 0 ? normalizedFormGuestOptions : fallback.form.guestOptions,
+    },
+    longStay: {
+      title: String(input?.longStay?.title ?? fallback.longStay.title ?? '').trim(),
+      description: String(input?.longStay?.description ?? fallback.longStay.description ?? '').trim(),
+      bullets: normalizedLongStayBullets.length > 0 ? normalizedLongStayBullets : fallback.longStay.bullets,
+      ctaQuote: String(input?.longStay?.ctaQuote ?? fallback.longStay.ctaQuote ?? '').trim(),
+      ctaContact: String(input?.longStay?.ctaContact ?? fallback.longStay.ctaContact ?? '').trim(),
+    },
+    help: {
+      title: String(input?.help?.title ?? fallback.help.title ?? '').trim(),
+      description: String(input?.help?.description ?? fallback.help.description ?? '').trim(),
+      hoursTitle: String(input?.help?.hoursTitle ?? fallback.help.hoursTitle ?? '').trim(),
+      hoursDay: String(input?.help?.hoursDay ?? fallback.help.hoursDay ?? '').trim(),
+      contacts: normalizedHelpContacts.length > 0 ? normalizedHelpContacts : fallback.help.contacts,
+      hours: normalizedHelpHours.length > 0 ? normalizedHelpHours : fallback.help.hours,
+    },
+    why: {
+      title: String(input?.why?.title ?? fallback.why.title ?? '').trim(),
+      bullets: normalizedWhyBullets.length > 0 ? normalizedWhyBullets : fallback.why.bullets,
+    },
+    inquiry: {
+      action: String(input?.inquiry?.action ?? fallback.inquiry.action ?? '').trim(),
+      subtitle: String(input?.inquiry?.subtitle ?? fallback.inquiry.subtitle ?? '').trim(),
+      title: String(input?.inquiry?.title ?? fallback.inquiry.title ?? '').trim(),
+      firstName: String(input?.inquiry?.firstName ?? fallback.inquiry.firstName ?? '').trim(),
+      lastName: String(input?.inquiry?.lastName ?? fallback.inquiry.lastName ?? '').trim(),
+      company: String(input?.inquiry?.company ?? fallback.inquiry.company ?? '').trim(),
+      email: String(input?.inquiry?.email ?? fallback.inquiry.email ?? '').trim(),
+      phone: String(input?.inquiry?.phone ?? fallback.inquiry.phone ?? '').trim(),
+      purpose: String(input?.inquiry?.purpose ?? fallback.inquiry.purpose ?? '').trim(),
+      nationality: String(input?.inquiry?.nationality ?? fallback.inquiry.nationality ?? '').trim(),
+      guests: String(input?.inquiry?.guests ?? fallback.inquiry.guests ?? '').trim(),
+      rooms: String(input?.inquiry?.rooms ?? fallback.inquiry.rooms ?? '').trim(),
+      boarding: String(input?.inquiry?.boarding ?? fallback.inquiry.boarding ?? '').trim(),
+      moveIn: String(input?.inquiry?.moveIn ?? fallback.inquiry.moveIn ?? '').trim(),
+      message: String(input?.inquiry?.message ?? fallback.inquiry.message ?? '').trim(),
+      select: String(input?.inquiry?.select ?? fallback.inquiry.select ?? '').trim(),
+      send: String(input?.inquiry?.send ?? fallback.inquiry.send ?? '').trim(),
+      policy: String(input?.inquiry?.policy ?? fallback.inquiry.policy ?? '').trim(),
+      policyLink: String(input?.inquiry?.policyLink ?? fallback.inquiry.policyLink ?? '').trim(),
+      moveInPlaceholder: String(input?.inquiry?.moveInPlaceholder ?? fallback.inquiry.moveInPlaceholder ?? '').trim(),
+      stayPurposes: normalizedInquiryPurposes.length > 0 ? normalizedInquiryPurposes : fallback.inquiry.stayPurposes,
+      boardingOptions: normalizedInquiryBoardingOptions.length > 0 ? normalizedInquiryBoardingOptions : fallback.inquiry.boardingOptions,
+      roomOptions: normalizedInquiryRoomOptions.length > 0 ? normalizedInquiryRoomOptions : fallback.inquiry.roomOptions,
+    },
+  };
+}
+
+function validateReservationContent(input: ReservationCmsContent) {
+  if (!input.hero.subtitle || !input.hero.title || !input.hero.description) {
+    return 'Reservation hero fields are required';
+  }
+  if (!input.hero.backgroundImage) {
+    return 'Reservation hero background image is required';
+  }
+  if (!input.crumb.home || !input.crumb.current) {
+    return 'Reservation breadcrumb fields are required';
+  }
+  if (!input.shortStay.subtitle || !input.shortStay.title || !input.shortStay.description || !input.shortStay.helper) {
+    return 'Short stay fields are required';
+  }
+  if (
+    !input.form.action ||
+    !input.form.checkIn ||
+    !input.form.checkOut ||
+    !input.form.boarding ||
+    !input.form.select ||
+    !input.form.rooms ||
+    !input.form.guests ||
+    !input.form.availability
+  ) {
+    return 'Reservation form labels are required';
+  }
+  if (!Array.isArray(input.form.boardingOptions) || input.form.boardingOptions.length < 1) {
+    return 'Reservation form boarding options are required (at least 1)';
+  }
+  if (input.form.boardingOptions.length > 20) {
+    return 'Reservation form boarding option limit is 20';
+  }
+  if (input.form.boardingOptions.some((item) => !item)) {
+    return 'Reservation form boarding options cannot be empty';
+  }
+  if (!Array.isArray(input.form.roomOptions) || input.form.roomOptions.length < 1) {
+    return 'Reservation form room options are required (at least 1)';
+  }
+  if (input.form.roomOptions.length > 20) {
+    return 'Reservation form room option limit is 20';
+  }
+  if (input.form.roomOptions.some((item) => !item)) {
+    return 'Reservation form room options cannot be empty';
+  }
+  if (!Array.isArray(input.form.guestOptions) || input.form.guestOptions.length < 1) {
+    return 'Reservation form guest options are required (at least 1)';
+  }
+  if (input.form.guestOptions.length > 20) {
+    return 'Reservation form guest option limit is 20';
+  }
+  if (input.form.guestOptions.some((item) => !item)) {
+    return 'Reservation form guest options cannot be empty';
+  }
+  if (!input.longStay.title || !input.longStay.description || !input.longStay.ctaQuote || !input.longStay.ctaContact) {
+    return 'Long stay fields are required';
+  }
+  if (!Array.isArray(input.longStay.bullets) || input.longStay.bullets.length < 1) {
+    return 'Long stay bullets are required (at least 1)';
+  }
+  if (input.longStay.bullets.length > 20) {
+    return 'Long stay bullet limit is 20';
+  }
+  if (input.longStay.bullets.some((item) => !item)) {
+    return 'Long stay bullets cannot be empty';
+  }
+  if (!input.help.title || !input.help.description || !input.help.hoursTitle || !input.help.hoursDay) {
+    return 'Help card fields are required';
+  }
+  if (!Array.isArray(input.help.contacts) || input.help.contacts.length < 1) {
+    return 'Help contacts are required (at least 1)';
+  }
+  if (input.help.contacts.length > 10) {
+    return 'Help contact limit is 10';
+  }
+  for (const [index, item] of input.help.contacts.entries()) {
+    if (!item.icon || !item.value) {
+      return `Help contact ${index + 1}: icon and value are required`;
+    }
+  }
+  if (!Array.isArray(input.help.hours) || input.help.hours.length < 1) {
+    return 'Help hours rows are required (at least 1)';
+  }
+  if (input.help.hours.length > 10) {
+    return 'Help hours row limit is 10';
+  }
+  if (input.help.hours.some((item) => !item)) {
+    return 'Help hours rows cannot be empty';
+  }
+  if (!input.why.title) {
+    return 'Why section title is required';
+  }
+  if (!Array.isArray(input.why.bullets) || input.why.bullets.length < 1) {
+    return 'Why section bullets are required (at least 1)';
+  }
+  if (input.why.bullets.length > 20) {
+    return 'Why section bullet limit is 20';
+  }
+  if (input.why.bullets.some((item) => !item)) {
+    return 'Why section bullets cannot be empty';
+  }
+  if (
+    !input.inquiry.action ||
+    !input.inquiry.subtitle ||
+    !input.inquiry.title ||
+    !input.inquiry.firstName ||
+    !input.inquiry.lastName ||
+    !input.inquiry.company ||
+    !input.inquiry.email ||
+    !input.inquiry.phone ||
+    !input.inquiry.purpose ||
+    !input.inquiry.nationality ||
+    !input.inquiry.guests ||
+    !input.inquiry.rooms ||
+    !input.inquiry.boarding ||
+    !input.inquiry.moveIn ||
+    !input.inquiry.message ||
+    !input.inquiry.select ||
+    !input.inquiry.send ||
+    !input.inquiry.policy ||
+    !input.inquiry.policyLink ||
+    !input.inquiry.moveInPlaceholder
+  ) {
+    return 'Inquiry form fields are required';
+  }
+  if (!Array.isArray(input.inquiry.stayPurposes) || input.inquiry.stayPurposes.length < 1) {
+    return 'Inquiry stay purposes are required (at least 1)';
+  }
+  if (input.inquiry.stayPurposes.length > 15) {
+    return 'Inquiry stay purpose limit is 15';
+  }
+  for (const [index, item] of input.inquiry.stayPurposes.entries()) {
+    if (!item.value || !item.label) {
+      return `Inquiry stay purpose ${index + 1}: value and label are required`;
+    }
+  }
+  if (!Array.isArray(input.inquiry.boardingOptions) || input.inquiry.boardingOptions.length < 1) {
+    return 'Inquiry boarding options are required (at least 1)';
+  }
+  if (input.inquiry.boardingOptions.length > 20) {
+    return 'Inquiry boarding option limit is 20';
+  }
+  if (input.inquiry.boardingOptions.some((item) => !item)) {
+    return 'Inquiry boarding options cannot be empty';
+  }
+  if (!Array.isArray(input.inquiry.roomOptions) || input.inquiry.roomOptions.length < 1) {
+    return 'Inquiry room options are required (at least 1)';
+  }
+  if (input.inquiry.roomOptions.length > 20) {
+    return 'Inquiry room option limit is 20';
+  }
+  if (input.inquiry.roomOptions.some((item) => !item)) {
+    return 'Inquiry room options cannot be empty';
+  }
+  return null;
+}
+
 function mergeRoomsCardsWithSharedMedia(
   cards: HomeCmsContent['rooms']['cards'],
   sharedMediaCards: HomeCmsContent['rooms']['cards'],
@@ -1347,6 +2517,564 @@ async function getHomeContent(locale: ContentLocale) {
   return fallback;
 }
 
+async function getLocalizedDefaultServicesContent(locale: ContentLocale): Promise<ServicesCmsContent> {
+  if (servicesFallbackCache[locale]) {
+    return JSON.parse(JSON.stringify(servicesFallbackCache[locale])) as ServicesCmsContent;
+  }
+
+  const fallback = JSON.parse(JSON.stringify(defaultServicesContent)) as ServicesCmsContent;
+  const localePath = path.resolve(process.cwd(), '..', 'meri-boarding-public-fe', 'src', 'i18n', 'locales', `${locale}.json`);
+
+  try {
+    const raw = await readFile(localePath, 'utf8');
+    const parsed = JSON.parse(raw) as {
+      servicesHero?: {
+        subtitle?: unknown;
+        title?: unknown;
+        home?: unknown;
+        crumb?: unknown;
+      };
+      servicesContent?: {
+        heroSubtitle?: unknown;
+        heroTitle?: unknown;
+        heroDescription?: unknown;
+        ctaAvailability?: unknown;
+        ctaContact?: unknown;
+        stats?: Array<{ label?: unknown; value?: unknown; note?: unknown }>;
+        essentialsSubtitle?: unknown;
+        essentialsTitle?: unknown;
+        highlights?: Array<{ icon?: unknown; title?: unknown; description?: unknown }>;
+        supportSubtitle?: unknown;
+        supportTitle?: unknown;
+        supportDescription?: unknown;
+        ctaStart?: unknown;
+        supportList?: unknown[];
+      };
+    };
+    const hero = parsed?.servicesHero || {};
+    const content = parsed?.servicesContent || {};
+
+    fallback.hero.subtitle = String(hero.subtitle ?? fallback.hero.subtitle).trim();
+    fallback.hero.title = String(hero.title ?? fallback.hero.title).trim();
+    fallback.hero.home = String(hero.home ?? fallback.hero.home).trim();
+    fallback.hero.crumb = String(hero.crumb ?? fallback.hero.crumb).trim();
+
+    fallback.content.heroSubtitle = String(content.heroSubtitle ?? fallback.content.heroSubtitle).trim();
+    fallback.content.heroTitle = String(content.heroTitle ?? fallback.content.heroTitle).trim();
+    fallback.content.heroDescription = String(content.heroDescription ?? fallback.content.heroDescription).trim();
+    fallback.content.ctaAvailability = String(content.ctaAvailability ?? fallback.content.ctaAvailability).trim();
+    fallback.content.ctaContact = String(content.ctaContact ?? fallback.content.ctaContact).trim();
+    fallback.content.essentialsSubtitle = String(content.essentialsSubtitle ?? fallback.content.essentialsSubtitle).trim();
+    fallback.content.essentialsTitle = String(content.essentialsTitle ?? fallback.content.essentialsTitle).trim();
+    fallback.content.supportSubtitle = String(content.supportSubtitle ?? fallback.content.supportSubtitle).trim();
+    fallback.content.supportTitle = String(content.supportTitle ?? fallback.content.supportTitle).trim();
+    fallback.content.supportDescription = String(content.supportDescription ?? fallback.content.supportDescription).trim();
+    fallback.content.ctaStart = String(content.ctaStart ?? fallback.content.ctaStart).trim();
+
+    if (Array.isArray(content.stats) && content.stats.length > 0) {
+      fallback.content.stats = content.stats
+        .map((item) => ({
+          label: String(item?.label || '').trim(),
+          value: String(item?.value || '').trim(),
+          note: String(item?.note || '').trim(),
+        }))
+        .filter((item) => Boolean(item.label) && Boolean(item.value) && Boolean(item.note))
+        .slice(0, 6);
+    }
+    if (Array.isArray(content.highlights) && content.highlights.length > 0) {
+      fallback.content.highlights = content.highlights
+        .map((item) => ({
+          icon: String(item?.icon || '').trim() || 'fa fa-home',
+          title: String(item?.title || '').trim(),
+          description: String(item?.description || '').trim(),
+        }))
+        .filter((item) => Boolean(item.icon) && Boolean(item.title) && Boolean(item.description))
+        .slice(0, 12);
+    }
+    if (Array.isArray(content.supportList) && content.supportList.length > 0) {
+      fallback.content.supportList = content.supportList.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 20);
+    }
+  } catch {
+    // Keep hardcoded fallback when locale file cannot be read.
+  }
+
+  servicesFallbackCache[locale] = fallback;
+  return JSON.parse(JSON.stringify(fallback)) as ServicesCmsContent;
+}
+
+async function getServicesContent(locale: ContentLocale) {
+  const db = await getDb();
+  const contents = db.collection<ContentEntry<ServicesCmsContent>>('content_entries');
+  await contents.createIndex({ key: 1, locale: 1 }, { unique: true });
+  const localizedFallback = await getLocalizedDefaultServicesContent(locale);
+
+  const content = await contents.findOne({ key: 'page.services', locale });
+  if (content) {
+    return normalizeServicesContent(content.value, localizedFallback);
+  }
+
+  const fallback = localizedFallback;
+  const now = new Date();
+  await contents.updateOne(
+    { key: 'page.services', locale },
+    {
+      $set: { value: fallback, updatedAt: now },
+      $setOnInsert: { _id: new ObjectId(), key: 'page.services', locale, createdAt: now },
+    },
+    { upsert: true },
+  );
+
+  return fallback;
+}
+
+async function getLocalizedDefaultAmenitiesContent(locale: ContentLocale): Promise<AmenitiesCmsContent> {
+  if (amenitiesFallbackCache[locale]) {
+    return JSON.parse(JSON.stringify(amenitiesFallbackCache[locale])) as AmenitiesCmsContent;
+  }
+
+  const fallback = JSON.parse(JSON.stringify(defaultAmenitiesContent)) as AmenitiesCmsContent;
+  const localePath = path.resolve(process.cwd(), '..', 'meri-boarding-public-fe', 'src', 'i18n', 'locales', `${locale}.json`);
+
+  try {
+    const raw = await readFile(localePath, 'utf8');
+    const parsed = JSON.parse(raw) as {
+      amenitiesHero?: {
+        subtitle?: unknown;
+        title?: unknown;
+        crumb?: unknown;
+        home?: unknown;
+      };
+      amenitiesContent?: {
+        layoutSubtitle?: unknown;
+        layoutTitle?: unknown;
+        layoutDesc?: unknown;
+        layoutOptions?: Array<{ title?: unknown; icon?: unknown; description?: unknown; highlights?: unknown[] }>;
+        amenitiesSubtitle?: unknown;
+        amenitiesTitle?: unknown;
+        toggleLabel?: unknown;
+        cardView?: unknown;
+        listView?: unknown;
+        switchHelp?: unknown;
+        includedTitle?: unknown;
+        request?: unknown;
+      };
+      amenitiesData?: {
+        cards?: Array<{ title?: unknown; icon?: unknown; image?: unknown; description?: unknown; highlights?: unknown[] }>;
+        overviewItems?: unknown[];
+      };
+    };
+
+    const hero = parsed?.amenitiesHero || {};
+    const content = parsed?.amenitiesContent || {};
+    const data = parsed?.amenitiesData || {};
+
+    fallback.hero.subtitle = String(hero.subtitle ?? fallback.hero.subtitle).trim();
+    fallback.hero.title = String(hero.title ?? fallback.hero.title).trim();
+    fallback.hero.crumb = String(hero.crumb ?? fallback.hero.crumb).trim();
+    fallback.hero.home = String(hero.home ?? fallback.hero.home).trim();
+
+    fallback.content.layoutSubtitle = String(content.layoutSubtitle ?? fallback.content.layoutSubtitle).trim();
+    fallback.content.layoutTitle = String(content.layoutTitle ?? fallback.content.layoutTitle).trim();
+    fallback.content.layoutDesc = String(content.layoutDesc ?? fallback.content.layoutDesc).trim();
+    fallback.content.amenitiesSubtitle = String(content.amenitiesSubtitle ?? fallback.content.amenitiesSubtitle).trim();
+    fallback.content.amenitiesTitle = String(content.amenitiesTitle ?? fallback.content.amenitiesTitle).trim();
+    fallback.content.toggleLabel = String(content.toggleLabel ?? fallback.content.toggleLabel).trim();
+    fallback.content.cardView = String(content.cardView ?? fallback.content.cardView).trim();
+    fallback.content.listView = String(content.listView ?? fallback.content.listView).trim();
+    fallback.content.switchHelp = String(content.switchHelp ?? fallback.content.switchHelp).trim();
+    fallback.content.includedTitle = String(content.includedTitle ?? fallback.content.includedTitle).trim();
+    fallback.content.request = String(content.request ?? fallback.content.request).trim();
+
+    if (Array.isArray(content.layoutOptions) && content.layoutOptions.length > 0) {
+      fallback.content.layoutOptions = content.layoutOptions
+        .map((item) => ({
+          title: String(item?.title || '').trim(),
+          icon: String(item?.icon || '').trim() || 'fa fa-square-o',
+          description: String(item?.description || '').trim(),
+          highlights: Array.isArray(item?.highlights) ? item.highlights.map((row) => String(row || '').trim()).filter(Boolean).slice(0, 10) : [],
+        }))
+        .filter((item) => Boolean(item.title) && Boolean(item.icon) && Boolean(item.description) && item.highlights.length > 0)
+        .slice(0, 8);
+    }
+
+    if (Array.isArray(data.cards) && data.cards.length > 0) {
+      fallback.data.cards = data.cards
+        .map((item) => ({
+          title: String(item?.title || '').trim(),
+          icon: String(item?.icon || '').trim() || 'fa fa-home',
+          image: String(item?.image || '').trim(),
+          description: String(item?.description || '').trim(),
+          highlights: Array.isArray(item?.highlights) ? item.highlights.map((row) => String(row || '').trim()).filter(Boolean).slice(0, 10) : [],
+        }))
+        .filter((item) => Boolean(item.title) && Boolean(item.icon) && Boolean(item.image) && Boolean(item.description) && item.highlights.length > 0)
+        .slice(0, 24);
+    }
+
+    if (Array.isArray(data.overviewItems) && data.overviewItems.length > 0) {
+      fallback.data.overviewItems = data.overviewItems.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 40);
+    }
+  } catch {
+    // Keep hardcoded fallback when locale file cannot be read.
+  }
+
+  amenitiesFallbackCache[locale] = fallback;
+  return JSON.parse(JSON.stringify(fallback)) as AmenitiesCmsContent;
+}
+
+async function getAmenitiesContent(locale: ContentLocale) {
+  const db = await getDb();
+  const contents = db.collection<ContentEntry<AmenitiesCmsContent>>('content_entries');
+  await contents.createIndex({ key: 1, locale: 1 }, { unique: true });
+  const localizedFallback = await getLocalizedDefaultAmenitiesContent(locale);
+
+  const content = await contents.findOne({ key: 'page.amenities', locale });
+  if (content) {
+    return normalizeAmenitiesContent(content.value, localizedFallback);
+  }
+
+  const fallback = localizedFallback;
+  const now = new Date();
+  await contents.updateOne(
+    { key: 'page.amenities', locale },
+    {
+      $set: { value: fallback, updatedAt: now },
+      $setOnInsert: { _id: new ObjectId(), key: 'page.amenities', locale, createdAt: now },
+    },
+    { upsert: true },
+  );
+
+  return fallback;
+}
+
+async function getLocalizedDefaultReservationContent(locale: ContentLocale): Promise<ReservationCmsContent> {
+  if (reservationFallbackCache[locale]) {
+    return JSON.parse(JSON.stringify(reservationFallbackCache[locale])) as ReservationCmsContent;
+  }
+
+  const fallback = JSON.parse(JSON.stringify(defaultReservationContent)) as ReservationCmsContent;
+  const localePath = path.resolve(process.cwd(), '..', 'meri-boarding-public-fe', 'src', 'i18n', 'locales', `${locale}.json`);
+
+  try {
+    const raw = await readFile(localePath, 'utf8');
+    const parsed = JSON.parse(raw) as {
+      reservation?: {
+        hero?: {
+          subtitle?: unknown;
+          title?: unknown;
+          description?: unknown;
+        };
+        crumb?: {
+          home?: unknown;
+          current?: unknown;
+        };
+        shortStay?: {
+          subtitle?: unknown;
+          title?: unknown;
+          description?: unknown;
+          helper?: unknown;
+        };
+        form?: {
+          checkIn?: unknown;
+          checkOut?: unknown;
+          boarding?: unknown;
+          select?: unknown;
+          rooms?: unknown;
+          guests?: unknown;
+          availability?: unknown;
+          boardingOptions?: unknown[];
+          roomOptions?: unknown[];
+          guestOptions?: unknown[];
+        };
+        longStay?: {
+          title?: unknown;
+          description?: unknown;
+          bullets?: unknown[];
+          ctaQuote?: unknown;
+          ctaContact?: unknown;
+        };
+        help?: {
+          title?: unknown;
+          description?: unknown;
+          hoursTitle?: unknown;
+          hoursDay?: unknown;
+          contacts?: Array<{ icon?: unknown; value?: unknown }>;
+          hours?: unknown[];
+        };
+        why?: {
+          title?: unknown;
+          bullets?: unknown[];
+        };
+      };
+      bookingInquiryForm?: {
+        subtitle?: unknown;
+        title?: unknown;
+        firstName?: unknown;
+        lastName?: unknown;
+        company?: unknown;
+        email?: unknown;
+        phone?: unknown;
+        purpose?: unknown;
+        nationality?: unknown;
+        guests?: unknown;
+        rooms?: unknown;
+        boarding?: unknown;
+        moveIn?: unknown;
+        message?: unknown;
+        select?: unknown;
+        send?: unknown;
+        policy?: unknown;
+        policyLink?: unknown;
+        moveInPlaceholder?: unknown;
+        stayPurposes?: Array<{ value?: unknown; label?: unknown }>;
+        boardingOptions?: unknown[];
+        roomOptions?: unknown[];
+      };
+    };
+
+    const reservation = parsed?.reservation || {};
+    const inquiry = parsed?.bookingInquiryForm || {};
+
+    fallback.hero.subtitle = String(reservation?.hero?.subtitle ?? fallback.hero.subtitle).trim();
+    fallback.hero.title = String(reservation?.hero?.title ?? fallback.hero.title).trim();
+    fallback.hero.description = String(reservation?.hero?.description ?? fallback.hero.description).trim();
+    fallback.crumb.home = String(reservation?.crumb?.home ?? fallback.crumb.home).trim();
+    fallback.crumb.current = String(reservation?.crumb?.current ?? fallback.crumb.current).trim();
+    fallback.shortStay.subtitle = String(reservation?.shortStay?.subtitle ?? fallback.shortStay.subtitle).trim();
+    fallback.shortStay.title = String(reservation?.shortStay?.title ?? fallback.shortStay.title).trim();
+    fallback.shortStay.description = String(reservation?.shortStay?.description ?? fallback.shortStay.description).trim();
+    fallback.shortStay.helper = String(reservation?.shortStay?.helper ?? fallback.shortStay.helper).trim();
+    fallback.form.checkIn = String(reservation?.form?.checkIn ?? fallback.form.checkIn).trim();
+    fallback.form.checkOut = String(reservation?.form?.checkOut ?? fallback.form.checkOut).trim();
+    fallback.form.boarding = String(reservation?.form?.boarding ?? fallback.form.boarding).trim();
+    fallback.form.select = String(reservation?.form?.select ?? fallback.form.select).trim();
+    fallback.form.rooms = String(reservation?.form?.rooms ?? fallback.form.rooms).trim();
+    fallback.form.guests = String(reservation?.form?.guests ?? fallback.form.guests).trim();
+    fallback.form.availability = String(reservation?.form?.availability ?? fallback.form.availability).trim();
+    fallback.longStay.title = String(reservation?.longStay?.title ?? fallback.longStay.title).trim();
+    fallback.longStay.description = String(reservation?.longStay?.description ?? fallback.longStay.description).trim();
+    fallback.longStay.ctaQuote = String(reservation?.longStay?.ctaQuote ?? fallback.longStay.ctaQuote).trim();
+    fallback.longStay.ctaContact = String(reservation?.longStay?.ctaContact ?? fallback.longStay.ctaContact).trim();
+    fallback.help.title = String(reservation?.help?.title ?? fallback.help.title).trim();
+    fallback.help.description = String(reservation?.help?.description ?? fallback.help.description).trim();
+    fallback.help.hoursTitle = String(reservation?.help?.hoursTitle ?? fallback.help.hoursTitle).trim();
+    fallback.help.hoursDay = String(reservation?.help?.hoursDay ?? fallback.help.hoursDay).trim();
+    fallback.why.title = String(reservation?.why?.title ?? fallback.why.title).trim();
+
+    if (Array.isArray(reservation?.longStay?.bullets) && reservation.longStay.bullets.length > 0) {
+      fallback.longStay.bullets = reservation.longStay.bullets.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 20);
+    }
+    if (Array.isArray(reservation?.why?.bullets) && reservation.why.bullets.length > 0) {
+      fallback.why.bullets = reservation.why.bullets.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 20);
+    }
+    if (Array.isArray(reservation?.form?.boardingOptions) && reservation.form.boardingOptions.length > 0) {
+      fallback.form.boardingOptions = reservation.form.boardingOptions.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 20);
+    }
+    if (Array.isArray(reservation?.form?.roomOptions) && reservation.form.roomOptions.length > 0) {
+      fallback.form.roomOptions = reservation.form.roomOptions.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 20);
+    }
+    if (Array.isArray(reservation?.form?.guestOptions) && reservation.form.guestOptions.length > 0) {
+      fallback.form.guestOptions = reservation.form.guestOptions.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 20);
+    }
+    if (Array.isArray(reservation?.help?.contacts) && reservation.help.contacts.length > 0) {
+      fallback.help.contacts = reservation.help.contacts
+        .map((item) => ({
+          icon: String(item?.icon || '').trim() || 'fa fa-info-circle',
+          value: String(item?.value || '').trim(),
+        }))
+        .filter((item) => Boolean(item.value))
+        .slice(0, 10);
+    }
+    if (Array.isArray(reservation?.help?.hours) && reservation.help.hours.length > 0) {
+      fallback.help.hours = reservation.help.hours.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 10);
+    }
+
+    fallback.inquiry.subtitle = String(inquiry?.subtitle ?? fallback.inquiry.subtitle).trim();
+    fallback.inquiry.title = String(inquiry?.title ?? fallback.inquiry.title).trim();
+    fallback.inquiry.firstName = String(inquiry?.firstName ?? fallback.inquiry.firstName).trim();
+    fallback.inquiry.lastName = String(inquiry?.lastName ?? fallback.inquiry.lastName).trim();
+    fallback.inquiry.company = String(inquiry?.company ?? fallback.inquiry.company).trim();
+    fallback.inquiry.email = String(inquiry?.email ?? fallback.inquiry.email).trim();
+    fallback.inquiry.phone = String(inquiry?.phone ?? fallback.inquiry.phone).trim();
+    fallback.inquiry.purpose = String(inquiry?.purpose ?? fallback.inquiry.purpose).trim();
+    fallback.inquiry.nationality = String(inquiry?.nationality ?? fallback.inquiry.nationality).trim();
+    fallback.inquiry.guests = String(inquiry?.guests ?? fallback.inquiry.guests).trim();
+    fallback.inquiry.rooms = String(inquiry?.rooms ?? fallback.inquiry.rooms).trim();
+    fallback.inquiry.boarding = String(inquiry?.boarding ?? fallback.inquiry.boarding).trim();
+    fallback.inquiry.moveIn = String(inquiry?.moveIn ?? fallback.inquiry.moveIn).trim();
+    fallback.inquiry.message = String(inquiry?.message ?? fallback.inquiry.message).trim();
+    fallback.inquiry.select = String(inquiry?.select ?? fallback.inquiry.select).trim();
+    fallback.inquiry.send = String(inquiry?.send ?? fallback.inquiry.send).trim();
+    fallback.inquiry.policy = String(inquiry?.policy ?? fallback.inquiry.policy).trim();
+    fallback.inquiry.policyLink = String(inquiry?.policyLink ?? fallback.inquiry.policyLink).trim();
+    fallback.inquiry.moveInPlaceholder = String(inquiry?.moveInPlaceholder ?? fallback.inquiry.moveInPlaceholder).trim();
+
+    if (Array.isArray(inquiry?.stayPurposes) && inquiry.stayPurposes.length > 0) {
+      fallback.inquiry.stayPurposes = inquiry.stayPurposes
+        .map((item) => ({
+          value: String(item?.value || '').trim(),
+          label: String(item?.label || '').trim(),
+        }))
+        .filter((item) => Boolean(item.value) && Boolean(item.label))
+        .slice(0, 15);
+    }
+    if (Array.isArray(inquiry?.boardingOptions) && inquiry.boardingOptions.length > 0) {
+      fallback.inquiry.boardingOptions = inquiry.boardingOptions.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 20);
+    }
+    if (Array.isArray(inquiry?.roomOptions) && inquiry.roomOptions.length > 0) {
+      fallback.inquiry.roomOptions = inquiry.roomOptions.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 20);
+    }
+  } catch {
+    // Keep hardcoded fallback when locale file cannot be read.
+  }
+
+  reservationFallbackCache[locale] = fallback;
+  return JSON.parse(JSON.stringify(fallback)) as ReservationCmsContent;
+}
+
+async function getReservationContent(locale: ContentLocale) {
+  const db = await getDb();
+  const contents = db.collection<ContentEntry<ReservationCmsContent>>('content_entries');
+  await contents.createIndex({ key: 1, locale: 1 }, { unique: true });
+  const localizedFallback = await getLocalizedDefaultReservationContent(locale);
+
+  const content = await contents.findOne({ key: 'page.reservation', locale });
+  if (content) {
+    return normalizeReservationContent(content.value, localizedFallback);
+  }
+
+  const fallback = localizedFallback;
+  const now = new Date();
+  await contents.updateOne(
+    { key: 'page.reservation', locale },
+    {
+      $set: { value: fallback, updatedAt: now },
+      $setOnInsert: { _id: new ObjectId(), key: 'page.reservation', locale, createdAt: now },
+    },
+    { upsert: true },
+  );
+
+  return fallback;
+}
+
+async function getLocalizedDefaultContactContent(locale: ContentLocale): Promise<ContactCmsContent> {
+  if (contactFallbackCache[locale]) {
+    return JSON.parse(JSON.stringify(contactFallbackCache[locale])) as ContactCmsContent;
+  }
+
+  const fallback = JSON.parse(JSON.stringify(defaultContactContent)) as ContactCmsContent;
+  const localePath = path.resolve(process.cwd(), '..', 'meri-boarding-public-fe', 'src', 'i18n', 'locales', `${locale}.json`);
+
+  try {
+    const raw = await readFile(localePath, 'utf8');
+    const parsed = JSON.parse(raw) as {
+      contactHero?: {
+        subtitle?: unknown;
+        title?: unknown;
+        home?: unknown;
+        crumb?: unknown;
+      };
+      contactDetails?: {
+        subtitle?: unknown;
+        title?: unknown;
+        description?: unknown;
+        address?: unknown;
+        email?: unknown;
+        phone?: unknown;
+        whatsapp?: unknown;
+      };
+      contactForm?: {
+        name?: unknown;
+        email?: unknown;
+        phone?: unknown;
+        message?: unknown;
+        send?: unknown;
+        success?: unknown;
+        error?: unknown;
+        namePlaceholder?: unknown;
+        emailPlaceholder?: unknown;
+        phonePlaceholder?: unknown;
+        messagePlaceholder?: unknown;
+      };
+    };
+    const hero = parsed?.contactHero || {};
+    const details = parsed?.contactDetails || {};
+    const form = parsed?.contactForm || {};
+
+    fallback.hero.subtitle = String(hero.subtitle ?? fallback.hero.subtitle).trim();
+    fallback.hero.title = String(hero.title ?? fallback.hero.title).trim();
+    fallback.hero.home = String(hero.home ?? fallback.hero.home).trim();
+    fallback.hero.crumb = String(hero.crumb ?? fallback.hero.crumb).trim();
+
+    fallback.details.subtitle = String(details.subtitle ?? fallback.details.subtitle).trim();
+    fallback.details.title = String(details.title ?? fallback.details.title).trim();
+    fallback.details.description = String(details.description ?? fallback.details.description).trim();
+    fallback.details.items = [
+      {
+        icon: String(fallback.details.items[0]?.icon || 'icofont-location-pin').trim(),
+        title: String(details.address ?? fallback.details.items[0]?.title ?? 'Address').trim(),
+        value: String(fallback.details.items[0]?.value ?? '').trim(),
+      },
+      {
+        icon: String(fallback.details.items[1]?.icon || 'icofont-envelope').trim(),
+        title: String(details.email ?? fallback.details.items[1]?.title ?? 'Email').trim(),
+        value: String(fallback.details.items[1]?.value ?? '').trim(),
+      },
+      {
+        icon: String(fallback.details.items[2]?.icon || 'icofont-phone').trim(),
+        title: String(details.phone ?? fallback.details.items[2]?.title ?? 'Phone').trim(),
+        value: String(fallback.details.items[2]?.value ?? '').trim(),
+      },
+      {
+        icon: String(fallback.details.items[3]?.icon || 'icofont-brand-whatsapp').trim(),
+        title: String(details.whatsapp ?? fallback.details.items[3]?.title ?? 'WhatsApp').trim(),
+        value: String(fallback.details.items[3]?.value ?? '').trim(),
+      },
+    ];
+
+    fallback.form.name = String(form.name ?? fallback.form.name).trim();
+    fallback.form.email = String(form.email ?? fallback.form.email).trim();
+    fallback.form.phone = String(form.phone ?? fallback.form.phone).trim();
+    fallback.form.message = String(form.message ?? fallback.form.message).trim();
+    fallback.form.send = String(form.send ?? fallback.form.send).trim();
+    fallback.form.success = String(form.success ?? fallback.form.success).trim();
+    fallback.form.error = String(form.error ?? fallback.form.error).trim();
+    fallback.form.namePlaceholder = String(form.namePlaceholder ?? fallback.form.namePlaceholder).trim();
+    fallback.form.emailPlaceholder = String(form.emailPlaceholder ?? fallback.form.emailPlaceholder).trim();
+    fallback.form.phonePlaceholder = String(form.phonePlaceholder ?? fallback.form.phonePlaceholder).trim();
+    fallback.form.messagePlaceholder = String(form.messagePlaceholder ?? fallback.form.messagePlaceholder).trim();
+  } catch {
+    // Keep hardcoded fallback when locale file cannot be read.
+  }
+
+  contactFallbackCache[locale] = fallback;
+  return JSON.parse(JSON.stringify(fallback)) as ContactCmsContent;
+}
+
+async function getContactContent(locale: ContentLocale) {
+  const db = await getDb();
+  const contents = db.collection<ContentEntry<ContactCmsContent>>('content_entries');
+  await contents.createIndex({ key: 1, locale: 1 }, { unique: true });
+  const localizedFallback = await getLocalizedDefaultContactContent(locale);
+
+  const content = await contents.findOne({ key: 'page.contact', locale });
+  if (content) {
+    return normalizeContactContent(content.value, localizedFallback);
+  }
+
+  const fallback = localizedFallback;
+  const now = new Date();
+  await contents.updateOne(
+    { key: 'page.contact', locale },
+    {
+      $set: { value: fallback, updatedAt: now },
+      $setOnInsert: { _id: new ObjectId(), key: 'page.contact', locale, createdAt: now },
+    },
+    { upsert: true },
+  );
+
+  return fallback;
+}
+
 async function seedSuperAdmin() {
   if (!adminPassword) {
     server.log.warn('ADMIN_PASSWORD is empty. Super admin seed skipped.');
@@ -1398,6 +3126,30 @@ async function seedHeaderContents() {
 async function seedHomeContents() {
   for (const locale of allowedLocales) {
     await getHomeContent(locale);
+  }
+}
+
+async function seedServicesContents() {
+  for (const locale of allowedLocales) {
+    await getServicesContent(locale);
+  }
+}
+
+async function seedAmenitiesContents() {
+  for (const locale of allowedLocales) {
+    await getAmenitiesContent(locale);
+  }
+}
+
+async function seedReservationContents() {
+  for (const locale of allowedLocales) {
+    await getReservationContent(locale);
+  }
+}
+
+async function seedContactContents() {
+  for (const locale of allowedLocales) {
+    await getContactContent(locale);
   }
 }
 
@@ -1559,6 +3311,34 @@ server.get('/api/v1/public/content/home', async (request, reply) => {
   const locale = parseLocale(query?.locale);
   const content = await getHomeContent(locale);
   return reply.send({ key: 'page.home', locale, content });
+});
+
+server.get('/api/v1/public/content/services', async (request, reply) => {
+  const query = request.query as { locale?: string } | undefined;
+  const locale = parseLocale(query?.locale);
+  const content = await getServicesContent(locale);
+  return reply.send({ key: 'page.services', locale, content });
+});
+
+server.get('/api/v1/public/content/amenities', async (request, reply) => {
+  const query = request.query as { locale?: string } | undefined;
+  const locale = parseLocale(query?.locale);
+  const content = await getAmenitiesContent(locale);
+  return reply.send({ key: 'page.amenities', locale, content });
+});
+
+server.get('/api/v1/public/content/reservation', async (request, reply) => {
+  const query = request.query as { locale?: string } | undefined;
+  const locale = parseLocale(query?.locale);
+  const content = await getReservationContent(locale);
+  return reply.send({ key: 'page.reservation', locale, content });
+});
+
+server.get('/api/v1/public/content/contact', async (request, reply) => {
+  const query = request.query as { locale?: string } | undefined;
+  const locale = parseLocale(query?.locale);
+  const content = await getContactContent(locale);
+  return reply.send({ key: 'page.contact', locale, content });
 });
 
 server.get('/api/v1/public/hotels', async (request, reply) => {
@@ -2491,6 +4271,230 @@ server.get('/api/v1/admin/content/home', async (request, reply) => {
   return reply.send({ key: 'page.home', locale, content });
 });
 
+server.get('/api/v1/admin/content/services', async (request, reply) => {
+  const admin = await getRequestAdmin(request.headers.authorization);
+  if (!admin || (admin.role !== 'super_admin' && admin.role !== 'moderator')) {
+    return reply.code(403).send({ error: 'Only super_admin or moderator can access this route' });
+  }
+
+  const query = request.query as { locale?: string } | undefined;
+  const locale = parseLocale(query?.locale);
+  const content = await getServicesContent(locale);
+
+  return reply.send({ key: 'page.services', locale, content });
+});
+
+server.put('/api/v1/admin/content/services', async (request, reply) => {
+  const admin = await getRequestAdmin(request.headers.authorization);
+  if (!admin || (admin.role !== 'super_admin' && admin.role !== 'moderator')) {
+    return reply.code(403).send({ error: 'Only super_admin or moderator can update this route' });
+  }
+
+  const body = request.body as { locale?: string; content?: Partial<ServicesCmsContent> } | undefined;
+  const locale = parseLocale(body?.locale);
+
+  const db = await getDb();
+  const contents = db.collection<ContentEntry<ServicesCmsContent>>('content_entries');
+  await contents.createIndex({ key: 1, locale: 1 }, { unique: true });
+  const localizedFallback = await getLocalizedDefaultServicesContent(locale);
+  const existing = await contents.findOne({ key: 'page.services', locale });
+  const fallbackContent = existing ? normalizeServicesContent(existing.value, localizedFallback) : localizedFallback;
+  const nextContent = normalizeServicesContent(body?.content, fallbackContent);
+  const validationError = validateServicesContent(nextContent);
+  if (validationError) {
+    return reply.code(400).send({ error: validationError });
+  }
+
+  const now = new Date();
+  await contents.updateOne(
+    { key: 'page.services', locale },
+    {
+      $set: {
+        value: nextContent,
+        updatedAt: now,
+        updatedBy: admin._id,
+      },
+      $setOnInsert: {
+        _id: new ObjectId(),
+        key: 'page.services',
+        locale,
+        createdAt: now,
+      },
+    },
+    { upsert: true },
+  );
+
+  return reply.send({ ok: true, locale, content: nextContent });
+});
+
+server.get('/api/v1/admin/content/amenities', async (request, reply) => {
+  const admin = await getRequestAdmin(request.headers.authorization);
+  if (!admin || (admin.role !== 'super_admin' && admin.role !== 'moderator')) {
+    return reply.code(403).send({ error: 'Only super_admin or moderator can access this route' });
+  }
+
+  const query = request.query as { locale?: string } | undefined;
+  const locale = parseLocale(query?.locale);
+  const content = await getAmenitiesContent(locale);
+
+  return reply.send({ key: 'page.amenities', locale, content });
+});
+
+server.put('/api/v1/admin/content/amenities', async (request, reply) => {
+  const admin = await getRequestAdmin(request.headers.authorization);
+  if (!admin || (admin.role !== 'super_admin' && admin.role !== 'moderator')) {
+    return reply.code(403).send({ error: 'Only super_admin or moderator can update this route' });
+  }
+
+  const body = request.body as { locale?: string; content?: Partial<AmenitiesCmsContent> } | undefined;
+  const locale = parseLocale(body?.locale);
+
+  const db = await getDb();
+  const contents = db.collection<ContentEntry<AmenitiesCmsContent>>('content_entries');
+  await contents.createIndex({ key: 1, locale: 1 }, { unique: true });
+  const localizedFallback = await getLocalizedDefaultAmenitiesContent(locale);
+  const existing = await contents.findOne({ key: 'page.amenities', locale });
+  const fallbackContent = existing ? normalizeAmenitiesContent(existing.value, localizedFallback) : localizedFallback;
+  const nextContent = normalizeAmenitiesContent(body?.content, fallbackContent);
+  const validationError = validateAmenitiesContent(nextContent);
+  if (validationError) {
+    return reply.code(400).send({ error: validationError });
+  }
+
+  const now = new Date();
+  await contents.updateOne(
+    { key: 'page.amenities', locale },
+    {
+      $set: {
+        value: nextContent,
+        updatedAt: now,
+        updatedBy: admin._id,
+      },
+      $setOnInsert: {
+        _id: new ObjectId(),
+        key: 'page.amenities',
+        locale,
+        createdAt: now,
+      },
+    },
+    { upsert: true },
+  );
+
+  return reply.send({ ok: true, locale, content: nextContent });
+});
+
+server.get('/api/v1/admin/content/reservation', async (request, reply) => {
+  const admin = await getRequestAdmin(request.headers.authorization);
+  if (!admin || (admin.role !== 'super_admin' && admin.role !== 'moderator')) {
+    return reply.code(403).send({ error: 'Only super_admin or moderator can access this route' });
+  }
+
+  const query = request.query as { locale?: string } | undefined;
+  const locale = parseLocale(query?.locale);
+  const content = await getReservationContent(locale);
+
+  return reply.send({ key: 'page.reservation', locale, content });
+});
+
+server.put('/api/v1/admin/content/reservation', async (request, reply) => {
+  const admin = await getRequestAdmin(request.headers.authorization);
+  if (!admin || (admin.role !== 'super_admin' && admin.role !== 'moderator')) {
+    return reply.code(403).send({ error: 'Only super_admin or moderator can update this route' });
+  }
+
+  const body = request.body as { locale?: string; content?: Partial<ReservationCmsContent> } | undefined;
+  const locale = parseLocale(body?.locale);
+
+  const db = await getDb();
+  const contents = db.collection<ContentEntry<ReservationCmsContent>>('content_entries');
+  await contents.createIndex({ key: 1, locale: 1 }, { unique: true });
+  const localizedFallback = await getLocalizedDefaultReservationContent(locale);
+  const existing = await contents.findOne({ key: 'page.reservation', locale });
+  const fallbackContent = existing ? normalizeReservationContent(existing.value, localizedFallback) : localizedFallback;
+  const nextContent = normalizeReservationContent(body?.content, fallbackContent);
+  const validationError = validateReservationContent(nextContent);
+  if (validationError) {
+    return reply.code(400).send({ error: validationError });
+  }
+
+  const now = new Date();
+  await contents.updateOne(
+    { key: 'page.reservation', locale },
+    {
+      $set: {
+        value: nextContent,
+        updatedAt: now,
+        updatedBy: admin._id,
+      },
+      $setOnInsert: {
+        _id: new ObjectId(),
+        key: 'page.reservation',
+        locale,
+        createdAt: now,
+      },
+    },
+    { upsert: true },
+  );
+
+  return reply.send({ ok: true, locale, content: nextContent });
+});
+
+server.get('/api/v1/admin/content/contact', async (request, reply) => {
+  const admin = await getRequestAdmin(request.headers.authorization);
+  if (!admin || (admin.role !== 'super_admin' && admin.role !== 'moderator')) {
+    return reply.code(403).send({ error: 'Only super_admin or moderator can access this route' });
+  }
+
+  const query = request.query as { locale?: string } | undefined;
+  const locale = parseLocale(query?.locale);
+  const content = await getContactContent(locale);
+
+  return reply.send({ key: 'page.contact', locale, content });
+});
+
+server.put('/api/v1/admin/content/contact', async (request, reply) => {
+  const admin = await getRequestAdmin(request.headers.authorization);
+  if (!admin || (admin.role !== 'super_admin' && admin.role !== 'moderator')) {
+    return reply.code(403).send({ error: 'Only super_admin or moderator can update this route' });
+  }
+
+  const body = request.body as { locale?: string; content?: Partial<ContactCmsContent> } | undefined;
+  const locale = parseLocale(body?.locale);
+
+  const db = await getDb();
+  const contents = db.collection<ContentEntry<ContactCmsContent>>('content_entries');
+  await contents.createIndex({ key: 1, locale: 1 }, { unique: true });
+  const localizedFallback = await getLocalizedDefaultContactContent(locale);
+  const existing = await contents.findOne({ key: 'page.contact', locale });
+  const fallbackContent = existing ? normalizeContactContent(existing.value, localizedFallback) : localizedFallback;
+  const nextContent = normalizeContactContent(body?.content, fallbackContent);
+  const validationError = validateContactContent(nextContent);
+  if (validationError) {
+    return reply.code(400).send({ error: validationError });
+  }
+
+  const now = new Date();
+  await contents.updateOne(
+    { key: 'page.contact', locale },
+    {
+      $set: {
+        value: nextContent,
+        updatedAt: now,
+        updatedBy: admin._id,
+      },
+      $setOnInsert: {
+        _id: new ObjectId(),
+        key: 'page.contact',
+        locale,
+        createdAt: now,
+      },
+    },
+    { upsert: true },
+  );
+
+  return reply.send({ ok: true, locale, content: nextContent });
+});
+
 server.put('/api/v1/admin/content/home', async (request, reply) => {
   const admin = await getRequestAdmin(request.headers.authorization);
   if (!admin || (admin.role !== 'super_admin' && admin.role !== 'moderator')) {
@@ -2943,6 +4947,10 @@ const start = async () => {
     await seedSuperAdmin();
     await seedHeaderContents();
     await seedHomeContents();
+    await seedServicesContents();
+    await seedAmenitiesContents();
+    await seedReservationContents();
+    await seedContactContents();
     if (seedHotelsOnStart) {
       await seedHotels();
       server.log.info('Default hotels seed completed (SEED_HOTELS_ON_START=true).');

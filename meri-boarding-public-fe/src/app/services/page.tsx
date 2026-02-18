@@ -5,6 +5,7 @@ import ServicesContent from "@/components/meri/ServicesContent";
 import ServicesHero from "@/components/meri/ServicesHero";
 import type { Locale } from "@/i18n/getLocale";
 import { getLocale } from "@/i18n/getLocale";
+import { fetchServicesResolvedContent } from "@/lib/servicesContentApi";
 
 type ServicesPageProps = {
   params?: { locale?: Locale } | Promise<{ locale?: Locale }>;
@@ -13,13 +14,14 @@ type ServicesPageProps = {
 export default async function ServicesPage({ params }: ServicesPageProps = {}) {
   const resolvedParams = await params;
   const locale = resolvedParams?.locale ?? (await getLocale());
+  const content = await fetchServicesResolvedContent(locale);
   return (
     <>
       <Header locale={locale} />
       <main>
         <a href="#" id="back-to-top"></a>
-        <ServicesHero locale={locale} />
-        <ServicesContent locale={locale} />
+        <ServicesHero locale={locale} content={content.hero} />
+        <ServicesContent locale={locale} content={content.content} />
       </main>
       <Footer locale={locale} />
       <BuyNow />

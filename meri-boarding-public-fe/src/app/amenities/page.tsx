@@ -5,6 +5,7 @@ import Footer from "@/components/meri/Footer";
 import Header from "@/components/meri/Header";
 import type { Locale } from "@/i18n/getLocale";
 import { getLocale } from "@/i18n/getLocale";
+import { fetchAmenitiesResolvedContent } from "@/lib/amenitiesContentApi";
 
 type AmenitiesPageProps = {
   params?: { locale?: Locale } | Promise<{ locale?: Locale }>;
@@ -13,13 +14,14 @@ type AmenitiesPageProps = {
 export default async function AmenitiesPage({ params }: AmenitiesPageProps = {}) {
   const resolvedParams = await params;
   const locale = resolvedParams?.locale ?? (await getLocale());
+  const content = await fetchAmenitiesResolvedContent(locale);
   return (
     <>
       <Header locale={locale} />
       <main>
         <a href="#" id="back-to-top"></a>
-        <AmenitiesHero locale={locale} />
-        <AmenitiesContent />
+        <AmenitiesHero locale={locale} content={content.hero} />
+        <AmenitiesContent locale={locale} content={content} />
       </main>
       <Footer locale={locale} />
       <BuyNow />

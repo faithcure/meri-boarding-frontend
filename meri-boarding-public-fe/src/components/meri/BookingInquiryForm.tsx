@@ -2,19 +2,43 @@ import type { Locale } from "@/i18n/getLocale";
 import { getLocale } from "@/i18n/getLocale";
 import { getMessages } from "@/i18n/messages";
 import { localePath } from "@/i18n/localePath";
+import type { ReservationResolvedContent } from "@/lib/reservationContentApi";
 import Link from "next/link";
-
-const boardingOptions = ["Flamingo", "Europaplatz", "Hildesheim"];
 
 type BookingInquiryFormProps = {
   locale?: Locale;
+  content?: ReservationResolvedContent["inquiry"];
 };
 
-export default async function BookingInquiryForm({ locale: localeProp }: BookingInquiryFormProps = {}) {
+export default async function BookingInquiryForm({ locale: localeProp, content }: BookingInquiryFormProps = {}) {
   const locale = localeProp ?? (await getLocale());
-  const t = getMessages(locale).bookingInquiryForm;
+  const fallback = getMessages(locale).bookingInquiryForm;
+  const t = {
+    action: String(content?.action || "https://meri-boarding.de/boarding-booking.php"),
+    subtitle: String(content?.subtitle || fallback.subtitle || ""),
+    title: String(content?.title || fallback.title || ""),
+    firstName: String(content?.firstName || fallback.firstName || ""),
+    lastName: String(content?.lastName || fallback.lastName || ""),
+    company: String(content?.company || fallback.company || ""),
+    email: String(content?.email || fallback.email || ""),
+    phone: String(content?.phone || fallback.phone || ""),
+    purpose: String(content?.purpose || fallback.purpose || ""),
+    nationality: String(content?.nationality || fallback.nationality || ""),
+    guests: String(content?.guests || fallback.guests || ""),
+    rooms: String(content?.rooms || fallback.rooms || ""),
+    boarding: String(content?.boarding || fallback.boarding || ""),
+    moveIn: String(content?.moveIn || fallback.moveIn || ""),
+    message: String(content?.message || fallback.message || ""),
+    select: String(content?.select || fallback.select || ""),
+    send: String(content?.send || fallback.send || ""),
+    policy: String(content?.policy || fallback.policy || ""),
+    policyLink: String(content?.policyLink || fallback.policyLink || ""),
+    moveInPlaceholder: String(content?.moveInPlaceholder || "mm/dd/yyyy"),
+    stayPurposes: Array.isArray(content?.stayPurposes) ? content.stayPurposes : fallback.stayPurposes,
+    boardingOptions: Array.isArray(content?.boardingOptions) ? content.boardingOptions : ["Flamingo", "Europaplatz", "Hildesheim"],
+    roomOptions: Array.isArray(content?.roomOptions) ? content.roomOptions : ["1", "2", "3"],
+  };
   const withLocale = (path: string) => localePath(locale, path);
-  const purposes = t.stayPurposes;
   return (
     <section className="relative mt-80">
       <div className="container">
@@ -34,7 +58,7 @@ export default async function BookingInquiryForm({ locale: localeProp }: Booking
                 name="bookingInquiryForm"
                 id="booking_inquiry_form"
                 method="post"
-                action="https://meri-boarding.de/boarding-booking.php"
+                action={t.action}
               >
                 <div className="row g-4">
                   <div className="col-md-6">
@@ -95,7 +119,7 @@ export default async function BookingInquiryForm({ locale: localeProp }: Booking
                     <h3 className="fs-18">{t.purpose}</h3>
                     <select name="zweck" className="bg-white form-control" required>
                       <option value="">{t.select}</option>
-                      {purposes.map((purpose) => (
+                      {t.stayPurposes.map((purpose) => (
                         <option key={purpose.value} value={purpose.value}>
                           {purpose.label}
                         </option>
@@ -129,9 +153,11 @@ export default async function BookingInquiryForm({ locale: localeProp }: Booking
                     <h3 className="fs-18">{t.rooms}</h3>
                     <select name="anzahl_zimmer" className="bg-white form-control" required>
                       <option value="">{t.select}</option>
-                      <option value="1">1</option>
-                      <option value="2">2</option>
-                      <option value="3">3</option>
+                      {t.roomOptions.map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
                     </select>
                   </div>
 
@@ -139,7 +165,7 @@ export default async function BookingInquiryForm({ locale: localeProp }: Booking
                     <h3 className="fs-18">{t.boarding}</h3>
                     <select name="boardinghaus" className="bg-white form-control" required>
                       <option value="">{t.select}</option>
-                      {boardingOptions.map((option) => (
+                      {t.boardingOptions.map((option) => (
                         <option key={option} value={option}>
                           {option}
                         </option>
@@ -153,7 +179,7 @@ export default async function BookingInquiryForm({ locale: localeProp }: Booking
                       type="text"
                       name="date"
                       className="bg-white form-control"
-                      placeholder="mm/dd/yyyy"
+                      placeholder={t.moveInPlaceholder}
                     />
                   </div>
 

@@ -2,15 +2,34 @@ import type { Locale } from "@/i18n/getLocale";
 import { getLocale } from "@/i18n/getLocale";
 import { localePath } from "@/i18n/localePath";
 import { getMessages } from "@/i18n/messages";
+import type { ServicesResolvedContent } from "@/lib/servicesContentApi";
 import Link from "next/link";
 
 type ServicesContentProps = {
   locale?: Locale;
+  content?: ServicesResolvedContent["content"];
 };
 
-export default async function ServicesContent({ locale: localeProp }: ServicesContentProps = {}) {
+export default async function ServicesContent({ locale: localeProp, content }: ServicesContentProps = {}) {
   const locale = localeProp ?? (await getLocale());
-  const t = getMessages(locale).servicesContent;
+  const fallback = getMessages(locale).servicesContent;
+  const t = {
+    heroSubtitle: String(content?.heroSubtitle || fallback.heroSubtitle || ""),
+    heroTitle: String(content?.heroTitle || fallback.heroTitle || ""),
+    heroDescription: String(content?.heroDescription || fallback.heroDescription || ""),
+    ctaAvailability: String(content?.ctaAvailability || fallback.ctaAvailability || ""),
+    ctaContact: String(content?.ctaContact || fallback.ctaContact || ""),
+    stats: Array.isArray(content?.stats) ? content.stats : fallback.stats,
+    statsImage: String(content?.statsImage || "/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6639.jpg"),
+    essentialsSubtitle: String(content?.essentialsSubtitle || fallback.essentialsSubtitle || ""),
+    essentialsTitle: String(content?.essentialsTitle || fallback.essentialsTitle || ""),
+    highlights: Array.isArray(content?.highlights) ? content.highlights : fallback.highlights,
+    supportSubtitle: String(content?.supportSubtitle || fallback.supportSubtitle || ""),
+    supportTitle: String(content?.supportTitle || fallback.supportTitle || ""),
+    supportDescription: String(content?.supportDescription || fallback.supportDescription || ""),
+    ctaStart: String(content?.ctaStart || fallback.ctaStart || ""),
+    supportList: Array.isArray(content?.supportList) ? content.supportList : fallback.supportList,
+  };
   const withLocale = (path: string) => localePath(locale, path);
   return (
     <>
@@ -52,7 +71,7 @@ export default async function ServicesContent({ locale: localeProp }: ServicesCo
                 <div className="col-md-6">
                   <div
                     className="p-30 bg-dark-2 rounded-1 h-100"
-                    data-bgimage="url(/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6639.jpg) center"
+                    data-bgimage={`url(${t.statsImage}) center`}
                   ></div>
                 </div>
               </div>

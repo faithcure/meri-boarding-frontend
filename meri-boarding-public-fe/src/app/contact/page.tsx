@@ -6,6 +6,7 @@ import Footer from "@/components/meri/Footer";
 import Header from "@/components/meri/Header";
 import type { Locale } from "@/i18n/getLocale";
 import { getLocale } from "@/i18n/getLocale";
+import { fetchContactResolvedContent } from "@/lib/contactContentApi";
 
 type ContactPageProps = {
   params?: { locale?: Locale } | Promise<{ locale?: Locale }>;
@@ -14,13 +15,14 @@ type ContactPageProps = {
 export default async function ContactPage({ params }: ContactPageProps = {}) {
   const resolvedParams = await params;
   const locale = resolvedParams?.locale ?? (await getLocale());
+  const content = await fetchContactResolvedContent(locale);
   return (
     <>
       <Header locale={locale} />
       <main>
         <a href="#" id="back-to-top"></a>
-        <ContactHero locale={locale} />
-        <ContactContent locale={locale} />
+        <ContactHero locale={locale} content={content.hero} />
+        <ContactContent locale={locale} content={{ details: content.details, form: content.form }} />
         <BookingInquiryForm locale={locale} />
       </main>
       <Footer locale={locale} />

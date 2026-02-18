@@ -1,23 +1,34 @@
 import type { Locale } from "@/i18n/getLocale";
 import { getLocale } from "@/i18n/getLocale";
 import { getMessages } from "@/i18n/messages";
+import type { ContactResolvedContent } from "@/lib/contactContentApi";
 
 type ContactFormProps = {
   locale?: Locale;
+  content?: ContactResolvedContent["form"];
 };
 
-export default async function ContactForm({ locale: localeProp }: ContactFormProps = {}) {
+export default async function ContactForm({ locale: localeProp, content }: ContactFormProps = {}) {
   const locale = localeProp ?? (await getLocale());
-  const t = getMessages(locale).contactForm;
+  const fallback = getMessages(locale).contactForm;
+  const t = {
+    action: String(content?.action || "https://meri-boarding.de/boarding-booking.php"),
+    name: String(content?.name || fallback.name || ""),
+    email: String(content?.email || fallback.email || ""),
+    phone: String(content?.phone || fallback.phone || ""),
+    message: String(content?.message || fallback.message || ""),
+    send: String(content?.send || fallback.send || ""),
+    success: String(content?.success || fallback.success || ""),
+    error: String(content?.error || fallback.error || ""),
+    namePlaceholder: String(content?.namePlaceholder || fallback.namePlaceholder || ""),
+    emailPlaceholder: String(content?.emailPlaceholder || fallback.emailPlaceholder || ""),
+    phonePlaceholder: String(content?.phonePlaceholder || fallback.phonePlaceholder || ""),
+    messagePlaceholder: String(content?.messagePlaceholder || fallback.messagePlaceholder || ""),
+  };
   return (
     <div className="col-lg-6">
       <div className="bg-color-op-1 rounded-1 p-40 relative">
-        <form
-          name="contactForm"
-          id="contact_form"
-          method="post"
-          action="https://meri-boarding.de/boarding-booking.php"
-        >
+        <form name="contactForm" id="contact_form" method="post" action={t.action}>
           <div className="row g-4">
             <div className="col-md-6">
               <h3 className="fs-18">{t.name}</h3>

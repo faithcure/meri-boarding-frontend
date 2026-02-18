@@ -2,20 +2,29 @@ import type { Locale } from "@/i18n/getLocale";
 import { getLocale } from "@/i18n/getLocale";
 import { localePath } from "@/i18n/localePath";
 import { getMessages } from "@/i18n/messages";
+import type { AmenitiesResolvedContent } from "@/lib/amenitiesContentApi";
 import Link from "next/link";
 
 type AmenitiesHeroProps = {
   locale?: Locale;
+  content?: AmenitiesResolvedContent["hero"];
 };
 
-export default async function AmenitiesHero({ locale: localeProp }: AmenitiesHeroProps = {}) {
+export default async function AmenitiesHero({ locale: localeProp, content }: AmenitiesHeroProps = {}) {
   const locale = localeProp ?? (await getLocale());
-  const t = getMessages(locale).amenitiesHero;
+  const fallback = getMessages(locale).amenitiesHero;
+  const t = {
+    subtitle: String(content?.subtitle || fallback.subtitle || ""),
+    title: String(content?.title || fallback.title || ""),
+    crumb: String(content?.crumb || fallback.crumb || ""),
+    home: String(content?.home || fallback.home || ""),
+    backgroundImage: String(content?.backgroundImage || "/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6639.jpg"),
+  };
   const withLocale = (path: string) => localePath(locale, path);
   return (
     <section className="jarallax text-light relative rounded-1 overflow-hidden mt-80 mt-sm-70 mx-2">
       <div className="de-gradient-edge-top"></div>
-      <img src="/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6639.jpg" className="jarallax-img" alt="" />
+      <img src={t.backgroundImage} className="jarallax-img" alt="" />
       <div className="container relative z-2">
         <div className="row justify-content-center">
           <div className="col-lg-6 text-center">
