@@ -97,52 +97,61 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         <MenuItem href='/hotels' icon={<i className='bx-building-house' />}>
           Hotels
         </MenuItem>
-        <SubMenu label='Home Content' icon={<i className='bx-edit-alt' />}>
-          <MenuItem href='/content-home' icon={<i className='bx-sort' />}>
-            Section Order
+        <SubMenu label='Content Management' icon={<i className='bx-edit-alt' />}>
+          <SubMenu label='Home Content' icon={<i className='bx-home-circle' />}>
+            <MenuItem href='/content-home' icon={<i className='bx-sort' />}>
+              Section Order
+            </MenuItem>
+            <MenuItem href='/content-home/hero' icon={<i className='bx-image' />}>
+              Hero Settings
+            </MenuItem>
+            <MenuItem href='/content-home/rooms' icon={<i className='bx-layout' />}>
+              Rooms Settings
+            </MenuItem>
+            <MenuItem href='/content-home/testimonials' icon={<i className='bx-message-rounded-dots' />}>
+              Testimonials Settings
+            </MenuItem>
+            <MenuItem href='/content-home/facilities' icon={<i className='bx-bar-chart-alt-2' />}>
+              Facilities Settings
+            </MenuItem>
+            <MenuItem href='/content-home/gallery' icon={<i className='bx-images' />}>
+              Gallery Settings
+            </MenuItem>
+            <MenuItem href='/content-home/offers' icon={<i className='bx-purchase-tag-alt' />}>
+              Offers Settings
+            </MenuItem>
+            <MenuItem href='/content-home/faq' icon={<i className='bx-help-circle' />}>
+              FAQ Settings
+            </MenuItem>
+          </SubMenu>
+          <MenuItem href='/content-services' icon={<i className='bx-briefcase-alt-2' />}>
+            Services Content
           </MenuItem>
-          <MenuItem href='/content-home/hero' icon={<i className='bx-image' />}>
-            Hero Settings
+          <MenuItem href='/content-reservation' icon={<i className='bx-calendar' />}>
+            Reservation Content
           </MenuItem>
-          <MenuItem href='/content-home/rooms' icon={<i className='bx-layout' />}>
-            Rooms Settings
+          <MenuItem href='/content-amenities' icon={<i className='bx-grid-alt' />}>
+            Amenities Content
           </MenuItem>
-          <MenuItem href='/content-home/testimonials' icon={<i className='bx-message-rounded-dots' />}>
-            Testimonials Settings
-          </MenuItem>
-          <MenuItem href='/content-home/facilities' icon={<i className='bx-bar-chart-alt-2' />}>
-            Facilities Settings
-          </MenuItem>
-          <MenuItem href='/content-home/gallery' icon={<i className='bx-images' />}>
-            Gallery Settings
-          </MenuItem>
-          <MenuItem href='/content-home/offers' icon={<i className='bx-purchase-tag-alt' />}>
-            Offers Settings
-          </MenuItem>
-          <MenuItem href='/content-home/faq' icon={<i className='bx-help-circle' />}>
-            FAQ Settings
+          <MenuItem href='/content-contact' icon={<i className='bx-envelope' />}>
+            Contact Content
           </MenuItem>
         </SubMenu>
-        <MenuItem href='/content-services' icon={<i className='bx-briefcase-alt-2' />}>
-          Services Content
-        </MenuItem>
-        <MenuItem href='/content-reservation' icon={<i className='bx-calendar' />}>
-          Reservation Content
-        </MenuItem>
-        <MenuItem href='/content-amenities' icon={<i className='bx-grid-alt' />}>
-          Amenities Content
-        </MenuItem>
-        <MenuItem href='/content-contact' icon={<i className='bx-envelope' />}>
-          Contact Content
-        </MenuItem>
-        {isSuperAdmin ? (
-          <MenuItem href='/users' icon={<i className='bx-group' />}>
-            Users
+        <SubMenu label='Forms & Messages' icon={<i className='bx-message-square-dots' />}>
+          <MenuItem href='/contact-submissions' icon={<i className='bx-mail-send' />}>
+            Contact Submissions
           </MenuItem>
-        ) : null}
-        <MenuItem href='/about' icon={<i className='bx-info-circle' />}>
-          About
-        </MenuItem>
+        </SubMenu>
+        <SubMenu label='System' icon={<i className='bx-cog' />}>
+          {isSuperAdmin ? (
+            <MenuItem href='/users' icon={<i className='bx-group' />}>
+              Users
+            </MenuItem>
+          ) : null}
+          <MenuItem href='/about' icon={<i className='bx-info-circle' />}>
+            About
+          </MenuItem>
+        </SubMenu>
       </Menu>
       {/* <Menu
         popoutMenuOffset={{ mainAxis: 27 }}

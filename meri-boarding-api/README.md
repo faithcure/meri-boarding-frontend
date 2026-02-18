@@ -57,6 +57,7 @@ mongosh --port 27018 --eval "use meri_boarding; db.admins.find({}, {email:1,name
 - `GET /health`
 - `GET /api/v1/health`
 - `GET /api/v1/public/content/header?locale=en`
+- `POST /api/v1/public/forms/contact`
 - `POST /api/v1/auth/login`
 - `POST /api/v1/auth/register`
 - `GET /api/v1/auth/me`
@@ -67,3 +68,6 @@ mongosh --port 27018 --eval "use meri_boarding; db.admins.find({}, {email:1,name
 - `POST /api/v1/admin/users` (`super_admin` only, can create `moderator`/`user`)
 - `GET /api/v1/admin/content/header?locale=en` (`super_admin|moderator`)
 - `PUT /api/v1/admin/content/header` (`super_admin|moderator`)
+- `GET /api/v1/admin/contact-submissions` (`super_admin|moderator`)
+- `PATCH /api/v1/admin/contact-submissions/:submissionId` (`super_admin|moderator`)
+- `DELETE /api/v1/admin/contact-submissions/:submissionId` (`super_admin|moderator`)

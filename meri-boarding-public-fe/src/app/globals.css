@@ -120,6 +120,104 @@ header.smaller .logo-scroll {
   border-color: transparent;
 }
 
+.contact-form-control {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.contact-form-control:focus {
+  box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb, 0, 0, 0), 0.15);
+}
+
+.contact-form-control-invalid {
+  border-color: #d73939 !important;
+  box-shadow: 0 0 0 3px rgba(215, 57, 57, 0.14);
+}
+
+.contact-field-error {
+  font-size: 13px;
+  color: #b42323;
+  margin-top: 7px;
+  padding-left: 2px;
+  line-height: 1.35;
+}
+
+.contact-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 180px;
+  justify-content: center;
+}
+
+.contact-submit-btn:disabled {
+  opacity: 0.9;
+  cursor: wait;
+}
+
+.contact-submit-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-top-color: #ffffff;
+  border-radius: 999px;
+  animation: contact-spin 0.85s linear infinite;
+}
+
+.contact-feedback {
+  margin-top: 16px;
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  line-height: 1.45;
+}
+
+.contact-feedback-success {
+  border: 1px solid rgba(35, 153, 92, 0.28);
+  background: rgba(35, 153, 92, 0.1);
+  color: #1f6d45;
+}
+
+.contact-feedback-error {
+  border: 1px solid rgba(194, 44, 44, 0.3);
+  background: rgba(194, 44, 44, 0.1);
+  color: #9f1f1f;
+}
+
+.contact-feedback-icon {
+  font-size: 28px;
+  line-height: 1;
+}
+
+.contact-feedback-title {
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.contact-assistant-note {
+  margin-top: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.68);
+  background: rgba(var(--primary-color-rgb, 0, 0, 0), 0.08);
+  border: 1px dashed rgba(var(--primary-color-rgb, 0, 0, 0), 0.24);
+  border-radius: 999px;
+  padding: 7px 12px;
+}
+
+.contact-assistant-note i {
+  color: var(--primary-color);
+}
+
+@keyframes contact-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .hotel-checkin-card {
   will-change: box-shadow, filter;
 }

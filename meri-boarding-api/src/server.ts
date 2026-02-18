@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { createHmac, randomBytes, scryptSync, timingSafeEqual } from 'node:crypto';
 import { createReadStream } from 'node:fs';
 import { mkdir, readFile, stat, unlink, writeFile } from 'node:fs/promises';
+import nodemailer from 'nodemailer';
 import path from 'node:path';
 import { MongoClient, ObjectId } from 'mongodb';
 
@@ -19,6 +20,14 @@ const adminName = (process.env.ADMIN_NAME || 'Super Admin').trim();
 const tokenSecret = process.env.ADMIN_TOKEN_SECRET || process.env.ADMIN_SESSION_SECRET || 'change-this-secret';
 const tokenHours = Number(process.env.ADMIN_TOKEN_HOURS || 12);
 const seedHotelsOnStart = String(process.env.SEED_HOTELS_ON_START || '').trim().toLowerCase() === 'true';
+const smtpHost = String(process.env.SMTP_HOST || '').trim();
+const smtpPort = Number(process.env.SMTP_PORT || 465);
+const smtpSecure = String(process.env.SMTP_SECURE || 'true').trim().toLowerCase() !== 'false';
+const smtpStartTls = String(process.env.SMTP_STARTTLS || '').trim().toLowerCase() === 'true';
+const smtpUser = String(process.env.SMTP_USER || '').trim();
+const smtpPass = String(process.env.SMTP_PASS || '').trim();
+const smtpFrom = String(process.env.SMTP_FROM || smtpUser || 'no-reply@local.test').trim();
+const contactNotifyToRaw = String(process.env.CONTACT_FORM_TO || process.env.CONTACT_NOTIFY_TO || '').trim();
 
 type AdminRole = 'super_admin' | 'moderator' | 'user';
 
@@ -197,6 +206,28 @@ type ContactSocialLink = {
   icon: string;
   label: string;
   url: string;
+};
+
+type ContactSubmissionStatus = 'unread' | 'read';
+
+type ContactSubmission = {
+  _id: ObjectId;
+  name: string;
+  email: string;
+  phone: string;
+  country?: string;
+  subject?: string;
+  message: string;
+  locale: ContentLocale;
+  sourcePage: string;
+  status: ContactSubmissionStatus;
+  mailSent: boolean;
+  mailError?: string;
+  userAgent?: string;
+  ip?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  readAt?: Date;
 };
 
 type ReservationHelpContact = {
@@ -1217,6 +1248,100 @@ function isValidLink(input: string) {
   if (!value || value.length > 400) return false;
   if (value.startsWith('/')) return true;
   return /^https?:\/\//i.test(value);
+}
+
+function canManageContent(admin: AdminUser | null) {
+  return Boolean(admin && (admin.role === 'super_admin' || admin.role === 'moderator'));
+}
+
+function parseEmailList(input: string) {
+  const values = String(input || '')
+    .split(',')
+    .map((item) => item.trim().toLowerCase())
+    .filter(Boolean);
+  return Array.from(new Set(values));
+}
+
+function extractEmailsFromText(input: string) {
+  const text = String(input || '');
+  const matches = text.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi) || [];
+  const values = matches.map((item) => item.trim().toLowerCase()).filter(Boolean);
+  return Array.from(new Set(values));
+}
+
+function extractEnvelopeAddress(input: string) {
+  const value = String(input || '').trim();
+  if (!value) return '';
+  const bracketMatch = /<([^>]+)>/.exec(value);
+  if (bracketMatch?.[1]) return bracketMatch[1].trim();
+  if (value.includes('@')) return value;
+  return '';
+}
+
+async function sendSmtpMail(options: { to: string[]; subject: string; text: string }) {
+  if (!smtpHost || !smtpPort || !smtpFrom) {
+    return { sent: false, error: 'SMTP config is missing (SMTP_HOST/SMTP_PORT/SMTP_FROM).' };
+  }
+
+  const fromEnvelope = extractEnvelopeAddress(smtpFrom);
+  if (!fromEnvelope || !fromEnvelope.includes('@')) {
+    return { sent: false, error: 'SMTP_FROM must include a valid email address.' };
+  }
+
+  const recipients = options.to.map((item) => extractEnvelopeAddress(item)).filter((item) => item.includes('@'));
+  if (recipients.length < 1) {
+    return { sent: false, error: 'No valid recipient email address found.' };
+  }
+
+  if ((smtpUser && !smtpPass) || (!smtpUser && smtpPass)) {
+    return { sent: false, error: 'Both SMTP_USER and SMTP_PASS must be set together.' };
+  }
+
+  try {
+    const transport = nodemailer.createTransport({
+      host: smtpHost,
+      port: smtpPort,
+      secure: smtpSecure,
+      requireTLS: !smtpSecure && smtpStartTls,
+      auth: smtpUser && smtpPass ? { user: smtpUser, pass: smtpPass } : undefined,
+      connectionTimeout: 20_000,
+      greetingTimeout: 20_000,
+      socketTimeout: 20_000,
+    });
+
+    await transport.sendMail({
+      from: smtpFrom,
+      to: recipients.join(', '),
+      subject: String(options.subject || 'Meri Boarding Contact Submission').trim(),
+      text: String(options.text || ''),
+    });
+
+    return { sent: true as const };
+  } catch (error) {
+    return { sent: false as const, error: String((error as Error)?.message || 'SMTP send failed') };
+  }
+}
+
+function formatContactSubmission(item: ContactSubmission) {
+  return {
+    id: String(item._id),
+    name: item.name,
+    email: item.email,
+    phone: item.phone,
+    country: String(item.country || ''),
+    subject: String(item.subject || ''),
+    message: item.message,
+    locale: item.locale,
+    sourcePage: item.sourcePage,
+    status: item.status,
+    mailSent: item.mailSent,
+    mailError: item.mailError || '',
+    userAgent: item.userAgent || '',
+    ip: item.ip || '',
+    createdAt: item.createdAt.toISOString(),
+    updatedAt: item.updatedAt.toISOString(),
+    readAt: item.readAt ? item.readAt.toISOString() : '',
+  };
 }
 
 const genericRoomsCardTitleByLocale: Record<ContentLocale, string> = {
@@ -3075,6 +3200,27 @@ async function getContactContent(locale: ContentLocale) {
   return fallback;
 }
 
+async function getContactSubmissionsCollection() {
+  const db = await getDb();
+  const submissions = db.collection<ContactSubmission>('contact_submissions');
+  await submissions.createIndex({ createdAt: -1 });
+  await submissions.createIndex({ status: 1, createdAt: -1 });
+  await submissions.createIndex({ email: 1 });
+  return submissions;
+}
+
+async function resolveContactNotificationRecipients(locale: ContentLocale) {
+  const envRecipients = parseEmailList(contactNotifyToRaw);
+  if (envRecipients.length > 0) return envRecipients;
+
+  const content = await getContactContent(locale);
+  const itemEmails = (content.details.items || [])
+    .flatMap((item) => extractEmailsFromText(String(item?.value || '')))
+    .filter(Boolean);
+
+  return Array.from(new Set(itemEmails));
+}
+
 async function seedSuperAdmin() {
   if (!adminPassword) {
     server.log.warn('ADMIN_PASSWORD is empty. Super admin seed skipped.');
@@ -3339,6 +3485,132 @@ server.get('/api/v1/public/content/contact', async (request, reply) => {
   const locale = parseLocale(query?.locale);
   const content = await getContactContent(locale);
   return reply.send({ key: 'page.contact', locale, content });
+});
+
+server.post('/api/v1/public/forms/contact', async (request, reply) => {
+  const body = request.body as
+    | {
+        locale?: string;
+        sourcePage?: string;
+        name?: string;
+        email?: string;
+        phone?: string;
+        country?: string;
+        subject?: string;
+        message?: string;
+      }
+    | undefined;
+
+  const locale = parseLocale(body?.locale);
+  const sourcePage = String(body?.sourcePage || '/contact').trim().slice(0, 120) || '/contact';
+  const name = String(body?.name || '').trim();
+  const email = String(body?.email || '').trim().toLowerCase();
+  const phone = String(body?.phone || '').trim();
+  const country = String(body?.country || '').trim();
+  const subject = String(body?.subject || '').trim();
+  const message = String(body?.message || '').trim();
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!name || name.length < 2) {
+    return reply.code(400).send({ error: 'Name must be at least 2 characters.' });
+  }
+  if (!emailRegex.test(email)) {
+    return reply.code(400).send({ error: 'Valid email is required.' });
+  }
+  if (!phone || phone.length < 5) {
+    return reply.code(400).send({ error: 'Phone is required.' });
+  }
+  if (!country || country.length < 2) {
+    return reply.code(400).send({ error: 'Country is required.' });
+  }
+  if (!subject || subject.length < 2) {
+    return reply.code(400).send({ error: 'Subject is required.' });
+  }
+  if (!message || message.length < 5) {
+    return reply.code(400).send({ error: 'Message must be at least 5 characters.' });
+  }
+  if (message.length > 5000) {
+    return reply.code(400).send({ error: 'Message is too long.' });
+  }
+
+  const now = new Date();
+  const forwardedFor = String(request.headers['x-forwarded-for'] || '').split(',')[0].trim();
+  const ip = (forwardedFor || request.ip || '').slice(0, 120);
+  const userAgent = String(request.headers['user-agent'] || '').trim().slice(0, 300);
+  const submission: ContactSubmission = {
+    _id: new ObjectId(),
+    locale,
+    sourcePage,
+    name: name.slice(0, 160),
+    email: email.slice(0, 200),
+    phone: phone.slice(0, 80),
+    country: country.slice(0, 120),
+    subject: subject.slice(0, 160),
+    message,
+    status: 'unread',
+    mailSent: false,
+    userAgent,
+    ip,
+    createdAt: now,
+    updatedAt: now,
+  };
+
+  const submissions = await getContactSubmissionsCollection();
+  await submissions.insertOne(submission);
+
+  try {
+    const recipients = await resolveContactNotificationRecipients(locale);
+    const mailResult = await sendSmtpMail({
+      to: recipients,
+      subject: `New Contact Message - ${submission.subject || 'General'} - ${submission.name}`,
+      text: [
+        'A new contact form submission has been received.',
+        '',
+        `Date: ${submission.createdAt.toISOString()}`,
+        `Locale: ${submission.locale}`,
+        `Source: ${submission.sourcePage}`,
+        `Name: ${submission.name}`,
+        `Email: ${submission.email}`,
+        `Phone: ${submission.phone}`,
+        `Country: ${submission.country || '-'}`,
+        `Subject: ${submission.subject || '-'}`,
+        '',
+        'Message:',
+        submission.message,
+      ].join('\n'),
+    });
+
+    if (mailResult.sent) {
+      await submissions.updateOne(
+        { _id: submission._id },
+        { $set: { mailSent: true, mailError: '', updatedAt: new Date() } },
+      );
+      return reply.code(201).send({ ok: true, id: String(submission._id), mailSent: true });
+    }
+
+    await submissions.updateOne(
+      { _id: submission._id },
+      { $set: { mailSent: false, mailError: String(mailResult.error || 'Mail send failed.'), updatedAt: new Date() } },
+    );
+
+    return reply.code(202).send({
+      ok: true,
+      id: String(submission._id),
+      mailSent: false,
+      warning: 'Message saved but email notification failed.',
+    });
+  } catch (error) {
+    await submissions.updateOne(
+      { _id: submission._id },
+      { $set: { mailSent: false, mailError: String((error as Error)?.message || 'Mail send failed.'), updatedAt: new Date() } },
+    );
+    return reply.code(202).send({
+      ok: true,
+      id: String(submission._id),
+      mailSent: false,
+      warning: 'Message saved but email notification failed.',
+    });
+  }
 });
 
 server.get('/api/v1/public/hotels', async (request, reply) => {
@@ -4493,6 +4765,126 @@ server.put('/api/v1/admin/content/contact', async (request, reply) => {
   );
 
   return reply.send({ ok: true, locale, content: nextContent });
+});
+
+server.get('/api/v1/admin/contact-submissions', async (request, reply) => {
+  const admin = await getRequestAdmin(request.headers.authorization);
+  if (!canManageContent(admin)) {
+    return reply.code(403).send({ error: 'Only super_admin or moderator can access this route' });
+  }
+
+  const query = request.query as
+    | {
+        status?: string;
+        page?: string | number;
+        limit?: string | number;
+        search?: string;
+      }
+    | undefined;
+
+  const statusRaw = String(query?.status || 'all').trim().toLowerCase();
+  const status = statusRaw === 'read' || statusRaw === 'unread' ? (statusRaw as ContactSubmissionStatus) : 'all';
+  const page = Math.max(1, Number(query?.page || 1));
+  const limit = Math.min(100, Math.max(5, Number(query?.limit || 25)));
+  const search = String(query?.search || '').trim().slice(0, 120);
+  const skip = (page - 1) * limit;
+  const filter: Record<string, unknown> = {};
+
+  if (status !== 'all') {
+    filter.status = status;
+  }
+
+  if (search) {
+    const regex = new RegExp(escapeRegex(search), 'i');
+    filter.$or = [
+      { name: regex },
+      { email: regex },
+      { phone: regex },
+      { country: regex },
+      { subject: regex },
+      { message: regex },
+      { sourcePage: regex },
+    ];
+  }
+
+  const submissions = await getContactSubmissionsCollection();
+  const [items, total, unreadCount, readCount] = await Promise.all([
+    submissions.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit).toArray(),
+    submissions.countDocuments(filter),
+    submissions.countDocuments({ status: 'unread' }),
+    submissions.countDocuments({ status: 'read' }),
+  ]);
+
+  return reply.send({
+    items: items.map(formatContactSubmission),
+    total,
+    page,
+    limit,
+    counts: {
+      unread: unreadCount,
+      read: readCount,
+      all: unreadCount + readCount,
+    },
+  });
+});
+
+server.patch('/api/v1/admin/contact-submissions/:submissionId', async (request, reply) => {
+  const admin = await getRequestAdmin(request.headers.authorization);
+  if (!canManageContent(admin)) {
+    return reply.code(403).send({ error: 'Only super_admin or moderator can update this route' });
+  }
+
+  const params = request.params as { submissionId?: string } | undefined;
+  const submissionId = String(params?.submissionId || '');
+  if (!ObjectId.isValid(submissionId)) {
+    return reply.code(400).send({ error: 'Invalid submission id' });
+  }
+
+  const body = request.body as { status?: string } | undefined;
+  const nextStatus = String(body?.status || '').trim().toLowerCase();
+  if (nextStatus !== 'read' && nextStatus !== 'unread') {
+    return reply.code(400).send({ error: 'Status must be "read" or "unread"' });
+  }
+
+  const now = new Date();
+  const submissions = await getContactSubmissionsCollection();
+  const result =
+    nextStatus === 'read'
+      ? await submissions.updateOne(
+          { _id: new ObjectId(submissionId) },
+          { $set: { status: 'read', readAt: now, updatedAt: now } },
+        )
+      : await submissions.updateOne(
+          { _id: new ObjectId(submissionId) },
+          { $set: { status: 'unread', updatedAt: now }, $unset: { readAt: '' } },
+        );
+
+  if (!result.matchedCount) {
+    return reply.code(404).send({ error: 'Submission not found' });
+  }
+
+  return reply.send({ ok: true });
+});
+
+server.delete('/api/v1/admin/contact-submissions/:submissionId', async (request, reply) => {
+  const admin = await getRequestAdmin(request.headers.authorization);
+  if (!canManageContent(admin)) {
+    return reply.code(403).send({ error: 'Only super_admin or moderator can delete this route' });
+  }
+
+  const params = request.params as { submissionId?: string } | undefined;
+  const submissionId = String(params?.submissionId || '');
+  if (!ObjectId.isValid(submissionId)) {
+    return reply.code(400).send({ error: 'Invalid submission id' });
+  }
+
+  const submissions = await getContactSubmissionsCollection();
+  const result = await submissions.deleteOne({ _id: new ObjectId(submissionId) });
+  if (!result.deletedCount) {
+    return reply.code(404).send({ error: 'Submission not found' });
+  }
+
+  return reply.send({ ok: true });
 });
 
 server.put('/api/v1/admin/content/home', async (request, reply) => {

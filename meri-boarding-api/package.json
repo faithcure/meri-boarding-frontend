@@ -12,7 +12,8 @@
     "@fastify/cors": "^11.1.0",
     "dotenv": "^17.2.3",
     "fastify": "^5.6.1",
-    "mongodb": "^7.1.0"
+    "mongodb": "^7.1.0",
+    "nodemailer": "^8.0.1"
   },
   "devDependencies": {
     "@types/node": "^24.3.0",
