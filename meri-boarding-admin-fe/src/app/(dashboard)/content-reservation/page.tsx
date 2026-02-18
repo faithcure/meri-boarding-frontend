@@ -483,6 +483,8 @@ export default function ReservationContentPage() {
   const [expanded, setExpanded] = useState<'hero' | 'short' | 'form' | 'long' | 'help' | 'why' | 'inquiry'>('hero')
 
   const [formErrors, setFormErrors] = useState<ReservationErrors>({})
+  const [uploadErrors, setUploadErrors] = useState<{ hero?: string }>({})
+  const [uploadingTarget, setUploadingTarget] = useState<'hero' | null>(null)
   const [reservation, setReservation] = useState<ReservationContent>(createDefaultReservation())
 
   const loadReservation = useCallback(
@@ -499,6 +501,7 @@ return
       setError('')
       setSuccess('')
       setFormErrors({})
+      setUploadErrors({})
 
       try {
         const meResponse = await fetch(`${apiBaseUrl}/api/v1/auth/me`, {
@@ -554,6 +557,79 @@ return
   const handleLocaleChange = (nextLocale: Locale) => {
     setLocale(nextLocale)
     setLoading(true)
+  }
+
+  const toDataUrl = (file: File) =>
+    new Promise<string>((resolve, reject) => {
+      const reader = new FileReader()
+
+      reader.onload = () => resolve(String(reader.result || ''))
+      reader.onerror = () => reject(new Error('File read failed'))
+      reader.readAsDataURL(file)
+    })
+
+  const uploadReservationImage = async (file: File) => {
+    const token = window.localStorage.getItem('admin_token')
+
+    if (!token) return
+
+    if (!['image/png', 'image/jpeg', 'image/jpg', 'image/webp'].includes(file.type)) {
+      setUploadErrors({ hero: 'Only PNG, JPG or WEBP files are allowed.' })
+
+      return
+    }
+
+    if (file.size > 8 * 1024 * 1024) {
+      setUploadErrors({ hero: 'Image size cannot exceed 8MB.' })
+
+      return
+    }
+
+    setUploadingTarget('hero')
+    setUploadErrors({ hero: '' })
+    setError('')
+    setSuccess('')
+
+    try {
+      const dataUrl = await toDataUrl(file)
+
+      const response = await fetch(`${apiBaseUrl}/api/v1/admin/content/page-image`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          fileName: file.name,
+          dataUrl,
+          context: 'reservation-hero'
+        })
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        setUploadErrors({ hero: data?.error || 'Image upload failed.' })
+
+        return
+      }
+
+      const imageUrl = String(data?.imageUrl || '')
+
+      if (!imageUrl) {
+        setUploadErrors({ hero: 'Image upload failed.' })
+
+        return
+      }
+
+      setReservation(prev => ({ ...prev, hero: { ...prev.hero, backgroundImage: imageUrl } }))
+      setFormErrors(prev => ({ ...prev, heroBackgroundImage: undefined }))
+      setSuccess('Image uploaded.')
+    } catch {
+      setUploadErrors({ hero: 'Image upload failed.' })
+    } finally {
+      setUploadingTarget(null)
+    }
   }
 
   const handleSave = async () => {
@@ -669,6 +745,27 @@ return
                   </Grid>
                   <Grid size={{ xs: 12 }}>
                     <CustomTextField label='Hero Background Image URL' value={reservation.hero.backgroundImage} onChange={e => setReservation(prev => ({ ...prev, hero: { ...prev.hero, backgroundImage: e.target.value } }))} error={Boolean(formErrors.heroBackgroundImage)} helperText={formErrors.heroBackgroundImage} fullWidth />
+                    <div className='mt-2'>
+                      <Button component='label' variant={uploadErrors.hero ? 'contained' : 'outlined'} color={uploadErrors.hero ? 'error' : 'primary'} disabled={Boolean(uploadingTarget) || saving}>
+                        {uploadingTarget === 'hero' ? 'Uploading...' : 'Upload Hero Background'}
+                        <input
+                          hidden
+                          type='file'
+                          accept='image/png,image/jpeg,image/jpg,image/webp'
+                          onChange={event => {
+                            const file = event.target.files?.[0]
+
+                            event.currentTarget.value = ''
+                            if (file) void uploadReservationImage(file)
+                          }}
+                        />
+                      </Button>
+                    </div>
+                    {uploadErrors.hero ? (
+                      <Typography variant='caption' color='error.main'>
+                        {uploadErrors.hero}
+                      </Typography>
+                    ) : null}
                   </Grid>
                   <Grid size={{ xs: 12, md: 6 }}>
                     <CustomTextField label='Breadcrumb Home' value={reservation.crumb.home} onChange={e => setReservation(prev => ({ ...prev, crumb: { ...prev.crumb, home: e.target.value } }))} error={Boolean(formErrors.crumbHome)} helperText={formErrors.crumbHome} fullWidth />

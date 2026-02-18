@@ -207,6 +207,9 @@ export default function AmenitiesContentPage() {
     overviewByIndex: {}
   })
 
+  const [uploadErrors, setUploadErrors] = useState<{ hero?: string; cards: Record<number, string> }>({ cards: {} })
+  const [uploadingTarget, setUploadingTarget] = useState<string | null>(null)
+
   const [amenities, setAmenities] = useState<AmenitiesContent>(createDefaultAmenities())
 
   const loadAmenities = useCallback(async (targetLocale: Locale) => {
@@ -222,6 +225,7 @@ export default function AmenitiesContentPage() {
     setError('')
     setSuccess('')
     setFormErrors({ layoutByIndex: {}, cardsByIndex: {}, overviewByIndex: {} })
+    setUploadErrors({ cards: {} })
 
     try {
       const meResponse = await fetch(`${apiBaseUrl}/api/v1/auth/me`, {
@@ -398,6 +402,128 @@ export default function AmenitiesContentPage() {
     next.splice(to, 0, moved)
 
     return next
+  }
+
+  const toDataUrl = (file: File) =>
+    new Promise<string>((resolve, reject) => {
+      const reader = new FileReader()
+
+      reader.onload = () => resolve(String(reader.result || ''))
+      reader.onerror = () => reject(new Error('File read failed'))
+      reader.readAsDataURL(file)
+    })
+
+  const uploadAmenitiesImage = async (file: File, target: 'hero' | number) => {
+    const token = window.localStorage.getItem('admin_token')
+
+    if (!token) return
+
+    if (!['image/png', 'image/jpeg', 'image/jpg', 'image/webp'].includes(file.type)) {
+      if (target === 'hero') {
+        setUploadErrors(prev => ({ ...prev, hero: 'Only PNG, JPG or WEBP files are allowed.' }))
+      } else {
+        setUploadErrors(prev => ({ ...prev, cards: { ...prev.cards, [target]: 'Only PNG, JPG or WEBP files are allowed.' } }))
+      }
+
+      
+return
+    }
+
+    if (file.size > 8 * 1024 * 1024) {
+      if (target === 'hero') {
+        setUploadErrors(prev => ({ ...prev, hero: 'Image size cannot exceed 8MB.' }))
+      } else {
+        setUploadErrors(prev => ({ ...prev, cards: { ...prev.cards, [target]: 'Image size cannot exceed 8MB.' } }))
+      }
+
+      
+return
+    }
+
+    const targetKey = target === 'hero' ? 'hero' : `card-${target}`
+
+    setUploadingTarget(targetKey)
+
+    if (target === 'hero') {
+      setUploadErrors(prev => ({ ...prev, hero: '' }))
+    } else {
+      setUploadErrors(prev => ({ ...prev, cards: { ...prev.cards, [target]: '' } }))
+    }
+
+    setError('')
+    setSuccess('')
+
+    try {
+      const dataUrl = await toDataUrl(file)
+
+      const response = await fetch(`${apiBaseUrl}/api/v1/admin/content/page-image`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          fileName: file.name,
+          dataUrl,
+          context: target === 'hero' ? 'amenities-hero' : `amenities-card-${target}`
+        })
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        const msg = data?.error || 'Image upload failed.'
+
+        if (target === 'hero') {
+          setUploadErrors(prev => ({ ...prev, hero: msg }))
+        } else {
+          setUploadErrors(prev => ({ ...prev, cards: { ...prev.cards, [target]: msg } }))
+        }
+
+        
+return
+      }
+
+      const imageUrl = String(data?.imageUrl || '')
+
+      if (!imageUrl) {
+        if (target === 'hero') {
+          setUploadErrors(prev => ({ ...prev, hero: 'Image upload failed.' }))
+        } else {
+          setUploadErrors(prev => ({ ...prev, cards: { ...prev.cards, [target]: 'Image upload failed.' } }))
+        }
+
+        
+return
+      }
+
+      if (target === 'hero') {
+        setAmenities(prev => ({ ...prev, hero: { ...prev.hero, backgroundImage: imageUrl } }))
+        setFormErrors(prev => ({ ...prev, heroBackgroundImage: undefined }))
+      } else {
+        setAmenities(prev => ({
+          ...prev,
+          data: {
+            ...prev.data,
+            cards: prev.data.cards.map((row, i) => (i === target ? { ...row, image: imageUrl } : row))
+          }
+        }))
+        setFormErrors(prev => ({
+          ...prev,
+          cardsByIndex: { ...prev.cardsByIndex, [target]: { ...prev.cardsByIndex[target], image: undefined } }
+        }))
+      }
+
+      setSuccess('Image uploaded.')
+    } catch {
+      if (target === 'hero') {
+        setUploadErrors(prev => ({ ...prev, hero: 'Image upload failed.' }))
+      } else {
+        setUploadErrors(prev => ({ ...prev, cards: { ...prev.cards, [target]: 'Image upload failed.' } }))
+      }
+    } finally {
+      setUploadingTarget(null)
+    }
   }
 
   const handleSave = async () => {
@@ -581,6 +707,32 @@ export default function AmenitiesContentPage() {
                       helperText={formErrors.heroBackgroundImage}
                       fullWidth
                     />
+                    <div className='mt-2'>
+                      <Button
+                        component='label'
+                        variant={uploadErrors.hero ? 'contained' : 'outlined'}
+                        color={uploadErrors.hero ? 'error' : 'primary'}
+                        disabled={Boolean(uploadingTarget) || saving}
+                      >
+                        {uploadingTarget === 'hero' ? 'Uploading...' : 'Upload Hero Background'}
+                        <input
+                          hidden
+                          type='file'
+                          accept='image/png,image/jpeg,image/jpg,image/webp'
+                          onChange={event => {
+                            const file = event.target.files?.[0]
+
+                            event.currentTarget.value = ''
+                            if (file) void uploadAmenitiesImage(file, 'hero')
+                          }}
+                        />
+                      </Button>
+                    </div>
+                    {uploadErrors.hero ? (
+                      <Typography variant='caption' color='error.main'>
+                        {uploadErrors.hero}
+                      </Typography>
+                    ) : null}
                   </Grid>
                 </Grid>
               </AccordionDetails>
@@ -990,6 +1142,32 @@ export default function AmenitiesContentPage() {
                             helperText={formErrors.cardsByIndex[index]?.image}
                             fullWidth
                           />
+                          <div className='mt-2'>
+                            <Button
+                              component='label'
+                              variant={uploadErrors.cards[index] ? 'contained' : 'outlined'}
+                              color={uploadErrors.cards[index] ? 'error' : 'primary'}
+                              disabled={Boolean(uploadingTarget) || saving}
+                            >
+                              {uploadingTarget === `card-${index}` ? 'Uploading...' : 'Upload Card Image'}
+                              <input
+                                hidden
+                                type='file'
+                                accept='image/png,image/jpeg,image/jpg,image/webp'
+                                onChange={event => {
+                                  const file = event.target.files?.[0]
+
+                                  event.currentTarget.value = ''
+                                  if (file) void uploadAmenitiesImage(file, index)
+                                }}
+                              />
+                            </Button>
+                          </div>
+                          {uploadErrors.cards[index] ? (
+                            <Typography variant='caption' color='error.main'>
+                              {uploadErrors.cards[index]}
+                            </Typography>
+                          ) : null}
                         </Grid>
                         <Grid size={{ xs: 12 }}>
                           <CustomTextField

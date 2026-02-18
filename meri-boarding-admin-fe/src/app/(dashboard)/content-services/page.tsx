@@ -191,6 +191,9 @@ export default function ServicesContentPage() {
     supportListByIndex: {}
   })
 
+  const [uploadErrors, setUploadErrors] = useState<{ hero?: string; stats?: string }>({})
+  const [uploadingTarget, setUploadingTarget] = useState<'hero' | 'stats' | null>(null)
+
   const [services, setServices] = useState<ServicesContent>(createDefaultServices())
 
   const loadServices = useCallback(async (targetLocale: Locale) => {
@@ -206,6 +209,7 @@ export default function ServicesContentPage() {
     setError('')
     setSuccess('')
     setFormErrors({ statsByIndex: {}, highlightsByIndex: {}, supportListByIndex: {} })
+    setUploadErrors({})
 
     try {
       const meResponse = await fetch(`${apiBaseUrl}/api/v1/auth/me`, {
@@ -376,6 +380,85 @@ export default function ServicesContentPage() {
     next.splice(to, 0, moved)
 
     return next
+  }
+
+  const toDataUrl = (file: File) =>
+    new Promise<string>((resolve, reject) => {
+      const reader = new FileReader()
+
+      reader.onload = () => resolve(String(reader.result || ''))
+      reader.onerror = () => reject(new Error('File read failed'))
+      reader.readAsDataURL(file)
+    })
+
+  const uploadServicesImage = async (file: File, target: 'hero' | 'stats') => {
+    const token = window.localStorage.getItem('admin_token')
+
+    if (!token) return
+
+    if (!['image/png', 'image/jpeg', 'image/jpg', 'image/webp'].includes(file.type)) {
+      setUploadErrors(prev => ({ ...prev, [target]: 'Only PNG, JPG or WEBP files are allowed.' }))
+      
+return
+    }
+
+    if (file.size > 8 * 1024 * 1024) {
+      setUploadErrors(prev => ({ ...prev, [target]: 'Image size cannot exceed 8MB.' }))
+      
+return
+    }
+
+    setUploadingTarget(target)
+    setUploadErrors(prev => ({ ...prev, [target]: '' }))
+    setError('')
+    setSuccess('')
+
+    try {
+      const dataUrl = await toDataUrl(file)
+
+      const response = await fetch(`${apiBaseUrl}/api/v1/admin/content/page-image`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          fileName: file.name,
+          dataUrl,
+          context: `services-${target}`
+        })
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        setUploadErrors(prev => ({ ...prev, [target]: data?.error || 'Image upload failed.' }))
+        
+return
+      }
+
+      const imageUrl = String(data?.imageUrl || '')
+
+      if (!imageUrl) {
+        setUploadErrors(prev => ({ ...prev, [target]: 'Image upload failed.' }))
+        
+return
+      }
+
+      if (target === 'hero') {
+        setServices(prev => ({ ...prev, hero: { ...prev.hero, backgroundImage: imageUrl } }))
+        setFormErrors(prev => ({ ...prev, heroBackgroundImage: undefined }))
+      } else {
+        setServices(prev => ({ ...prev, content: { ...prev.content, statsImage: imageUrl } }))
+        setFormErrors(prev => ({ ...prev, statsImage: undefined }))
+      }
+
+      setSuccess('Image uploaded.')
+    } catch {
+      setUploadErrors(prev => ({ ...prev, [target]: 'Image upload failed.' }))
+    } finally {
+      setUploadingTarget(null)
+    }
   }
 
   const handleSave = async () => {
@@ -554,6 +637,32 @@ export default function ServicesContentPage() {
                       helperText={formErrors.heroBackgroundImage}
                       fullWidth
                     />
+                    <div className='mt-2'>
+                      <Button
+                        component='label'
+                        variant={uploadErrors.hero ? 'contained' : 'outlined'}
+                        color={uploadErrors.hero ? 'error' : 'primary'}
+                        disabled={Boolean(uploadingTarget) || saving}
+                      >
+                        {uploadingTarget === 'hero' ? 'Uploading...' : 'Upload Hero Background'}
+                        <input
+                          hidden
+                          type='file'
+                          accept='image/png,image/jpeg,image/jpg,image/webp'
+                          onChange={event => {
+                            const file = event.target.files?.[0]
+
+                            event.currentTarget.value = ''
+                            if (file) void uploadServicesImage(file, 'hero')
+                          }}
+                        />
+                      </Button>
+                    </div>
+                    {uploadErrors.hero ? (
+                      <Typography variant='caption' color='error.main'>
+                        {uploadErrors.hero}
+                      </Typography>
+                    ) : null}
                   </Grid>
                 </Grid>
               </AccordionDetails>
@@ -666,6 +775,32 @@ export default function ServicesContentPage() {
                   helperText={formErrors.statsImage}
                   fullWidth
                 />
+                <div>
+                  <Button
+                    component='label'
+                    variant={uploadErrors.stats ? 'contained' : 'outlined'}
+                    color={uploadErrors.stats ? 'error' : 'primary'}
+                    disabled={Boolean(uploadingTarget) || saving}
+                  >
+                    {uploadingTarget === 'stats' ? 'Uploading...' : 'Upload Stats Image'}
+                    <input
+                      hidden
+                      type='file'
+                      accept='image/png,image/jpeg,image/jpg,image/webp'
+                      onChange={event => {
+                        const file = event.target.files?.[0]
+
+                        event.currentTarget.value = ''
+                        if (file) void uploadServicesImage(file, 'stats')
+                      }}
+                    />
+                  </Button>
+                </div>
+                {uploadErrors.stats ? (
+                  <Typography variant='caption' color='error.main'>
+                    {uploadErrors.stats}
+                  </Typography>
+                ) : null}
 
                 {services.content.stats.map((item, index) => (
                   <Card key={`services-stat-${index}`} variant='outlined'>

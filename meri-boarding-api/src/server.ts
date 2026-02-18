@@ -4896,6 +4896,30 @@ server.post('/api/v1/admin/content/home/offers-image', async (request, reply) =>
   return reply.send({ ok: true, imageUrl: `/api/v1/assets/home/${fileName}` });
 });
 
+server.post('/api/v1/admin/content/page-image', async (request, reply) => {
+  const admin = await getRequestAdmin(request.headers.authorization);
+  if (!admin || (admin.role !== 'super_admin' && admin.role !== 'moderator')) {
+    return reply.code(403).send({ error: 'Only super_admin or moderator can upload page images' });
+  }
+
+  const body = request.body as { fileName?: string; dataUrl?: string; context?: string } | undefined;
+  const parsed = parseDataUrl(String(body?.dataUrl || ''));
+  if (!parsed) {
+    return reply.code(400).send({ error: 'Invalid image format. Use PNG, JPG or WEBP data URL.' });
+  }
+  if (parsed.buffer.length > 8 * 1024 * 1024) {
+    return reply.code(400).send({ error: 'Image size cannot exceed 8MB' });
+  }
+
+  const context = sanitizeFilename(String(body?.context || 'page')).replace(/\.+/g, '-').slice(0, 24) || 'page';
+  const requestedName = sanitizeFilename(String(body?.fileName || `${context}-${Date.now()}.${parsed.ext}`));
+  const fileName = `${context}-${Date.now()}-${requestedName}`.replace(/\.+/g, '.');
+  const filePath = path.join(homeUploadDir, fileName);
+  await writeFile(filePath, parsed.buffer);
+
+  return reply.send({ ok: true, imageUrl: `/api/v1/assets/home/${fileName}` });
+});
+
 server.post('/api/v1/admin/users', async (request, reply) => {
   const currentAdmin = await getRequestAdmin(request.headers.authorization);
 
