@@ -1,5 +1,6 @@
 import type { Locale } from "@/i18n/getLocale";
 import { getMessages } from "@/i18n/messages";
+import { getServerApiBaseUrl, withPublicApiBaseIfNeeded } from "@/lib/apiBaseUrl";
 
 type CmsContactContent = {
   hero?: {
@@ -43,14 +44,10 @@ export type ContactResolvedContent = {
   };
 };
 
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? process.env.API_BASE_URL ?? "http://localhost:4000";
-const normalizedApiBaseUrl = apiBaseUrl.replace(/\/+$/, "");
+const apiBaseUrl = getServerApiBaseUrl();
 
 function withApiBaseIfNeeded(url: string) {
-  const value = String(url || "").trim();
-  if (!value) return "";
-  if (!value.startsWith("/api/")) return value;
-  return `${normalizedApiBaseUrl}${value}`;
+  return withPublicApiBaseIfNeeded(url);
 }
 
 function resolveContent(locale: Locale, cms?: CmsContactContent): ContactResolvedContent {
@@ -123,17 +120,13 @@ function resolveContent(locale: Locale, cms?: CmsContactContent): ContactResolve
 }
 
 export async function fetchContactResolvedContent(locale: Locale): Promise<ContactResolvedContent> {
-  try {
-    const response = await fetch(`${apiBaseUrl}/api/v1/public/content/contact?locale=${locale}`, {
-      cache: "no-store"
-    });
-    if (!response.ok) {
-      return resolveContent(locale, undefined);
-    }
-
-    const data = await response.json();
-    return resolveContent(locale, data?.content || {});
-  } catch {
-    return resolveContent(locale, undefined);
+  const response = await fetch(`${apiBaseUrl}/api/v1/public/content/contact?locale=${locale}`, {
+    cache: "no-store"
+  });
+  if (!response.ok) {
+    throw new Error(`Failed to fetch contact content (${response.status})`);
   }
+
+  const data = await response.json();
+  return resolveContent(locale, data?.content || {});
 }

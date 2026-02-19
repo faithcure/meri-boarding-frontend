@@ -33,7 +33,10 @@ type EditableUserState = {
 }
 
 export default function UsersPage() {
-  const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:4000'
+  const configuredApiBaseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL ?? '').trim()
+  const apiBaseUrl = configuredApiBaseUrl.startsWith('http://localhost') || configuredApiBaseUrl.startsWith('https://localhost')
+    ? ''
+    : configuredApiBaseUrl
 
   const [isSuperAdmin, setIsSuperAdmin] = useState(false)
   const [loading, setLoading] = useState(true)

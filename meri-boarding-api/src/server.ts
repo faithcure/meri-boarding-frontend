@@ -3,7 +3,7 @@ import cors from '@fastify/cors';
 import dotenv from 'dotenv';
 import { createHmac, randomBytes, scryptSync, timingSafeEqual } from 'node:crypto';
 import { createReadStream } from 'node:fs';
-import { mkdir, readFile, stat, unlink, writeFile } from 'node:fs/promises';
+import { mkdir, stat, unlink, writeFile } from 'node:fs/promises';
 import nodemailer from 'nodemailer';
 import path from 'node:path';
 import { MongoClient, ObjectId } from 'mongodb';
@@ -14,9 +14,6 @@ const port = Number(process.env.PORT || 4000);
 const host = process.env.HOST || '0.0.0.0';
 const mongoUri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017';
 const mongoDbName = process.env.MONGODB_DB || 'meri_boarding';
-const adminEmail = (process.env.ADMIN_EMAIL || 'admin@local.test').trim().toLowerCase();
-const adminPassword = (process.env.ADMIN_PASSWORD || '').trim();
-const adminName = (process.env.ADMIN_NAME || 'Super Admin').trim();
 const tokenSecret = process.env.ADMIN_TOKEN_SECRET || process.env.ADMIN_SESSION_SECRET || 'change-this-secret';
 const tokenHours = Number(process.env.ADMIN_TOKEN_HOURS || 12);
 const seedHotelsOnStart = String(process.env.SEED_HOTELS_ON_START || '').trim().toLowerCase() === 'true';
@@ -2494,63 +2491,7 @@ async function getLocalizedDefaultHomeContent(locale: ContentLocale): Promise<Ho
   }
 
   const fallback = JSON.parse(JSON.stringify(defaultHomeContent)) as HomeCmsContent;
-  const localePath = path.resolve(process.cwd(), '..', 'meri-boarding-public-fe', 'src', 'i18n', 'locales', `${locale}.json`);
   fallback.rooms.cards = getLocalizedGenericRoomsCards(locale);
-
-  try {
-    const raw = await readFile(localePath, 'utf8');
-    const parsed = JSON.parse(raw) as {
-      hero?: Record<string, unknown>;
-      rooms?: Record<string, unknown>;
-      testimonials?: { apartments?: unknown; locations?: unknown; slides?: Array<{ badge?: unknown; text?: unknown }> };
-      facilities?: {
-        subtitle?: unknown;
-        title?: unknown;
-        description?: unknown;
-        stats?: Array<{ label?: unknown; suffix?: unknown }>;
-      };
-    };
-    const hero = parsed?.hero || {};
-    const rooms = parsed?.rooms || {};
-    const testimonials = parsed?.testimonials || {};
-    const facilities = parsed?.facilities || {};
-    fallback.hero.titleLead = String(hero.titleLead ?? fallback.hero.titleLead).trim();
-    fallback.hero.titleHighlight = String(hero.titleHighlight ?? fallback.hero.titleHighlight).trim();
-    fallback.hero.titleTail = String(hero.titleTail ?? fallback.hero.titleTail).trim();
-    fallback.hero.description = String(hero.description ?? fallback.hero.description).trim();
-    fallback.hero.ctaLocations = String(hero.ctaLocations ?? fallback.hero.ctaLocations).trim();
-    fallback.hero.ctaQuote = String(hero.ctaQuote ?? fallback.hero.ctaQuote).trim();
-    fallback.rooms.subtitle = String(rooms.subtitle ?? fallback.rooms.subtitle).trim();
-    fallback.rooms.title = String(rooms.title ?? fallback.rooms.title).trim();
-    fallback.rooms.description = String(rooms.description ?? fallback.rooms.description).trim();
-    fallback.rooms.allAmenities = String(rooms.allAmenities ?? fallback.rooms.allAmenities).trim();
-    fallback.rooms.request = String(rooms.request ?? fallback.rooms.request).trim();
-    fallback.testimonials.apartments = String(testimonials.apartments ?? fallback.testimonials.apartments).trim();
-    fallback.testimonials.locations = String(testimonials.locations ?? fallback.testimonials.locations).trim();
-    if (Array.isArray(testimonials.slides) && testimonials.slides.length > 0) {
-      fallback.testimonials.slides = testimonials.slides
-        .map((item) => ({
-          badge: String(item?.badge || '').trim(),
-          text: String(item?.text || '').trim(),
-        }))
-        .filter((item) => Boolean(item.badge) && Boolean(item.text))
-        .slice(0, 8);
-    }
-    fallback.facilities.subtitle = String(facilities.subtitle ?? fallback.facilities.subtitle).trim();
-    fallback.facilities.title = String(facilities.title ?? fallback.facilities.title).trim();
-    fallback.facilities.description = String(facilities.description ?? fallback.facilities.description).trim();
-    if (Array.isArray(facilities.stats) && facilities.stats.length > 0) {
-      fallback.facilities.stats = facilities.stats
-        .map((item) => ({
-          label: String(item?.label || '').trim(),
-          suffix: String(item?.suffix || '').trim(),
-        }))
-        .filter((item) => Boolean(item.label) && Boolean(item.suffix))
-        .slice(0, 3);
-    }
-  } catch {
-    // Keep hardcoded fallback when locale file cannot be read.
-  }
 
   homeFallbackCache[locale] = fallback;
   return JSON.parse(JSON.stringify(fallback)) as HomeCmsContent;
@@ -2648,80 +2589,6 @@ async function getLocalizedDefaultServicesContent(locale: ContentLocale): Promis
   }
 
   const fallback = JSON.parse(JSON.stringify(defaultServicesContent)) as ServicesCmsContent;
-  const localePath = path.resolve(process.cwd(), '..', 'meri-boarding-public-fe', 'src', 'i18n', 'locales', `${locale}.json`);
-
-  try {
-    const raw = await readFile(localePath, 'utf8');
-    const parsed = JSON.parse(raw) as {
-      servicesHero?: {
-        subtitle?: unknown;
-        title?: unknown;
-        home?: unknown;
-        crumb?: unknown;
-      };
-      servicesContent?: {
-        heroSubtitle?: unknown;
-        heroTitle?: unknown;
-        heroDescription?: unknown;
-        ctaAvailability?: unknown;
-        ctaContact?: unknown;
-        stats?: Array<{ label?: unknown; value?: unknown; note?: unknown }>;
-        essentialsSubtitle?: unknown;
-        essentialsTitle?: unknown;
-        highlights?: Array<{ icon?: unknown; title?: unknown; description?: unknown }>;
-        supportSubtitle?: unknown;
-        supportTitle?: unknown;
-        supportDescription?: unknown;
-        ctaStart?: unknown;
-        supportList?: unknown[];
-      };
-    };
-    const hero = parsed?.servicesHero || {};
-    const content = parsed?.servicesContent || {};
-
-    fallback.hero.subtitle = String(hero.subtitle ?? fallback.hero.subtitle).trim();
-    fallback.hero.title = String(hero.title ?? fallback.hero.title).trim();
-    fallback.hero.home = String(hero.home ?? fallback.hero.home).trim();
-    fallback.hero.crumb = String(hero.crumb ?? fallback.hero.crumb).trim();
-
-    fallback.content.heroSubtitle = String(content.heroSubtitle ?? fallback.content.heroSubtitle).trim();
-    fallback.content.heroTitle = String(content.heroTitle ?? fallback.content.heroTitle).trim();
-    fallback.content.heroDescription = String(content.heroDescription ?? fallback.content.heroDescription).trim();
-    fallback.content.ctaAvailability = String(content.ctaAvailability ?? fallback.content.ctaAvailability).trim();
-    fallback.content.ctaContact = String(content.ctaContact ?? fallback.content.ctaContact).trim();
-    fallback.content.essentialsSubtitle = String(content.essentialsSubtitle ?? fallback.content.essentialsSubtitle).trim();
-    fallback.content.essentialsTitle = String(content.essentialsTitle ?? fallback.content.essentialsTitle).trim();
-    fallback.content.supportSubtitle = String(content.supportSubtitle ?? fallback.content.supportSubtitle).trim();
-    fallback.content.supportTitle = String(content.supportTitle ?? fallback.content.supportTitle).trim();
-    fallback.content.supportDescription = String(content.supportDescription ?? fallback.content.supportDescription).trim();
-    fallback.content.ctaStart = String(content.ctaStart ?? fallback.content.ctaStart).trim();
-
-    if (Array.isArray(content.stats) && content.stats.length > 0) {
-      fallback.content.stats = content.stats
-        .map((item) => ({
-          label: String(item?.label || '').trim(),
-          value: String(item?.value || '').trim(),
-          note: String(item?.note || '').trim(),
-        }))
-        .filter((item) => Boolean(item.label) && Boolean(item.value) && Boolean(item.note))
-        .slice(0, 6);
-    }
-    if (Array.isArray(content.highlights) && content.highlights.length > 0) {
-      fallback.content.highlights = content.highlights
-        .map((item) => ({
-          icon: String(item?.icon || '').trim() || 'fa fa-home',
-          title: String(item?.title || '').trim(),
-          description: String(item?.description || '').trim(),
-        }))
-        .filter((item) => Boolean(item.icon) && Boolean(item.title) && Boolean(item.description))
-        .slice(0, 12);
-    }
-    if (Array.isArray(content.supportList) && content.supportList.length > 0) {
-      fallback.content.supportList = content.supportList.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 20);
-    }
-  } catch {
-    // Keep hardcoded fallback when locale file cannot be read.
-  }
 
   servicesFallbackCache[locale] = fallback;
   return JSON.parse(JSON.stringify(fallback)) as ServicesCmsContent;
@@ -2758,89 +2625,6 @@ async function getLocalizedDefaultAmenitiesContent(locale: ContentLocale): Promi
   }
 
   const fallback = JSON.parse(JSON.stringify(defaultAmenitiesContent)) as AmenitiesCmsContent;
-  const localePath = path.resolve(process.cwd(), '..', 'meri-boarding-public-fe', 'src', 'i18n', 'locales', `${locale}.json`);
-
-  try {
-    const raw = await readFile(localePath, 'utf8');
-    const parsed = JSON.parse(raw) as {
-      amenitiesHero?: {
-        subtitle?: unknown;
-        title?: unknown;
-        crumb?: unknown;
-        home?: unknown;
-      };
-      amenitiesContent?: {
-        layoutSubtitle?: unknown;
-        layoutTitle?: unknown;
-        layoutDesc?: unknown;
-        layoutOptions?: Array<{ title?: unknown; icon?: unknown; description?: unknown; highlights?: unknown[] }>;
-        amenitiesSubtitle?: unknown;
-        amenitiesTitle?: unknown;
-        toggleLabel?: unknown;
-        cardView?: unknown;
-        listView?: unknown;
-        switchHelp?: unknown;
-        includedTitle?: unknown;
-        request?: unknown;
-      };
-      amenitiesData?: {
-        cards?: Array<{ title?: unknown; icon?: unknown; image?: unknown; description?: unknown; highlights?: unknown[] }>;
-        overviewItems?: unknown[];
-      };
-    };
-
-    const hero = parsed?.amenitiesHero || {};
-    const content = parsed?.amenitiesContent || {};
-    const data = parsed?.amenitiesData || {};
-
-    fallback.hero.subtitle = String(hero.subtitle ?? fallback.hero.subtitle).trim();
-    fallback.hero.title = String(hero.title ?? fallback.hero.title).trim();
-    fallback.hero.crumb = String(hero.crumb ?? fallback.hero.crumb).trim();
-    fallback.hero.home = String(hero.home ?? fallback.hero.home).trim();
-
-    fallback.content.layoutSubtitle = String(content.layoutSubtitle ?? fallback.content.layoutSubtitle).trim();
-    fallback.content.layoutTitle = String(content.layoutTitle ?? fallback.content.layoutTitle).trim();
-    fallback.content.layoutDesc = String(content.layoutDesc ?? fallback.content.layoutDesc).trim();
-    fallback.content.amenitiesSubtitle = String(content.amenitiesSubtitle ?? fallback.content.amenitiesSubtitle).trim();
-    fallback.content.amenitiesTitle = String(content.amenitiesTitle ?? fallback.content.amenitiesTitle).trim();
-    fallback.content.toggleLabel = String(content.toggleLabel ?? fallback.content.toggleLabel).trim();
-    fallback.content.cardView = String(content.cardView ?? fallback.content.cardView).trim();
-    fallback.content.listView = String(content.listView ?? fallback.content.listView).trim();
-    fallback.content.switchHelp = String(content.switchHelp ?? fallback.content.switchHelp).trim();
-    fallback.content.includedTitle = String(content.includedTitle ?? fallback.content.includedTitle).trim();
-    fallback.content.request = String(content.request ?? fallback.content.request).trim();
-
-    if (Array.isArray(content.layoutOptions) && content.layoutOptions.length > 0) {
-      fallback.content.layoutOptions = content.layoutOptions
-        .map((item) => ({
-          title: String(item?.title || '').trim(),
-          icon: String(item?.icon || '').trim() || 'fa fa-square-o',
-          description: String(item?.description || '').trim(),
-          highlights: Array.isArray(item?.highlights) ? item.highlights.map((row) => String(row || '').trim()).filter(Boolean).slice(0, 10) : [],
-        }))
-        .filter((item) => Boolean(item.title) && Boolean(item.icon) && Boolean(item.description) && item.highlights.length > 0)
-        .slice(0, 8);
-    }
-
-    if (Array.isArray(data.cards) && data.cards.length > 0) {
-      fallback.data.cards = data.cards
-        .map((item) => ({
-          title: String(item?.title || '').trim(),
-          icon: String(item?.icon || '').trim() || 'fa fa-home',
-          image: String(item?.image || '').trim(),
-          description: String(item?.description || '').trim(),
-          highlights: Array.isArray(item?.highlights) ? item.highlights.map((row) => String(row || '').trim()).filter(Boolean).slice(0, 10) : [],
-        }))
-        .filter((item) => Boolean(item.title) && Boolean(item.icon) && Boolean(item.image) && Boolean(item.description) && item.highlights.length > 0)
-        .slice(0, 24);
-    }
-
-    if (Array.isArray(data.overviewItems) && data.overviewItems.length > 0) {
-      fallback.data.overviewItems = data.overviewItems.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 40);
-    }
-  } catch {
-    // Keep hardcoded fallback when locale file cannot be read.
-  }
 
   amenitiesFallbackCache[locale] = fallback;
   return JSON.parse(JSON.stringify(fallback)) as AmenitiesCmsContent;
@@ -2877,180 +2661,6 @@ async function getLocalizedDefaultReservationContent(locale: ContentLocale): Pro
   }
 
   const fallback = JSON.parse(JSON.stringify(defaultReservationContent)) as ReservationCmsContent;
-  const localePath = path.resolve(process.cwd(), '..', 'meri-boarding-public-fe', 'src', 'i18n', 'locales', `${locale}.json`);
-
-  try {
-    const raw = await readFile(localePath, 'utf8');
-    const parsed = JSON.parse(raw) as {
-      reservation?: {
-        hero?: {
-          subtitle?: unknown;
-          title?: unknown;
-          description?: unknown;
-        };
-        crumb?: {
-          home?: unknown;
-          current?: unknown;
-        };
-        shortStay?: {
-          subtitle?: unknown;
-          title?: unknown;
-          description?: unknown;
-          helper?: unknown;
-        };
-        form?: {
-          checkIn?: unknown;
-          checkOut?: unknown;
-          boarding?: unknown;
-          select?: unknown;
-          rooms?: unknown;
-          guests?: unknown;
-          availability?: unknown;
-          boardingOptions?: unknown[];
-          roomOptions?: unknown[];
-          guestOptions?: unknown[];
-        };
-        longStay?: {
-          title?: unknown;
-          description?: unknown;
-          bullets?: unknown[];
-          ctaQuote?: unknown;
-          ctaContact?: unknown;
-        };
-        help?: {
-          title?: unknown;
-          description?: unknown;
-          hoursTitle?: unknown;
-          hoursDay?: unknown;
-          contacts?: Array<{ icon?: unknown; value?: unknown }>;
-          hours?: unknown[];
-        };
-        why?: {
-          title?: unknown;
-          bullets?: unknown[];
-        };
-      };
-      bookingInquiryForm?: {
-        subtitle?: unknown;
-        title?: unknown;
-        firstName?: unknown;
-        lastName?: unknown;
-        company?: unknown;
-        email?: unknown;
-        phone?: unknown;
-        purpose?: unknown;
-        nationality?: unknown;
-        guests?: unknown;
-        rooms?: unknown;
-        boarding?: unknown;
-        moveIn?: unknown;
-        message?: unknown;
-        select?: unknown;
-        send?: unknown;
-        policy?: unknown;
-        policyLink?: unknown;
-        moveInPlaceholder?: unknown;
-        stayPurposes?: Array<{ value?: unknown; label?: unknown }>;
-        boardingOptions?: unknown[];
-        roomOptions?: unknown[];
-      };
-    };
-
-    const reservation = parsed?.reservation || {};
-    const inquiry = parsed?.bookingInquiryForm || {};
-
-    fallback.hero.subtitle = String(reservation?.hero?.subtitle ?? fallback.hero.subtitle).trim();
-    fallback.hero.title = String(reservation?.hero?.title ?? fallback.hero.title).trim();
-    fallback.hero.description = String(reservation?.hero?.description ?? fallback.hero.description).trim();
-    fallback.crumb.home = String(reservation?.crumb?.home ?? fallback.crumb.home).trim();
-    fallback.crumb.current = String(reservation?.crumb?.current ?? fallback.crumb.current).trim();
-    fallback.shortStay.subtitle = String(reservation?.shortStay?.subtitle ?? fallback.shortStay.subtitle).trim();
-    fallback.shortStay.title = String(reservation?.shortStay?.title ?? fallback.shortStay.title).trim();
-    fallback.shortStay.description = String(reservation?.shortStay?.description ?? fallback.shortStay.description).trim();
-    fallback.shortStay.helper = String(reservation?.shortStay?.helper ?? fallback.shortStay.helper).trim();
-    fallback.form.checkIn = String(reservation?.form?.checkIn ?? fallback.form.checkIn).trim();
-    fallback.form.checkOut = String(reservation?.form?.checkOut ?? fallback.form.checkOut).trim();
-    fallback.form.boarding = String(reservation?.form?.boarding ?? fallback.form.boarding).trim();
-    fallback.form.select = String(reservation?.form?.select ?? fallback.form.select).trim();
-    fallback.form.rooms = String(reservation?.form?.rooms ?? fallback.form.rooms).trim();
-    fallback.form.guests = String(reservation?.form?.guests ?? fallback.form.guests).trim();
-    fallback.form.availability = String(reservation?.form?.availability ?? fallback.form.availability).trim();
-    fallback.longStay.title = String(reservation?.longStay?.title ?? fallback.longStay.title).trim();
-    fallback.longStay.description = String(reservation?.longStay?.description ?? fallback.longStay.description).trim();
-    fallback.longStay.ctaQuote = String(reservation?.longStay?.ctaQuote ?? fallback.longStay.ctaQuote).trim();
-    fallback.longStay.ctaContact = String(reservation?.longStay?.ctaContact ?? fallback.longStay.ctaContact).trim();
-    fallback.help.title = String(reservation?.help?.title ?? fallback.help.title).trim();
-    fallback.help.description = String(reservation?.help?.description ?? fallback.help.description).trim();
-    fallback.help.hoursTitle = String(reservation?.help?.hoursTitle ?? fallback.help.hoursTitle).trim();
-    fallback.help.hoursDay = String(reservation?.help?.hoursDay ?? fallback.help.hoursDay).trim();
-    fallback.why.title = String(reservation?.why?.title ?? fallback.why.title).trim();
-
-    if (Array.isArray(reservation?.longStay?.bullets) && reservation.longStay.bullets.length > 0) {
-      fallback.longStay.bullets = reservation.longStay.bullets.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 20);
-    }
-    if (Array.isArray(reservation?.why?.bullets) && reservation.why.bullets.length > 0) {
-      fallback.why.bullets = reservation.why.bullets.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 20);
-    }
-    if (Array.isArray(reservation?.form?.boardingOptions) && reservation.form.boardingOptions.length > 0) {
-      fallback.form.boardingOptions = reservation.form.boardingOptions.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 20);
-    }
-    if (Array.isArray(reservation?.form?.roomOptions) && reservation.form.roomOptions.length > 0) {
-      fallback.form.roomOptions = reservation.form.roomOptions.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 20);
-    }
-    if (Array.isArray(reservation?.form?.guestOptions) && reservation.form.guestOptions.length > 0) {
-      fallback.form.guestOptions = reservation.form.guestOptions.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 20);
-    }
-    if (Array.isArray(reservation?.help?.contacts) && reservation.help.contacts.length > 0) {
-      fallback.help.contacts = reservation.help.contacts
-        .map((item) => ({
-          icon: String(item?.icon || '').trim() || 'fa fa-info-circle',
-          value: String(item?.value || '').trim(),
-        }))
-        .filter((item) => Boolean(item.value))
-        .slice(0, 10);
-    }
-    if (Array.isArray(reservation?.help?.hours) && reservation.help.hours.length > 0) {
-      fallback.help.hours = reservation.help.hours.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 10);
-    }
-
-    fallback.inquiry.subtitle = String(inquiry?.subtitle ?? fallback.inquiry.subtitle).trim();
-    fallback.inquiry.title = String(inquiry?.title ?? fallback.inquiry.title).trim();
-    fallback.inquiry.firstName = String(inquiry?.firstName ?? fallback.inquiry.firstName).trim();
-    fallback.inquiry.lastName = String(inquiry?.lastName ?? fallback.inquiry.lastName).trim();
-    fallback.inquiry.company = String(inquiry?.company ?? fallback.inquiry.company).trim();
-    fallback.inquiry.email = String(inquiry?.email ?? fallback.inquiry.email).trim();
-    fallback.inquiry.phone = String(inquiry?.phone ?? fallback.inquiry.phone).trim();
-    fallback.inquiry.purpose = String(inquiry?.purpose ?? fallback.inquiry.purpose).trim();
-    fallback.inquiry.nationality = String(inquiry?.nationality ?? fallback.inquiry.nationality).trim();
-    fallback.inquiry.guests = String(inquiry?.guests ?? fallback.inquiry.guests).trim();
-    fallback.inquiry.rooms = String(inquiry?.rooms ?? fallback.inquiry.rooms).trim();
-    fallback.inquiry.boarding = String(inquiry?.boarding ?? fallback.inquiry.boarding).trim();
-    fallback.inquiry.moveIn = String(inquiry?.moveIn ?? fallback.inquiry.moveIn).trim();
-    fallback.inquiry.message = String(inquiry?.message ?? fallback.inquiry.message).trim();
-    fallback.inquiry.select = String(inquiry?.select ?? fallback.inquiry.select).trim();
-    fallback.inquiry.send = String(inquiry?.send ?? fallback.inquiry.send).trim();
-    fallback.inquiry.policy = String(inquiry?.policy ?? fallback.inquiry.policy).trim();
-    fallback.inquiry.policyLink = String(inquiry?.policyLink ?? fallback.inquiry.policyLink).trim();
-    fallback.inquiry.moveInPlaceholder = String(inquiry?.moveInPlaceholder ?? fallback.inquiry.moveInPlaceholder).trim();
-
-    if (Array.isArray(inquiry?.stayPurposes) && inquiry.stayPurposes.length > 0) {
-      fallback.inquiry.stayPurposes = inquiry.stayPurposes
-        .map((item) => ({
-          value: String(item?.value || '').trim(),
-          label: String(item?.label || '').trim(),
-        }))
-        .filter((item) => Boolean(item.value) && Boolean(item.label))
-        .slice(0, 15);
-    }
-    if (Array.isArray(inquiry?.boardingOptions) && inquiry.boardingOptions.length > 0) {
-      fallback.inquiry.boardingOptions = inquiry.boardingOptions.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 20);
-    }
-    if (Array.isArray(inquiry?.roomOptions) && inquiry.roomOptions.length > 0) {
-      fallback.inquiry.roomOptions = inquiry.roomOptions.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 20);
-    }
-  } catch {
-    // Keep hardcoded fallback when locale file cannot be read.
-  }
 
   reservationFallbackCache[locale] = fallback;
   return JSON.parse(JSON.stringify(fallback)) as ReservationCmsContent;
@@ -3087,89 +2697,6 @@ async function getLocalizedDefaultContactContent(locale: ContentLocale): Promise
   }
 
   const fallback = JSON.parse(JSON.stringify(defaultContactContent)) as ContactCmsContent;
-  const localePath = path.resolve(process.cwd(), '..', 'meri-boarding-public-fe', 'src', 'i18n', 'locales', `${locale}.json`);
-
-  try {
-    const raw = await readFile(localePath, 'utf8');
-    const parsed = JSON.parse(raw) as {
-      contactHero?: {
-        subtitle?: unknown;
-        title?: unknown;
-        home?: unknown;
-        crumb?: unknown;
-      };
-      contactDetails?: {
-        subtitle?: unknown;
-        title?: unknown;
-        description?: unknown;
-        address?: unknown;
-        email?: unknown;
-        phone?: unknown;
-        whatsapp?: unknown;
-      };
-      contactForm?: {
-        name?: unknown;
-        email?: unknown;
-        phone?: unknown;
-        message?: unknown;
-        send?: unknown;
-        success?: unknown;
-        error?: unknown;
-        namePlaceholder?: unknown;
-        emailPlaceholder?: unknown;
-        phonePlaceholder?: unknown;
-        messagePlaceholder?: unknown;
-      };
-    };
-    const hero = parsed?.contactHero || {};
-    const details = parsed?.contactDetails || {};
-    const form = parsed?.contactForm || {};
-
-    fallback.hero.subtitle = String(hero.subtitle ?? fallback.hero.subtitle).trim();
-    fallback.hero.title = String(hero.title ?? fallback.hero.title).trim();
-    fallback.hero.home = String(hero.home ?? fallback.hero.home).trim();
-    fallback.hero.crumb = String(hero.crumb ?? fallback.hero.crumb).trim();
-
-    fallback.details.subtitle = String(details.subtitle ?? fallback.details.subtitle).trim();
-    fallback.details.title = String(details.title ?? fallback.details.title).trim();
-    fallback.details.description = String(details.description ?? fallback.details.description).trim();
-    fallback.details.items = [
-      {
-        icon: String(fallback.details.items[0]?.icon || 'icofont-location-pin').trim(),
-        title: String(details.address ?? fallback.details.items[0]?.title ?? 'Address').trim(),
-        value: String(fallback.details.items[0]?.value ?? '').trim(),
-      },
-      {
-        icon: String(fallback.details.items[1]?.icon || 'icofont-envelope').trim(),
-        title: String(details.email ?? fallback.details.items[1]?.title ?? 'Email').trim(),
-        value: String(fallback.details.items[1]?.value ?? '').trim(),
-      },
-      {
-        icon: String(fallback.details.items[2]?.icon || 'icofont-phone').trim(),
-        title: String(details.phone ?? fallback.details.items[2]?.title ?? 'Phone').trim(),
-        value: String(fallback.details.items[2]?.value ?? '').trim(),
-      },
-      {
-        icon: String(fallback.details.items[3]?.icon || 'icofont-brand-whatsapp').trim(),
-        title: String(details.whatsapp ?? fallback.details.items[3]?.title ?? 'WhatsApp').trim(),
-        value: String(fallback.details.items[3]?.value ?? '').trim(),
-      },
-    ];
-
-    fallback.form.name = String(form.name ?? fallback.form.name).trim();
-    fallback.form.email = String(form.email ?? fallback.form.email).trim();
-    fallback.form.phone = String(form.phone ?? fallback.form.phone).trim();
-    fallback.form.message = String(form.message ?? fallback.form.message).trim();
-    fallback.form.send = String(form.send ?? fallback.form.send).trim();
-    fallback.form.success = String(form.success ?? fallback.form.success).trim();
-    fallback.form.error = String(form.error ?? fallback.form.error).trim();
-    fallback.form.namePlaceholder = String(form.namePlaceholder ?? fallback.form.namePlaceholder).trim();
-    fallback.form.emailPlaceholder = String(form.emailPlaceholder ?? fallback.form.emailPlaceholder).trim();
-    fallback.form.phonePlaceholder = String(form.phonePlaceholder ?? fallback.form.phonePlaceholder).trim();
-    fallback.form.messagePlaceholder = String(form.messagePlaceholder ?? fallback.form.messagePlaceholder).trim();
-  } catch {
-    // Keep hardcoded fallback when locale file cannot be read.
-  }
 
   contactFallbackCache[locale] = fallback;
   return JSON.parse(JSON.stringify(fallback)) as ContactCmsContent;
@@ -3221,46 +2748,10 @@ async function resolveContactNotificationRecipients(locale: ContentLocale) {
   return Array.from(new Set(itemEmails));
 }
 
-async function seedSuperAdmin() {
-  if (!adminPassword) {
-    server.log.warn('ADMIN_PASSWORD is empty. Super admin seed skipped.');
-    return;
-  }
-
+async function ensureAdminIndexes() {
   const db = await getDb();
   const admins = db.collection<AdminUser>('admins');
-
   await admins.createIndex({ email: 1 }, { unique: true });
-
-  const now = new Date();
-  const superAdminExists = await admins.findOne({ role: 'super_admin', active: true });
-
-  if (superAdminExists) {
-    return;
-  }
-
-  await admins.updateOne(
-    { email: adminEmail },
-    {
-      $set: {
-        name: adminName,
-        firstName: adminName.split(' ')[0] || 'Super',
-        lastName: adminName.split(' ').slice(1).join(' ') || 'Admin',
-        role: 'super_admin',
-        approved: true,
-        active: true,
-        updatedAt: now,
-      },
-      $setOnInsert: {
-        email: adminEmail,
-        passwordHash: hashPassword(adminPassword),
-        createdAt: now,
-      },
-    },
-    { upsert: true },
-  );
-
-  server.log.info(`Seeded super admin: ${adminEmail}`);
 }
 
 async function seedHeaderContents() {
@@ -3799,6 +3290,10 @@ server.post('/api/v1/auth/register', async (request, reply) => {
 
   const db = await getDb();
   const admins = db.collection<AdminUser>('admins');
+  const hasSuperAdmin = (await admins.countDocuments({ role: 'super_admin', active: true }, { limit: 1 })) > 0;
+  const role: AdminRole = hasSuperAdmin ? 'user' : 'super_admin';
+  const approved = !hasSuperAdmin;
+  const active = !hasSuperAdmin;
 
   try {
     const now = new Date();
@@ -3810,14 +3305,18 @@ server.post('/api/v1/auth/register', async (request, reply) => {
       phone,
       name: `${firstName} ${lastName}`.trim(),
       passwordHash: hashPassword(password),
-      role: 'user',
-      approved: false,
-      active: false,
+      role,
+      approved,
+      active,
       createdAt: now,
       updatedAt: now,
     });
   } catch {
     return reply.code(409).send({ error: 'This email is already registered' });
+  }
+
+  if (!hasSuperAdmin) {
+    return reply.code(201).send({ ok: true, message: 'First account created as super_admin.' });
   }
 
   return reply.code(201).send({ ok: true, message: 'Registration submitted. Wait for admin approval.' });
@@ -5360,7 +4859,7 @@ server.post('/api/v1/admin/users', async (request, reply) => {
 const start = async () => {
   try {
     await ensureStorageFolders();
-    await seedSuperAdmin();
+    await ensureAdminIndexes();
     await seedHeaderContents();
     await seedHomeContents();
     await seedServicesContents();

@@ -44,7 +44,10 @@ export default function MyProfilePage() {
 
   const cropBox = { width: 320, height: 180 }
 
-  const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:4000'
+  const configuredApiBaseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL ?? '').trim()
+  const apiBaseUrl = configuredApiBaseUrl.startsWith('http://localhost') || configuredApiBaseUrl.startsWith('https://localhost')
+    ? ''
+    : configuredApiBaseUrl
   const avatarSrc = useMemo(() => previewAvatar || '/images/avatars/user-silhouette.svg', [previewAvatar])
   const normalizeAvatarUrl = (avatarUrl?: string) => {
     if (!avatarUrl) return '/images/avatars/user-silhouette.svg'

@@ -19,11 +19,10 @@ export default async function HotelsPage({ params }: HotelsPageProps = {}) {
   const locale = resolvedParams?.locale ?? (await getLocale());
   const t = getMessages(locale).hotels;
   const fallbackHotelImage = "/images/placeholders/room.svg";
-  const apiBaseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL ?? process.env.API_BASE_URL ?? "").replace(/\/+$/, "");
   const withApiHost = (url: string) => {
     const value = String(url || "").trim();
     if (!value) return fallbackHotelImage;
-    return value.startsWith("/api/") && apiBaseUrl ? `${apiBaseUrl}${value}` : value;
+    return value;
   };
   const normalizeFact = (input: unknown): HotelFactView => {
     if (typeof input === "string") return { text: input, icon: "fa fa-check" };
@@ -36,7 +35,7 @@ export default async function HotelsPage({ params }: HotelsPageProps = {}) {
     }
     return { text: "", icon: "fa fa-check" };
   };
-  const apiHotels = await fetchPublicHotels(locale).catch(() => []);
+  const apiHotels = await fetchPublicHotels(locale);
   const hotelCards = apiHotels.map((item) => ({
     slug: item.slug,
     image: withApiHost(item.coverImageUrl || fallbackHotelImage),

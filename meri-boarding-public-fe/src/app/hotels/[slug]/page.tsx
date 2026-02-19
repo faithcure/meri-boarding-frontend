@@ -28,11 +28,10 @@ export default async function HotelDynamicPage({ params }: HotelDynamicPageProps
   const locale = resolvedParams?.locale ?? (await getLocale())
   const slug = resolvedParams?.slug
   const fallbackHotelImage = '/images/placeholders/room.svg'
-  const apiBaseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL ?? process.env.API_BASE_URL ?? '').replace(/\/+$/, '')
   const withApiHost = (url: string) => {
     const value = String(url || '').trim()
     if (!value) return fallbackHotelImage
-    return value.startsWith('/api/') && apiBaseUrl ? `${apiBaseUrl}${value}` : value
+    return value
   }
   const hotel = await fetchPublicHotelBySlug(locale, slug)
   const allHotels = await fetchPublicHotels(locale)

@@ -154,7 +154,10 @@ export default function ContactForm({ locale: localeProp, content }: ContactForm
     ]
   }, [locale])
 
-  const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:4000'
+  const configuredApiBaseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL ?? '').trim()
+  const apiBaseUrl = configuredApiBaseUrl.startsWith('http://localhost') || configuredApiBaseUrl.startsWith('https://localhost')
+    ? ''
+    : configuredApiBaseUrl
   const [submitting, setSubmitting] = useState(false)
   const [formValues, setFormValues] = useState<ContactFormValues>({
     name: '',

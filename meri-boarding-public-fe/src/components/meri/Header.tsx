@@ -3,6 +3,7 @@ import MainMenuActive from "@/components/meri/MainMenuActive";
 import type { Locale } from "@/i18n/getLocale";
 import { getLocale } from "@/i18n/getLocale";
 import { localePath } from "@/i18n/localePath";
+import { getServerApiBaseUrl } from "@/lib/apiBaseUrl";
 import { fetchPublicHotels } from "@/lib/hotelsApi";
 import Link from "next/link";
 
@@ -12,8 +13,15 @@ type HeaderProps = {
 
 export default async function Header({ locale: localeProp }: HeaderProps = {}) {
   const locale = localeProp ?? (await getLocale());
-  const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? process.env.API_BASE_URL ?? "http://localhost:4000";
-  let t = {
+  const apiBaseUrl = getServerApiBaseUrl();
+  const tResponse = await fetch(`${apiBaseUrl}/api/v1/public/content/header?locale=${locale}`, {
+    next: { revalidate: 60 },
+  });
+  if (!tResponse.ok) {
+    throw new Error(`Failed to fetch header content (${tResponse.status})`);
+  }
+  const tData = await tResponse.json();
+  const t = {
     home: "",
     hotels: "",
     services: "",
@@ -21,33 +29,16 @@ export default async function Header({ locale: localeProp }: HeaderProps = {}) {
     ourAmenities: "",
     contact: "",
     reservation: "",
+    ...(tData?.content || {}),
   };
-  let hotelLinks: Array<{ slug: string; menuName: string; available: boolean }> = [];
+
+  const hotels = await fetchPublicHotels(locale);
+  const hotelLinks: Array<{ slug: string; menuName: string; available: boolean }> = hotels.map((item) => ({
+    slug: item.slug,
+    menuName: item.slug,
+    available: item.available !== false
+  }));
   const fullLabel = locale === "de" ? "Voll" : locale === "tr" ? "Dolu" : "Full";
-
-  try {
-    const response = await fetch(`${apiBaseUrl}/api/v1/public/content/header?locale=${locale}`, {
-      next: { revalidate: 60 },
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      if (data?.content) {
-        t = { ...t, ...data.content };
-      }
-    }
-  } catch {}
-
-  try {
-    const hotels = await fetchPublicHotels(locale);
-    hotelLinks = hotels.map((item) => ({
-      slug: item.slug,
-      menuName: item.slug,
-      available: item.available !== false
-    }));
-  } catch {
-    hotelLinks = [];
-  }
 
   const withLocale = (path: string) => localePath(locale, path);
   return (

@@ -64,7 +64,10 @@ const normalizeFacilities = (input: unknown): FacilitiesContent => {
 }
 
 export default function FacilitiesSettingsPage() {
-  const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:4000'
+  const configuredApiBaseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL ?? '').trim()
+  const apiBaseUrl = configuredApiBaseUrl.startsWith('http://localhost') || configuredApiBaseUrl.startsWith('https://localhost')
+    ? ''
+    : configuredApiBaseUrl
   const [allowed, setAllowed] = useState(false)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)

@@ -12,7 +12,7 @@ npm install
 cp .env.example .env
 ```
 
-Edit `.env` and set a strong `ADMIN_PASSWORD` and `ADMIN_TOKEN_SECRET`.
+Edit `.env` and set a strong `ADMIN_TOKEN_SECRET`.
 
 ## 3. Start local MongoDB on WSL (port 27018)
 
@@ -38,13 +38,8 @@ In a second terminal:
 npm run dev
 ```
 
-On first start, API seeds one active `super_admin` into MongoDB using:
-
-- `ADMIN_EMAIL`
-- `ADMIN_PASSWORD`
-- `ADMIN_NAME`
-
-If there is already an active `super_admin`, seed is skipped.
+If there is no active `super_admin` in DB, the first `/api/v1/auth/register`
+user is created as `super_admin` automatically.
 
 ## 5. Verify
 
