@@ -1,0 +1,59 @@
+name: meri_boarding                                                                                                                                   
+                                                                                                                                                        
+  services:                                                                                                                                             
+    mongo:                                                                                                                                              
+      image: mongo:7                                                                                                                                    
+      container_name: meri_mongo                                                                                                                        
+      restart: unless-stopped                                                                                                                           
+      environment:                                                                                                                                      
+        MONGO_INITDB_DATABASE: meri_boarding                                                                                                            
+      volumes:                                                                                                                                          
+        - mongo_data:/data/db                                                                                                                           
+      healthcheck:                                                                                                                                      
+        test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]                                                                     
+        interval: 10s                                                                                                                                   
+        timeout: 5s                                                                                                                                     
+        retries: 10                                                                                                                                     
+                                                                                                                                                        
+    api:                                                                                                                                                
+      build:                                                                                                                                            
+        context: ./meri-boarding-api                                                                                                                    
+        dockerfile: Dockerfile                                                                                                                          
+      container_name: meri_api                                                                                                                          
+      restart: unless-stopped                                                                                                                           
+      env_file:                                                                                                                                         
+        - ./deploy/env/api.env                                                                                                                          
+      depends_on:                                                                                                                                       
+        mongo:                                                                                                                                          
+          condition: service_healthy                                                                                                                    
+      ports:                                                                                                                                            
+        - "4000:4000"                                                                                                                                   
+                                                                                                                                                        
+    public-fe:                                                                                                                                          
+      build:                                                                                                                                            
+        context: ./meri-boarding-public-fe                                                                                                              
+        dockerfile: Dockerfile                                                                                                                          
+      container_name: meri_public                                                                                                                       
+      restart: unless-stopped                                                                                                                           
+      env_file:                                                                                                                                         
+        - ./deploy/env/public.env                                                                                                                       
+      depends_on:                                                                                                                                       
+        - api                                                                                                                                           
+      ports:                                                                                                                                            
+        - "3000:3000"                                                                                                                                   
+                                                                                                                                                        
+    admin-fe:                                                                                                                                           
+      build:                                                                                                                                            
+        context: ./meri-boarding-admin-fe                                                                                                               
+        dockerfile: Dockerfile                                                                                                                          
+      container_name: meri_admin                                                                                                                        
+      restart: unless-stopped                                                                                                                           
+      env_file:                                                                                                                                         
+        - ./deploy/env/admin.env                                                                                                                        
+      depends_on:                                                                                                                                       
+        - api                                                                                                                                           
+      ports:                                                                                                                                            
+        - "3001:3001"                                                                                                                                   
+                                                                                                                                                        
+  volumes:                                                                                                                                              
+    mongo_data:                
