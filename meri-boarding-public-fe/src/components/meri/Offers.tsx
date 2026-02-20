@@ -29,6 +29,7 @@ export default async function Offers({ locale: localeProp, content }: OffersProp
     "/images/Europaplatz_Fotos/_DSC6639.jpg"
   ];
   const withLocale = (path: string) => localePath(locale, path);
+  const offerTargetPath = withLocale("/services");
   return (
     <section className="bg-color-op-1 rounded-1 mx-2">
       <div className="container">
@@ -56,10 +57,10 @@ export default async function Offers({ locale: localeProp, content }: OffersProp
                           </h3>
                         ) : null}
                         <img src={image} className="w-100 hover-scale-1-1" alt={card.title || ""} />
-                        <Link href={withLocale("/offer-single")} className="d-block abs w-100 h-100 top-0 start-0" aria-label={card.title} />
+                        <Link href={offerTargetPath} className="d-block abs w-100 h-100 top-0 start-0" aria-label={card.title} />
                       </div>
                       <div className="p-40 bg-dark-2 text-light relative">
-                        <Link className="text-white" href={withLocale("/offers")}>
+                        <Link className="text-white" href={offerTargetPath}>
                           <h3>{card.title}</h3>
                           <p>{card.text}</p>
                         </Link>
@@ -68,7 +69,7 @@ export default async function Offers({ locale: localeProp, content }: OffersProp
                   ) : (
                     <>
                       <div className="p-40 bg-dark-2 text-light relative">
-                        <Link className="text-white" href={withLocale("/offers")}>
+                        <Link className="text-white" href={offerTargetPath}>
                           <h3>{card.title}</h3>
                           <p>{card.text}</p>
                         </Link>
@@ -80,7 +81,7 @@ export default async function Offers({ locale: localeProp, content }: OffersProp
                           </h3>
                         ) : null}
                         <img src={image} className="w-100 hover-scale-1-1" alt={card.title || ""} />
-                        <Link href={withLocale("/offer-single")} className="d-block abs w-100 h-100 top-0 start-0" aria-label={card.title} />
+                        <Link href={offerTargetPath} className="d-block abs w-100 h-100 top-0 start-0" aria-label={card.title} />
                       </div>
                     </>
                   )}
