@@ -25,6 +25,8 @@ const smtpUser = String(process.env.SMTP_USER || '').trim();
 const smtpPass = String(process.env.SMTP_PASS || '').trim();
 const smtpFrom = String(process.env.SMTP_FROM || smtpUser || 'no-reply@local.test').trim();
 const contactNotifyToRaw = String(process.env.CONTACT_FORM_TO || process.env.CONTACT_NOTIFY_TO || '').trim();
+const ragServiceUrl = String(process.env.RAG_SERVICE_URL || 'http://rag-service:4100').trim().replace(/\/+$/, '');
+const ragRequestTimeoutMs = Number(process.env.RAG_REQUEST_TIMEOUT_MS || 10000);
 
 type AdminRole = 'super_admin' | 'moderator' | 'user';
 
@@ -2976,6 +2978,51 @@ server.get('/api/v1/public/content/contact', async (request, reply) => {
   const locale = parseLocale(query?.locale);
   const content = await getContactContent(locale);
   return reply.send({ key: 'page.contact', locale, content });
+});
+
+server.post('/api/v1/chat', async (request, reply) => {
+  const body = request.body as
+    | {
+        question?: string;
+        locale?: string;
+        topK?: number;
+      }
+    | undefined;
+
+  const question = String(body?.question || '').trim();
+  const locale = parseLocale(body?.locale);
+  const topK = Math.max(1, Math.min(12, Number(body?.topK || 5)));
+
+  if (!question || question.length < 3) {
+    return reply.code(400).send({ error: 'Question must be at least 3 characters.' });
+  }
+
+  const timeout = Number.isFinite(ragRequestTimeoutMs) && ragRequestTimeoutMs > 0 ? ragRequestTimeoutMs : 10000;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeout);
+
+  try {
+    const ragResponse = await fetch(`${ragServiceUrl}/query`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ question, locale, topK }),
+      signal: controller.signal,
+    });
+
+    if (!ragResponse.ok) {
+      const text = await ragResponse.text();
+      request.log.error({ status: ragResponse.status, body: text }, 'rag-service returned error');
+      return reply.code(502).send({ error: 'Chat service is temporarily unavailable.' });
+    }
+
+    const payload = await ragResponse.json();
+    return reply.send(payload);
+  } catch (error) {
+    request.log.error(error, 'rag-service request failed');
+    return reply.code(502).send({ error: 'Chat service is temporarily unavailable.' });
+  } finally {
+    clearTimeout(timer);
+  }
 });
 
 server.post('/api/v1/public/forms/contact', async (request, reply) => {

@@ -30,6 +30,7 @@ coverage/
 **/.env.development.local
 **/.env.test.local
 **/.env.production.local
+deploy/env/*.env
 
 # Logs
 *.log
@@ -40,4 +41,3 @@ pnpm-debug.log*
 
 # Runtime uploads / generated assets
 meri-boarding-api/uploads/
-

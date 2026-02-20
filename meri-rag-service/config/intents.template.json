@@ -1,0 +1,26 @@
+{
+  "version": "0.0.1-template",
+  "updated_at": "YYYY-MM-DD",
+  "locales": [
+    "tr",
+    "de",
+    "en"
+  ],
+  "notes": "Copy this file to intents.vX.json and fill all TODO fields.",
+  "intents": [
+    {
+      "id": "TODO_intent_id",
+      "owner": "reception_or_guest_support_or_policy_guard",
+      "description": "TODO short description",
+      "examples": [
+        "TODO example in tr",
+        "TODO example in de",
+        "TODO example in en"
+      ],
+      "action": "inform_or_collect_info_or_handoff",
+      "required_fields": [],
+      "handoff_if": [],
+      "must_not_claim": []
+    }
+  ]
+}

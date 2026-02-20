@@ -1,0 +1,54 @@
+{
+  "version": "0.0.1-template",
+  "updated_at": "YYYY-MM-DD",
+  "notes": "Copy this file to guardrails.vX.json and fill policy decisions.",
+  "policy": {
+    "non_negotiable_rules": [
+      "TODO rule 1",
+      "TODO rule 2"
+    ],
+    "data_handling": {
+      "collect_minimum_fields_only": true,
+      "verification_required_for_booking_specific_actions": true,
+      "forbidden_fields_in_chat": [
+        "TODO forbidden field"
+      ]
+    },
+    "answer_style": {
+      "max_sentences": 6,
+      "must_include_next_step": true,
+      "must_be_grounded_in_sources": true,
+      "fallback_on_low_confidence": true
+    },
+    "confidence_thresholds": {
+      "safe_answer_min": 0.62,
+      "low_confidence_handoff_max": 0.45
+    },
+    "handoff_triggers": [
+      "TODO trigger"
+    ],
+    "unsafe_or_disallowed_requests": [
+      "TODO disallowed request"
+    ]
+  },
+  "response_templates": {
+    "tr": {
+      "low_confidence": "TODO",
+      "handoff": "TODO",
+      "refusal": "TODO",
+      "emergency": "TODO"
+    },
+    "de": {
+      "low_confidence": "TODO",
+      "handoff": "TODO",
+      "refusal": "TODO",
+      "emergency": "TODO"
+    },
+    "en": {
+      "low_confidence": "TODO",
+      "handoff": "TODO",
+      "refusal": "TODO",
+      "emergency": "TODO"
+    }
+  }
+}

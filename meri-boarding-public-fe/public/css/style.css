@@ -9211,6 +9211,19 @@ section.bg-grey {
   visibility: hidden;
 }
 
+/* Fallback: if WOW JS is not initialized, keep content visible instead of blank sections. */
+html:not(.wow-ready) .wow {
+  visibility: visible;
+}
+
+html.wow-ready .wow {
+  visibility: hidden;
+}
+
+html.wow-ready .wow.animated {
+  visibility: visible;
+}
+
 #back-to-top {
   background: var(--primary-color);
   position: fixed;

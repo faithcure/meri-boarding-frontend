@@ -16,10 +16,26 @@
     const header = $('header');
     let mobileMenuShow = 0;
     let vCount = '0';
-    let mb;
-    let opAutoshow = 0;
-    let newScrollPosition = 0;
-    let lastScrollPosition;
+     let mb;
+     let opAutoshow = 0;
+     let newScrollPosition = 0;
+     let lastScrollPosition;
+     
+     function markWowReady() {
+       if (typeof document === "undefined") return;
+       document.documentElement.classList.add("wow-ready");
+     }
+ 
+     function initWowSafe() {
+       try {
+         if (typeof WOW !== "undefined") {
+           new WOW().init();
+           markWowReady();
+           return true;
+         }
+       } catch (e) {}
+       return false;
+     }
      /* predefined vars end */
      
      /* --------------------------------------------------
@@ -644,7 +660,7 @@
   splitTextToChars(".split");
 
   // Init WOW after splitting
-  new WOW().init();
+  initWowSafe();
 
      /* --------------------------------------------------
       * plugin | isotope
@@ -1035,7 +1051,7 @@
        } catch (e) {}
        try { sequence(); } catch (e) {}
        try { sequenceA(); } catch (e) {}
-       try { if (typeof WOW !== "undefined") { new WOW().init(); } } catch (e) {}
+       try { initWowSafe(); } catch (e) {}
      }
 
      if (typeof window !== "undefined") {
@@ -1566,10 +1582,16 @@
         });
         //  select2 end
 
-         // skrollr init
-         skrollr.init();
-         const s = skrollr.init();
-         if (s.isMobile()) s.destroy();
+         // skrollr can force extra body height; only enable when keyframe attributes are present.
+         const hasSkrollrTargets = document.querySelector(
+           '[data-0],[data-100],[data-bottom-top],[data-top-bottom],[data-anchor-target]'
+         );
+         if (typeof skrollr !== 'undefined' && hasSkrollrTargets) {
+           const s = skrollr.init();
+           if (s && typeof s.isMobile === 'function' && s.isMobile()) {
+             s.destroy();
+           }
+         }
 
 
          // --------------------------------------------------
@@ -1649,7 +1671,7 @@
          customElements();
          init(); 
          
-         new WOW().init();
+         initWowSafe();
 
          
          // one page navigation

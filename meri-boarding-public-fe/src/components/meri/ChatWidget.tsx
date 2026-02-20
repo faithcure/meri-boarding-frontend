@@ -5,11 +5,26 @@ import type { Locale } from "@/i18n/getLocale";
 import { useLocale } from "@/i18n/useLocale";
 import type { Messages } from "@/i18n/messages";
 import { getMessages } from "@/i18n/messages";
+import { withPublicApiBaseIfNeeded } from "@/lib/apiBaseUrl";
 
 type Message = {
   role: "assistant" | "user";
   text: string;
   html?: string;
+  variant?: "default" | "meta" | "error";
+};
+
+type ChatApiSource = {
+  sourceId?: string;
+  title?: string;
+  url?: string;
+};
+
+type ChatApiResponse = {
+  answer?: string;
+  sources?: ChatApiSource[];
+  model?: string;
+  error?: string;
 };
 
 const initialMessages = (t: Messages["chatWidget"]): Message[] => [
@@ -30,6 +45,20 @@ const escapeHtml = (value: string) =>
 type ChatWidgetProps = {
   locale?: Locale;
 };
+
+const chatApiUrl = withPublicApiBaseIfNeeded("/api/v1/chat");
+
+function getSourcesLabel(locale: Locale) {
+  if (locale === "tr") return "Kaynaklar";
+  if (locale === "de") return "Quellen";
+  return "Sources";
+}
+
+function getChatErrorText(locale: Locale) {
+  if (locale === "tr") return "Mesaj gonderilemedi. Lutfen tekrar deneyin.";
+  if (locale === "de") return "Nachricht konnte nicht gesendet werden. Bitte erneut versuchen.";
+  return "Message could not be sent. Please try again.";
+}
 
 export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
   const activeLocale = useLocale();
@@ -61,23 +90,75 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
     }
   }, [messages, isOpen, isTyping]);
 
-  const handleSend = () => {
-    if (stage !== "ready") return;
+  const handleSend = async () => {
+    if (stage !== "ready" || isTyping) return;
     const trimmed = input.trim();
     if (!trimmed) return;
+
     setMessages((prev) => [...prev, { role: "user", text: trimmed }]);
     setInput("");
     setIsTyping(true);
-    window.setTimeout(() => {
+
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => controller.abort(), 12000);
+
+    try {
+      const response = await fetch(chatApiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          question: trimmed,
+          locale,
+        }),
+        signal: controller.signal,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Chat API failed (${response.status})`);
+      }
+
+      const payload = (await response.json()) as ChatApiResponse;
+      const answer = String(payload?.answer || "").trim() || t.thanks;
+      const nextMessages: Message[] = [
+        {
+          role: "assistant",
+          text: answer,
+          variant: "default",
+        },
+      ];
+
+      const sourceLines = (Array.isArray(payload?.sources) ? payload.sources : [])
+        .slice(0, 3)
+        .map((source, index) => {
+          const title = String(source?.title || source?.sourceId || "").trim();
+          if (!title) return "";
+          const url = String(source?.url || "").trim();
+          return url ? `${index + 1}. ${title} (${url})` : `${index + 1}. ${title}`;
+        })
+        .filter(Boolean);
+
+      if (sourceLines.length > 0) {
+        nextMessages.push({
+          role: "assistant",
+          text: `${getSourcesLabel(locale)}:\n${sourceLines.join("\n")}`,
+          variant: "meta",
+        });
+      }
+
+      setMessages((prev) => [...prev, ...nextMessages]);
+    } catch (_error) {
       setMessages((prev) => [
         ...prev,
         {
           role: "assistant",
-          text: t.thanks,
+          text: getChatErrorText(locale),
+          variant: "error",
         },
       ]);
+    } finally {
+      window.clearTimeout(timeoutId);
       setIsTyping(false);
-    }, 700);
+    }
   };
 
   const handleContactSubmit = (event: React.FormEvent) => {
@@ -155,7 +236,10 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
 
         <div className="chat-panel-body" ref={listRef}>
           {messages.map((message, index) => (
-            <div key={`${message.role}-${index}`} className={`chat-bubble ${message.role}`}>
+            <div
+              key={`${message.role}-${index}`}
+              className={`chat-bubble ${message.role} ${message.variant || "default"}`}
+            >
               {message.role === "assistant" && message.html ? (
                 <span dangerouslySetInnerHTML={{ __html: message.html }} />
               ) : (
@@ -208,15 +292,16 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
               type="text"
               value={input}
               placeholder={t.placeholder}
+              disabled={isTyping}
               onChange={(event) => setInput(event.target.value)}
               onKeyDown={(event) => {
                 if (event.key === "Enter") {
                   event.preventDefault();
-                  handleSend();
+                  void handleSend();
                 }
               }}
             />
-            <button type="button" onClick={handleSend}>
+            <button type="button" onClick={() => void handleSend()} disabled={isTyping}>
               {t.send}
             </button>
           </div>

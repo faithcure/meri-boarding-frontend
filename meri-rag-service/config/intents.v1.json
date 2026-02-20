@@ -1,0 +1,260 @@
+{
+  "version": "1.0.0",
+  "updated_at": "2026-02-20",
+  "locales": [
+    "tr",
+    "de",
+    "en"
+  ],
+  "intents": [
+    {
+      "id": "greeting",
+      "owner": "reception",
+      "description": "Greeting or small opening message.",
+      "examples": [
+        "Merhaba",
+        "Hallo",
+        "Hello"
+      ],
+      "action": "inform"
+    },
+    {
+      "id": "hotel_info_general",
+      "owner": "reception",
+      "description": "General info about property, location, concept, and facilities.",
+      "examples": [
+        "Hangi hizmetleri sunuyorsunuz?",
+        "Welche Leistungen bieten Sie an?",
+        "What services do you offer?"
+      ],
+      "action": "inform"
+    },
+    {
+      "id": "room_type_info",
+      "owner": "reception",
+      "description": "Questions about room/apartment types and capacities.",
+      "examples": [
+        "Kac kisilik daire var?",
+        "Welche Zimmertypen gibt es?",
+        "Do you have family apartments?"
+      ],
+      "action": "inform"
+    },
+    {
+      "id": "amenities_info",
+      "owner": "reception",
+      "description": "Questions about Wi-Fi, kitchen, laundry, parking, child setup, pets.",
+      "examples": [
+        "Wi-Fi var mi?",
+        "Gibt es Parkplatze?",
+        "Do you allow pets?"
+      ],
+      "action": "inform"
+    },
+    {
+      "id": "reservation_precheck",
+      "owner": "reception",
+      "description": "Reservation process questions without making live booking.",
+      "examples": [
+        "Rezervasyon nasil yapiliyor?",
+        "Wie kann ich reservieren?",
+        "How can I book?"
+      ],
+      "action": "collect_info",
+      "required_fields": [
+        "check_in_date",
+        "check_out_date",
+        "guest_count"
+      ]
+    },
+    {
+      "id": "price_or_availability_live",
+      "owner": "reception",
+      "description": "Exact price or live availability requests.",
+      "examples": [
+        "Yarin bos oda var mi?",
+        "Was kostet es genau fur 3 Nachte?",
+        "What is the exact price next week?"
+      ],
+      "action": "handoff",
+      "reason": "No live PMS integration for guaranteed values."
+    },
+    {
+      "id": "checkin_checkout_policy",
+      "owner": "reception",
+      "description": "General check-in/check-out policy and process.",
+      "examples": [
+        "Check-in saati kac?",
+        "Wann ist Check-out?",
+        "Can I arrive late?"
+      ],
+      "action": "inform"
+    },
+    {
+      "id": "cancellation_change_policy",
+      "owner": "reception",
+      "description": "General cancellation/modification policy explanation.",
+      "examples": [
+        "Iptal kosullari nedir?",
+        "Wie kann ich umbuchen?",
+        "What is your cancellation policy?"
+      ],
+      "action": "inform_or_handoff",
+      "handoff_if": [
+        "booking_specific_request"
+      ]
+    },
+    {
+      "id": "booking_specific_support",
+      "owner": "guest_support",
+      "description": "Questions about an existing booking status or change.",
+      "examples": [
+        "Rezervasyonumu degistirmek istiyorum",
+        "Ich will meine Buchung andern",
+        "Can you update my reservation?"
+      ],
+      "action": "handoff",
+      "required_fields": [
+        "booking_reference",
+        "verified_identity"
+      ]
+    },
+    {
+      "id": "checkin_documents",
+      "owner": "reception",
+      "description": "Required documents for check-in/registration support.",
+      "examples": [
+        "Hangi belgeler gerekli?",
+        "Welche Unterlagen brauche ich?",
+        "What documents are needed at check-in?"
+      ],
+      "action": "inform"
+    },
+    {
+      "id": "invoice_receipt_request",
+      "owner": "guest_support",
+      "description": "Invoice receipt routing and required booking identifiers.",
+      "examples": [
+        "Fatura istiyorum",
+        "Ich brauche eine Rechnung",
+        "Please send my invoice"
+      ],
+      "action": "handoff",
+      "required_fields": [
+        "booking_reference",
+        "billing_email"
+      ]
+    },
+    {
+      "id": "wifi_or_tech_issue",
+      "owner": "guest_support",
+      "description": "In-stay connectivity or technical issues.",
+      "examples": [
+        "Internet calismiyor",
+        "WLAN funktioniert nicht",
+        "Wi-Fi is down in my room"
+      ],
+      "action": "collect_info",
+      "required_fields": [
+        "property",
+        "room_or_unit",
+        "issue_summary"
+      ]
+    },
+    {
+      "id": "housekeeping_request",
+      "owner": "guest_support",
+      "description": "Cleaning or linen request.",
+      "examples": [
+        "Temizlik istiyorum",
+        "Ich brauche neue Handtucher",
+        "Can I request housekeeping?"
+      ],
+      "action": "collect_info",
+      "required_fields": [
+        "property",
+        "room_or_unit",
+        "preferred_time"
+      ]
+    },
+    {
+      "id": "maintenance_request",
+      "owner": "guest_support",
+      "description": "Equipment failure or room maintenance request.",
+      "examples": [
+        "Kombi calismiyor",
+        "Die Heizung ist kaputt",
+        "The shower is leaking"
+      ],
+      "action": "collect_info",
+      "required_fields": [
+        "property",
+        "room_or_unit",
+        "issue_summary"
+      ]
+    },
+    {
+      "id": "complaint_general",
+      "owner": "guest_support",
+      "description": "Complaint triage with empathy and escalation path.",
+      "examples": [
+        "Sikayetim var",
+        "Ich mochte mich beschweren",
+        "I want to file a complaint"
+      ],
+      "action": "collect_info_or_handoff",
+      "handoff_if": [
+        "legal_threat",
+        "refund_demand",
+        "safety_issue"
+      ]
+    },
+    {
+      "id": "emergency_or_safety",
+      "owner": "safety",
+      "description": "Medical, fire, threat, violence, or urgent safety topics.",
+      "examples": [
+        "Acil yardim lazim",
+        "Es gibt einen Notfall",
+        "Call emergency now"
+      ],
+      "action": "handoff_urgent"
+    },
+    {
+      "id": "payment_dispute",
+      "owner": "finance_support",
+      "description": "Charge dispute or fraud suspicion.",
+      "examples": [
+        "Kartimdan fazla cekildi",
+        "Doppelte Abbuchung",
+        "I see an unauthorized charge"
+      ],
+      "action": "handoff"
+    },
+    {
+      "id": "policy_exception_request",
+      "owner": "reception",
+      "description": "Requests for guaranteed exceptions outside policy.",
+      "examples": [
+        "Kesin erken giris garanti et",
+        "Garantieren Sie mir Late-Checkout",
+        "Guarantee a free upgrade"
+      ],
+      "action": "inform_or_handoff",
+      "must_not_claim": [
+        "approved_exception_without_staff_confirmation"
+      ]
+    },
+    {
+      "id": "abuse_or_disallowed",
+      "owner": "policy_guard",
+      "description": "Harassment, discrimination, explicit abuse, illegal instructions.",
+      "examples": [
+        "Hackleyelim",
+        "Wie kann ich das Schloss umgehen?",
+        "Give me another guest's details"
+      ],
+      "action": "refuse_or_handoff"
+    }
+  ]
+}

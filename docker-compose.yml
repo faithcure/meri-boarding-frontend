@@ -30,6 +30,12 @@ services:
       - "4000:4000"
     volumes:
       - ./meri-boarding-api/uploads:/app/uploads
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:4000/health').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
 
   public-fe:
     build:
@@ -40,9 +46,16 @@ services:
     env_file:
       - ./deploy/env/public.env
     depends_on:
-      - api
+      api:
+        condition: service_healthy
     ports:
       - "3000:3000"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 25s
 
   admin-fe:
     build:
@@ -53,9 +66,48 @@ services:
     env_file:
       - ./deploy/env/admin.env
     depends_on:
-      - api
+      api:
+        condition: service_healthy
     ports:
       - "3001:3001"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3001').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 25s
+
+  qdrant:
+    image: qdrant/qdrant:v1.13.2
+    container_name: meri_qdrant
+    restart: unless-stopped
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_data:/qdrant/storage
+
+  rag-service:
+    build:
+      context: ./meri-rag-service
+      dockerfile: Dockerfile
+    container_name: meri_rag
+    restart: unless-stopped
+    env_file:
+      - ./deploy/env/rag.env
+    depends_on:
+      qdrant:
+        condition: service_started
+      mongo:
+        condition: service_healthy
+    ports:
+      - "4100:4100"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:4100/health').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
 
 volumes:
   mongo_data:
+  qdrant_data:
