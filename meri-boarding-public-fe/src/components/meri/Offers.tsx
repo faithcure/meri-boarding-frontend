@@ -29,6 +29,7 @@ export default async function Offers({ locale: localeProp, content }: OffersProp
     "/images/Europaplatz_Fotos/_DSC6639.jpg"
   ];
   const withLocale = (path: string) => localePath(locale, path);
+  // Legacy offer pages were removed; cards now route to services page.
   const offerTargetPath = withLocale("/services");
   return (
     <section className="bg-color-op-1 rounded-1 mx-2">
