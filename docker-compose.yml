@@ -28,6 +28,8 @@ services:
         condition: service_healthy
     ports:
       - "4000:4000"
+    volumes:
+      - ./deploy/storage/uploads:/app/uploads
 
   public-fe:
     build:
