@@ -179,12 +179,12 @@ export default function HeroSettingsPage() {
     const token = window.localStorage.getItem('admin_token')
     if (!token) return
 
-    if (!['image/png', 'image/svg+xml'].includes(file.type)) {
-      setError('Only PNG or SVG files are allowed.')
+    if (!['image/png', 'image/jpeg', 'image/jpg', 'image/webp'].includes(file.type)) {
+      setError('Only PNG, JPG or WEBP files are allowed.')
       return
     }
-    if (file.size > 4 * 1024 * 1024) {
-      setError('Logo size cannot exceed 4MB.')
+    if (file.size > 8 * 1024 * 1024) {
+      setError('Image size cannot exceed 8MB.')
       return
     }
 
@@ -193,7 +193,7 @@ export default function HeroSettingsPage() {
     setSuccess('')
     try {
       const dataUrl = await toDataUrl(file)
-      const response = await fetch(`${apiBaseUrl}/api/v1/admin/content/home/partner-logo`, {
+      const response = await fetch(`${apiBaseUrl}/api/v1/admin/content/home/hero-image`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -201,8 +201,7 @@ export default function HeroSettingsPage() {
         },
         body: JSON.stringify({
           fileName: file.name,
-          dataUrl,
-          oldLogoUrl: String(hero.bookingPartners[partnerIndex]?.logo || '')
+          dataUrl
         })
       })
       const data = await response.json()
@@ -227,12 +226,12 @@ export default function HeroSettingsPage() {
     const token = window.localStorage.getItem('admin_token')
     if (!token) return
 
-    if (!['image/png', 'image/jpeg', 'image/jpg', 'image/webp'].includes(file.type)) {
-      setError('Only PNG, JPG or WEBP files are allowed.')
+    if (!['image/png', 'image/svg+xml'].includes(file.type)) {
+      setError('Only PNG or SVG files are allowed.')
       return
     }
-    if (file.size > 8 * 1024 * 1024) {
-      setError('Image size cannot exceed 8MB.')
+    if (file.size > 4 * 1024 * 1024) {
+      setError('Logo size cannot exceed 4MB.')
       return
     }
 
@@ -249,7 +248,8 @@ export default function HeroSettingsPage() {
         },
         body: JSON.stringify({
           fileName: file.name,
-          dataUrl
+          dataUrl,
+          oldLogoUrl: String(hero.bookingPartners[partnerIndex]?.logo || '')
         })
       })
       const data = await response.json()
