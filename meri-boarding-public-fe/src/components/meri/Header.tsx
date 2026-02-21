@@ -60,7 +60,7 @@ export default async function Header({ locale: localeProp }: HeaderProps = {}) {
                   <Link href={withLocale("/")}>
                     <img className="logo-main" src="/images/meri/meri-logo-black.png" alt="Meri Boarding Group" />
                     <img className="logo-scroll" src="/images/meri/meri-logo-black.png" alt="Meri Boarding Group" />
-                    <img className="logo-mobile" src="/meri-logo-mark.svg" alt="Meri Boarding Group" />
+                    <img className="logo-mobile" src="/images/meri/meri-logo-black.png" alt="Meri Boarding Group" />
                   </Link>
                 </div>
               </div>
@@ -68,6 +68,7 @@ export default async function Header({ locale: localeProp }: HeaderProps = {}) {
               <div className="de-flex-col">
                 <div className="de-flex-col header-col-mid">
                   <ul id="mainmenu">
+                    <LocaleSwitcher variant="menu" />
                     <li>
                       <Link className="menu-item" href={withLocale("/")}>
                         {t.home}
@@ -112,6 +113,20 @@ export default async function Header({ locale: localeProp }: HeaderProps = {}) {
                       <Link className="menu-item" href={withLocale("/contact")}>
                         {t.contact}
                       </Link>
+                    </li>
+                    <li className="mobile-menu-socials">
+                      <a className="mobile-menu-social" href="https://www.instagram.com/" aria-label="Instagram" target="_blank" rel="noreferrer">
+                        <i className="fa-brands fa-instagram" aria-hidden="true"></i>
+                      </a>
+                      <a className="mobile-menu-social" href="https://www.linkedin.com/" aria-label="LinkedIn" target="_blank" rel="noreferrer">
+                        <i className="fa-brands fa-linkedin-in" aria-hidden="true"></i>
+                      </a>
+                      <a className="mobile-menu-social" href="#" aria-label="Facebook">
+                        <i className="fa-brands fa-facebook-f" aria-hidden="true"></i>
+                      </a>
+                      <a className="mobile-menu-social" href="#" aria-label="YouTube">
+                        <i className="fa-brands fa-youtube" aria-hidden="true"></i>
+                      </a>
                     </li>
                   </ul>
                 </div>

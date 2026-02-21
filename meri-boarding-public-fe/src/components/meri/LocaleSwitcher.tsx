@@ -6,7 +6,7 @@ import type { Locale } from "@/i18n/getLocale";
 import { localePath } from "@/i18n/localePath";
 
 type LocaleSwitcherProps = {
-  variant?: "header" | "footer";
+  variant?: "header" | "footer" | "menu";
 };
 
 const locales = [
@@ -60,6 +60,29 @@ export default function LocaleSwitcher({ variant = "header" }: LocaleSwitcherPro
     if (nextLocale === currentLocale) return;
     router.push(localePath(nextLocale, pathname));
   };
+
+  if (variant === "menu") {
+    return (
+      <li className="mobile-menu-locale">
+        <div className="mobile-menu-locale-title">Language</div>
+        <div className="mobile-menu-locale-links">
+          {locales.map((locale) => (
+            <a
+              key={locale.code}
+              href={localePath(locale.code as Locale, pathname)}
+              className={`menu-item mobile-menu-locale-link ${currentLocale === locale.code ? "is-active" : ""}`}
+              aria-current={currentLocale === locale.code ? "page" : undefined}
+              aria-label={locale.label}
+              onClick={() => setLocaleCookie(locale.code)}
+            >
+              <img className="lang-flag" src={locale.flag} alt="" aria-hidden="true" />
+              <span>{locale.label}</span>
+            </a>
+          ))}
+        </div>
+      </li>
+    );
+  }
 
   if (variant === "header") {
     return (

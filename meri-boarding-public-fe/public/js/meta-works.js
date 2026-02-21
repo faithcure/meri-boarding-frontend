@@ -979,7 +979,7 @@
      /* --------------------------------------------------
       * multiple init functions
       * --------------------------------------------------*/
-    function init() {
+     function init() {
        const $sidebar = $('#de-sidebar');
        const sidebarHeight = parseInt($sidebar.css('height'), 10);
        const windowHeight = $(window).innerHeight();
@@ -1043,6 +1043,78 @@
        $('#btn-close').on('click', () => $('#extra-wrap').removeClass('open'));
      }
 
+     function bindMobileNavigation() {
+       let closeTimerId = null;
+       const closeAnimationMs = 340;
+
+       const expandAllMobileSubmenus = () => {
+         const isMobile = window.matchMedia('(max-width: 992px)').matches;
+         if (!isMobile) return;
+         const $itemsWithChildren = jQuery('#mainmenu li').has('ul');
+         $itemsWithChildren.children('span').addClass('active').data('iteration', 2);
+         $itemsWithChildren.children('ul').css('height', 'auto');
+       };
+
+       const setMobileMenuState = (open) => {
+         const $header = jQuery('header');
+         const $menuBtn = jQuery('#menu-btn');
+         if (closeTimerId) {
+           window.clearTimeout(closeTimerId);
+           closeTimerId = null;
+         }
+         if (open) {
+           $header.removeClass('menu-closing').addClass('menu-open').css('height', jQuery(window).innerHeight());
+           $menuBtn.addClass('menu-open').attr('aria-expanded', 'true');
+           expandAllMobileSubmenus();
+           mobileMenuShow = 1;
+         } else {
+           if (!$header.hasClass('menu-open')) return;
+           $header.addClass('menu-closing').removeClass('menu-open');
+           $menuBtn.removeClass('menu-open').attr('aria-expanded', 'false');
+           closeTimerId = window.setTimeout(() => {
+             $header.removeClass('menu-closing').css('height', 'auto');
+             closeTimerId = null;
+           }, closeAnimationMs);
+           mobileMenuShow = 0;
+         }
+       };
+
+       jQuery('#menu-btn').off("click").on("click", function(e) {
+         e.preventDefault();
+         const isOpen = jQuery('header').hasClass('menu-open');
+         setMobileMenuState(!isOpen);
+       });
+
+       jQuery(document)
+         .off("click.meriMobileMenu")
+         .on("click.meriMobileMenu", function(e) {
+           const isMobile = window.matchMedia('(max-width: 992px)').matches;
+           if (!isMobile) return;
+           if (!jQuery('header').hasClass('menu-open')) return;
+           const $target = jQuery(e.target);
+           if ($target.closest('#menu-btn').length) return;
+           if ($target.closest('#mainmenu').length) return;
+           setMobileMenuState(false);
+         });
+
+       jQuery('#mainmenu a.menu-item')
+         .off("click.meriMobileMenu")
+         .on("click.meriMobileMenu", function() {
+           const isMobile = window.matchMedia('(max-width: 992px)').matches;
+           if (!isMobile) return;
+           setMobileMenuState(false);
+         });
+
+       jQuery(window)
+         .off("resize.meriMobileMenu")
+         .on("resize.meriMobileMenu", function() {
+           const isMobile = window.matchMedia('(max-width: 992px)').matches;
+           if (!isMobile) {
+             setMobileMenuState(false);
+           }
+         });
+     }
+
      function reinitMetaWorks() {
        try { customBg(); } catch (e) {}
        try { initResize(); } catch (e) {}
@@ -1058,6 +1130,7 @@
          $('#mainmenu li:has(ul)').addClass('has-child');
          menuArrow();
        } catch (e) {}
+       try { bindMobileNavigation(); } catch (e) {}
        try { owlnavcenter(); } catch (e) {}
        try { sequence(); } catch (e) {}
        try { sequenceA(); } catch (e) {}
@@ -1644,54 +1717,7 @@
          // --------------------------------------------------
          // navigation for mobile
          // --------------------------------------------------
-         const setMobileMenuState = (open) => {
-             const $header = jQuery('header');
-             const $menuBtn = jQuery('#menu-btn');
-             if (open) {
-                 $header.addClass('menu-open').css('height', jQuery(window).innerHeight());
-                 $menuBtn.addClass('menu-open').attr('aria-expanded', 'true');
-                 mobileMenuShow = 1;
-             } else {
-                 $header.removeClass('menu-open').css('height', 'auto');
-                 $menuBtn.removeClass('menu-open').attr('aria-expanded', 'false');
-                 mobileMenuShow = 0;
-             }
-         };
-
-         jQuery('#menu-btn').off("click").on("click", function(e) {
-             e.preventDefault();
-             const isOpen = jQuery('header').hasClass('menu-open');
-             setMobileMenuState(!isOpen);
-         });
-
-         jQuery(document)
-             .off("click.meriMobileMenu")
-             .on("click.meriMobileMenu", function(e) {
-                 const isMobile = window.matchMedia('(max-width: 992px)').matches;
-                 if (!isMobile) return;
-                 if (!jQuery('header').hasClass('menu-open')) return;
-                 const $target = jQuery(e.target);
-                 if ($target.closest('#menu-btn').length) return;
-                 if ($target.closest('#mainmenu').length) return;
-                 setMobileMenuState(false);
-             });
-
-         jQuery('#mainmenu a.menu-item')
-             .off("click.meriMobileMenu")
-             .on("click.meriMobileMenu", function() {
-                 const isMobile = window.matchMedia('(max-width: 992px)').matches;
-                 if (!isMobile) return;
-                 setMobileMenuState(false);
-             });
-
-         jQuery(window)
-             .off("resize.meriMobileMenu")
-             .on("resize.meriMobileMenu", function() {
-                 const isMobile = window.matchMedia('(max-width: 992px)').matches;
-                 if (!isMobile) {
-                     setMobileMenuState(false);
-                 }
-             });
+         bindMobileNavigation();
 
          jQuery("a.btn").on("click", function(evn) {
              if (this.href.indexOf('#') === -1) {
