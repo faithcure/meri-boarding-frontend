@@ -18,7 +18,7 @@ export default async function Header({ locale: localeProp }: HeaderProps = {}) {
   let remoteHeaderContent: Record<string, unknown> = {};
   try {
     const tResponse = await fetch(`${apiBaseUrl}/api/v1/public/content/header?locale=${locale}`, {
-      next: { revalidate: 60 },
+      cache: 'no-store',
     });
     if (!tResponse.ok) {
       throw new Error(`Failed to fetch header content (${tResponse.status})`);

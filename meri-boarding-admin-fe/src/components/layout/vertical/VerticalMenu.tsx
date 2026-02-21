@@ -141,6 +141,9 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           <MenuItem href='/contact-submissions' icon={<i className='bx-mail-send' />}>
             Contact Submissions
           </MenuItem>
+          <MenuItem href='/form-messages/partners' icon={<i className='bx-images' />}>
+            Partner Logos
+          </MenuItem>
         </SubMenu>
         <SubMenu label='System' icon={<i className='bx-cog' />}>
           <MenuItem href='/system/general-settings' icon={<i className='bx-slider-alt' />}>

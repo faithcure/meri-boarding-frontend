@@ -28,7 +28,15 @@ export default async function HomePage({ locale }: HomePageProps) {
     if (!content.sections[sectionKey].enabled) return null;
 
     if (sectionKey === "hero") return <Hero locale={locale} content={content.hero} />;
-    if (sectionKey === "bookingPartners") return <BookingPartnersSection partners={content.hero.bookingPartners} />;
+    if (sectionKey === "bookingPartners") {
+      return (
+        <BookingPartnersSection
+          partners={content.hero.bookingPartners}
+          title={content.hero.bookingPartnersTitle}
+          description={content.hero.bookingPartnersDescription}
+        />
+      );
+    }
     if (sectionKey === "rooms") return <Rooms locale={locale} content={content.rooms} />;
     if (sectionKey === "testimonials") return <Testimonials content={content.testimonials} />;
     if (sectionKey === "facilities") return <Facilities content={content.facilities} />;

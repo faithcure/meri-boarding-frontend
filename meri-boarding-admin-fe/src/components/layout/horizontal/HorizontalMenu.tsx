@@ -122,6 +122,14 @@ const HorizontalMenu = () => {
         <MenuItem href='/content-contact' icon={<i className='bx-envelope' />}>
           Contact Content
         </MenuItem>
+        <SubMenu label='Forms & Messages' icon={<i className='bx-message-square-dots' />}>
+          <MenuItem href='/contact-submissions' icon={<i className='bx-mail-send' />}>
+            Contact Submissions
+          </MenuItem>
+          <MenuItem href='/form-messages/partners' icon={<i className='bx-images' />}>
+            Partner Logos
+          </MenuItem>
+        </SubMenu>
         <MenuItem href='/about' icon={<i className='bx-info-circle' />}>
           About
         </MenuItem>

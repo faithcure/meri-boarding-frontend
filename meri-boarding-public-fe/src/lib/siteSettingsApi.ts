@@ -44,7 +44,6 @@ export type PublicGeneralSettings = {
 }
 
 const apiBaseUrl = getServerApiBaseUrl()
-const API_REVALIDATE_SECONDS = 60
 const fallbackIconUrl = '/images/icon.webp'
 const fallbackSocialLinks: PublicSocialLink[] = [
   { id: 'instagram', platform: 'instagram', label: 'Instagram', url: 'https://www.instagram.com/', iconClass: 'fa-brands fa-instagram' },
@@ -113,7 +112,7 @@ function resolveSocialLinks(cms?: CmsGeneralSettingsContent): PublicSocialLink[]
 export async function fetchGeneralSettings(): Promise<PublicGeneralSettings> {
   try {
     const response = await fetch(`${apiBaseUrl}/api/v1/public/settings/general`, {
-      next: { revalidate: API_REVALIDATE_SECONDS }
+      cache: 'no-store'
     })
     if (!response.ok) {
       throw new Error(`Failed to fetch general settings (${response.status})`)

@@ -47,6 +47,8 @@ export async function registerAdminContentRoutes(ctx: RouteContext) {
     saveUploadedImage,
     parseSiteIconDataUrl,
     saveRawUploadedAsset,
+    unlink,
+    path,
     homeUploadDir,
     assetWidthCeiling,
     assetPrewarmWidths,
@@ -862,6 +864,43 @@ server.post('/api/v1/admin/content/home/hero-image', async (request, reply) => {
   });
 
   return reply.send({ ok: true, imageUrl: savedImage.url });
+});
+
+server.post('/api/v1/admin/content/home/partner-logo', async (request, reply) => {
+  const admin = await getRequestAdmin(request.headers.authorization);
+  if (!admin || (admin.role !== 'super_admin' && admin.role !== 'moderator')) {
+    return reply.code(403).send({ error: 'Only super_admin or moderator can upload partner logos' });
+  }
+
+  const body = request.body as { fileName?: string; dataUrl?: string; oldLogoUrl?: string } | undefined;
+  const parsed = parseSiteIconDataUrl(String(body?.dataUrl || ''));
+  if (!parsed || (parsed.ext !== 'png' && parsed.ext !== 'svg')) {
+    return reply.code(400).send({ error: 'Invalid logo format. Use PNG or SVG data URL.' });
+  }
+  if (parsed.buffer.length > 4 * 1024 * 1024) {
+    return reply.code(400).send({ error: 'Logo size cannot exceed 4MB' });
+  }
+
+  const requestedName = sanitizeFilename(String(body?.fileName || `partner-logo.${parsed.ext}`));
+  const savedLogo = await saveRawUploadedAsset({
+    uploadDir: homeUploadDir,
+    bucket: 'home',
+    filePrefix: 'home-partner-logo',
+    requestedName,
+    ext: parsed.ext,
+    sourceBuffer: parsed.buffer,
+  });
+
+  const oldLogoUrl = String(body?.oldLogoUrl || '').trim();
+  const oldLogoFileName = oldLogoUrl.split('/api/v1/assets/home/')[1];
+  if (oldLogoFileName) {
+    const safeOldLogoFileName = sanitizeFilename(oldLogoFileName);
+    if (safeOldLogoFileName && safeOldLogoFileName !== savedLogo.fileName) {
+      await unlink(path.join(homeUploadDir, safeOldLogoFileName)).catch(() => undefined);
+    }
+  }
+
+  return reply.send({ ok: true, imageUrl: savedLogo.url });
 });
 
 server.post('/api/v1/admin/content/home/rooms-image', async (request, reply) => {

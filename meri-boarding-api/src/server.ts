@@ -160,6 +160,7 @@ type HomeBookingPartner = {
   name: string;
   logo: string;
   url: string;
+  description: string;
 };
 
 type HomeGalleryItem = {
@@ -273,6 +274,8 @@ type HomeCmsContent = {
     ctaLocationsHref: string;
     ctaQuote: string;
     ctaQuoteHref: string;
+    bookingPartnersTitle: string;
+    bookingPartnersDescription: string;
     slides: HomeHeroSlide[];
     bookingPartners: HomeBookingPartner[];
   };
@@ -536,6 +539,8 @@ const defaultHomeContent: HomeCmsContent = {
     ctaLocationsHref: '/hotels',
     ctaQuote: 'Request a Quote Now',
     ctaQuoteHref: '/contact',
+    bookingPartnersTitle: 'Booking Partners',
+    bookingPartnersDescription: 'Reserve through our trusted platforms and partners.',
     bookingPartners: [],
     slides: [
       { image: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6821-Bearbeitet.jpg', position: 'center 13%' },
@@ -1946,13 +1951,18 @@ function normalizeHomeContent(input: Partial<HomeCmsContent> | undefined, fallba
       ctaLocationsHref: String(input?.hero?.ctaLocationsHref ?? fallback.hero.ctaLocationsHref ?? '').trim(),
       ctaQuote: String(input?.hero?.ctaQuote ?? fallback.hero.ctaQuote ?? '').trim(),
       ctaQuoteHref: String(input?.hero?.ctaQuoteHref ?? fallback.hero.ctaQuoteHref ?? '').trim(),
+      bookingPartnersTitle: String(input?.hero?.bookingPartnersTitle ?? fallback.hero.bookingPartnersTitle ?? '').trim().slice(0, 120),
+      bookingPartnersDescription: String(input?.hero?.bookingPartnersDescription ?? fallback.hero.bookingPartnersDescription ?? '')
+        .trim()
+        .slice(0, 320),
       bookingPartners: bookingPartnersSource
         .map((item) => ({
           name: String(item?.name || '').trim(),
           logo: String(item?.logo || '').trim(),
           url: String(item?.url || '').trim(),
+          description: String(item?.description || '').trim().slice(0, 300),
         }))
-        .filter((item) => Boolean(item.name) || Boolean(item.logo) || Boolean(item.url))
+        .filter((item) => Boolean(item.name) || Boolean(item.logo) || Boolean(item.url) || Boolean(item.description))
         .slice(0, 12),
       slides: heroSlidesSource
         .map((item) => ({
@@ -2073,12 +2083,21 @@ function validateHomeContent(input: HomeCmsContent) {
   if (input.hero.bookingPartners.length > 12) {
     return 'Hero booking partner limit is 12';
   }
+  if (String(input.hero.bookingPartnersTitle || '').trim().length > 120) {
+    return 'Booking partners title must be at most 120 characters';
+  }
+  if (String(input.hero.bookingPartnersDescription || '').trim().length > 320) {
+    return 'Booking partners description must be at most 320 characters';
+  }
   for (const [index, partner] of input.hero.bookingPartners.entries()) {
     if (!partner.name || !partner.logo || !partner.url) {
       return `Booking partner ${index + 1}: name, logo and link are required`;
     }
     if (!isValidLink(partner.url)) {
       return `Booking partner ${index + 1}: link must start with "/" or "http(s)://"`;
+    }
+    if (String(partner.description || '').trim().length > 300) {
+      return `Booking partner ${index + 1}: description must be at most 300 characters`;
     }
   }
 
@@ -3554,6 +3573,8 @@ const routeContext = {
   parseSiteIconDataUrl,
   saveRawUploadedAsset,
   prewarmAssetBucket,
+  unlink,
+  path,
 };
 
 await registerPublicRoutes(routeContext);

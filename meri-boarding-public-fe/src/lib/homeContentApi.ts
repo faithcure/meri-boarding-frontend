@@ -15,7 +15,9 @@ type CmsHomeContent = {
     ctaLocationsHref?: string
     ctaQuote?: string
     ctaQuoteHref?: string
-    bookingPartners?: Array<{ name?: string; logo?: string; url?: string }>
+    bookingPartnersTitle?: string
+    bookingPartnersDescription?: string
+    bookingPartners?: Array<{ name?: string; logo?: string; url?: string; description?: string }>
     slides?: Array<{ image?: string; position?: string }>
   }
   rooms?: {
@@ -76,7 +78,9 @@ export type HomeResolvedContent = {
   hero: ReturnType<typeof getMessages>['hero'] & {
     ctaLocationsHref: string
     ctaQuoteHref: string
-    bookingPartners: Array<{ name: string; logo: string; url: string }>
+    bookingPartnersTitle: string
+    bookingPartnersDescription: string
+    bookingPartners: Array<{ name: string; logo: string; url: string; description: string }>
     slides: Array<{ image: string; position: string }>
   }
   rooms: ReturnType<typeof getMessages>['rooms'] & {
@@ -220,11 +224,14 @@ function resolveContent(locale: Locale, cms?: CmsHomeContent): HomeResolvedConte
       ctaLocationsHref: String(cms?.hero?.ctaLocationsHref || '/hotels'),
       ctaQuote: String(cms?.hero?.ctaQuote || ''),
       ctaQuoteHref: String(cms?.hero?.ctaQuoteHref || '/contact'),
+      bookingPartnersTitle: String(cms?.hero?.bookingPartnersTitle || 'Booking Partners').trim(),
+      bookingPartnersDescription: String(cms?.hero?.bookingPartnersDescription || 'Reserve through our trusted platforms and partners.').trim(),
       bookingPartners: bookingPartnersSource
         .map(item => ({
           name: String(item?.name || '').trim(),
           logo: withOptimizedAsset(String(item?.logo || '').trim(), 420, 82),
-          url: String(item?.url || '').trim()
+          url: String(item?.url || '').trim(),
+          description: String(item?.description || '').trim()
         }))
         .filter(item => Boolean(item.name) && Boolean(item.logo) && Boolean(item.url))
         .slice(0, 12),

@@ -155,7 +155,6 @@ export type ReservationResolvedContent = {
 }
 
 const apiBaseUrl = getServerApiBaseUrl()
-const API_REVALIDATE_SECONDS = 60
 
 function withApiBaseIfNeeded(url: string) {
   return withPublicApiBaseIfNeeded(url)
@@ -300,7 +299,7 @@ function resolveContent(locale: Locale, cms?: CmsReservationContent): Reservatio
 export async function fetchReservationResolvedContent(locale: Locale): Promise<ReservationResolvedContent> {
   try {
     const response = await fetch(`${apiBaseUrl}/api/v1/public/content/reservation?locale=${locale}`, {
-      next: { revalidate: API_REVALIDATE_SECONDS }
+      cache: 'no-store'
     })
     if (!response.ok) {
       throw new Error(`Failed to fetch reservation content (${response.status})`)

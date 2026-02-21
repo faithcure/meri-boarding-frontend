@@ -53,7 +53,6 @@ export type PublicHotelDetail = {
 }
 
 const apiBaseUrl = getServerApiBaseUrl()
-const API_REVALIDATE_SECONDS = 60
 
 function withApiBaseIfNeeded(url: string) {
   return withPublicApiBaseIfNeeded(url)
@@ -119,7 +118,7 @@ function normalizeGalleryMeta(input: unknown) {
 export async function fetchPublicHotels(locale: Locale): Promise<PublicHotelListItem[]> {
   try {
     const response = await fetch(`${apiBaseUrl}/api/v1/public/hotels?locale=${locale}`, {
-      next: { revalidate: API_REVALIDATE_SECONDS }
+      cache: 'no-store'
     })
     if (!response.ok) {
       throw new Error(`Failed to fetch hotels (${response.status})`)
@@ -142,7 +141,7 @@ export async function fetchPublicHotels(locale: Locale): Promise<PublicHotelList
 export async function fetchPublicHotelBySlug(locale: Locale, slug: string): Promise<PublicHotelDetail | null> {
   try {
     const response = await fetch(`${apiBaseUrl}/api/v1/public/hotels/${slug}?locale=${locale}`, {
-      next: { revalidate: API_REVALIDATE_SECONDS }
+      cache: 'no-store'
     })
     if (response.status === 404) {
       return null

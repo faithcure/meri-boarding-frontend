@@ -45,7 +45,6 @@ export type ContactResolvedContent = {
 };
 
 const apiBaseUrl = getServerApiBaseUrl();
-const API_REVALIDATE_SECONDS = 60;
 
 function withApiBaseIfNeeded(url: string) {
   return withPublicApiBaseIfNeeded(url);
@@ -123,7 +122,7 @@ function resolveContent(locale: Locale, cms?: CmsContactContent): ContactResolve
 export async function fetchContactResolvedContent(locale: Locale): Promise<ContactResolvedContent> {
   try {
     const response = await fetch(`${apiBaseUrl}/api/v1/public/content/contact?locale=${locale}`, {
-      next: { revalidate: API_REVALIDATE_SECONDS }
+      cache: 'no-store'
     });
     if (!response.ok) {
       throw new Error(`Failed to fetch contact content (${response.status})`);
