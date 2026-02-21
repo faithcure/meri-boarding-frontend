@@ -38,6 +38,11 @@ const verticalMenuData = (): VerticalMenuDataType[] => [
     icon: 'bx-envelope'
   },
   {
+    label: 'General Settings',
+    href: '/system/general-settings',
+    icon: 'bx-slider-alt'
+  },
+  {
     label: 'About',
     href: '/about',
     icon: 'bx-info-circle'

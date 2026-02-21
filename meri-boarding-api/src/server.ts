@@ -69,6 +69,10 @@ type HeaderContent = {
   hildesheim: string;
 };
 
+type GeneralSettingsContent = {
+  siteIconUrl: string;
+};
+
 type ContentEntry<T> = {
   _id: ObjectId;
   key: string;
@@ -1052,6 +1056,9 @@ const defaultHeaderContent: Record<ContentLocale, HeaderContent> = {
     hildesheim: 'Hildesheim',
   },
 };
+const defaultGeneralSettingsContent: GeneralSettingsContent = {
+  siteIconUrl: '/images/icon.webp',
+};
 
 const server = Fastify({
   logger: true,
@@ -1568,6 +1575,15 @@ function normalizeHeaderContent(input: Partial<HeaderContent> | undefined, fallb
   };
 }
 
+function normalizeGeneralSettingsContent(
+  input: Partial<GeneralSettingsContent> | undefined,
+  fallback: GeneralSettingsContent,
+): GeneralSettingsContent {
+  return {
+    siteIconUrl: String(input?.siteIconUrl ?? fallback.siteIconUrl).trim(),
+  };
+}
+
 function parseGalleryCategory(input?: string): HotelGalleryImage['category'] {
   const normalized = String(input || '').trim().toLowerCase();
   return allowedGalleryCategories.includes(normalized as HotelGalleryImage['category'])
@@ -1598,6 +1614,14 @@ function isValidBackgroundPosition(input: string) {
 function isValidLink(input: string) {
   const value = String(input || '').trim();
   if (!value || value.length > 400) return false;
+  if (value.startsWith('/')) return true;
+  return /^https?:\/\//i.test(value);
+}
+
+function isValidImagePathOrUrl(input: string) {
+  const value = String(input || '').trim();
+  if (!value || value.length > 400) return false;
+  if (/\s/.test(value)) return false;
   if (value.startsWith('/')) return true;
   return /^https?:\/\//i.test(value);
 }
@@ -2865,6 +2889,30 @@ async function getHeaderContent(locale: ContentLocale) {
   return fallback;
 }
 
+async function getGeneralSettingsContent() {
+  const db = await getDb();
+  const contents = db.collection<ContentEntry<GeneralSettingsContent>>('content_entries');
+  await contents.createIndex({ key: 1, locale: 1 }, { unique: true });
+
+  const content = await contents.findOne({ key: 'shared.general_settings', locale: 'en' });
+  if (content) {
+    return normalizeGeneralSettingsContent(content.value, defaultGeneralSettingsContent);
+  }
+
+  const fallback = defaultGeneralSettingsContent;
+  const now = new Date();
+  await contents.updateOne(
+    { key: 'shared.general_settings', locale: 'en' },
+    {
+      $set: { value: fallback, updatedAt: now },
+      $setOnInsert: { _id: new ObjectId(), key: 'shared.general_settings', locale: 'en', createdAt: now },
+    },
+    { upsert: true },
+  );
+
+  return fallback;
+}
+
 async function getLocalizedDefaultHomeContent(locale: ContentLocale): Promise<HomeCmsContent> {
   if (homeFallbackCache[locale]) {
     return JSON.parse(JSON.stringify(homeFallbackCache[locale])) as HomeCmsContent;
@@ -3324,6 +3372,11 @@ server.get('/api/v1/public/content/header', async (request, reply) => {
   const locale = parseLocale(query?.locale);
   const content = await getHeaderContent(locale);
   return reply.send({ key: 'shared.header', locale, content });
+});
+
+server.get('/api/v1/public/settings/general', async (_request, reply) => {
+  const content = await getGeneralSettingsContent();
+  return reply.send({ key: 'shared.general_settings', content });
 });
 
 server.get('/api/v1/public/content/home', async (request, reply) => {
@@ -4493,6 +4546,55 @@ server.put('/api/v1/admin/content/header', async (request, reply) => {
   );
 
   return reply.send({ ok: true, locale, content: nextContent });
+});
+
+server.get('/api/v1/admin/settings/general', async (request, reply) => {
+  const admin = await getRequestAdmin(request.headers.authorization);
+  if (!admin || (admin.role !== 'super_admin' && admin.role !== 'moderator')) {
+    return reply.code(403).send({ error: 'Only super_admin or moderator can access this route' });
+  }
+
+  const content = await getGeneralSettingsContent();
+  return reply.send({ key: 'shared.general_settings', content });
+});
+
+server.put('/api/v1/admin/settings/general', async (request, reply) => {
+  const admin = await getRequestAdmin(request.headers.authorization);
+  if (!admin || (admin.role !== 'super_admin' && admin.role !== 'moderator')) {
+    return reply.code(403).send({ error: 'Only super_admin or moderator can update this route' });
+  }
+
+  const body = request.body as { content?: Partial<GeneralSettingsContent> } | undefined;
+  const nextContent = normalizeGeneralSettingsContent(body?.content, defaultGeneralSettingsContent);
+
+  if (!isValidImagePathOrUrl(nextContent.siteIconUrl)) {
+    return reply.code(400).send({ error: 'Site icon URL must start with "/" or "http(s)://".' });
+  }
+
+  const db = await getDb();
+  const contents = db.collection<ContentEntry<GeneralSettingsContent>>('content_entries');
+  await contents.createIndex({ key: 1, locale: 1 }, { unique: true });
+
+  const now = new Date();
+  await contents.updateOne(
+    { key: 'shared.general_settings', locale: 'en' },
+    {
+      $set: {
+        value: nextContent,
+        updatedAt: now,
+        updatedBy: admin._id,
+      },
+      $setOnInsert: {
+        _id: new ObjectId(),
+        key: 'shared.general_settings',
+        locale: 'en',
+        createdAt: now,
+      },
+    },
+    { upsert: true },
+  );
+
+  return reply.send({ ok: true, content: nextContent });
 });
 
 server.get('/api/v1/admin/content/home', async (request, reply) => {

@@ -8,6 +8,7 @@ import RouteEffects from "@/components/meri/RouteEffects";
 import RouteTransitionOverlay from "@/components/meri/RouteTransitionOverlay";
 import type { Locale } from "@/i18n/getLocale";
 import { getLocale } from "@/i18n/getLocale";
+import { fetchSiteIconUrl } from "@/lib/siteSettingsApi";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -54,11 +55,14 @@ export default async function RootLayout({
 }>) {
   const resolvedParams = await params;
   const locale = resolvedParams?.locale ?? (await getLocale());
+  const siteIconUrl = await fetchSiteIconUrl();
 
   return (
     <html lang={locale}>
       <head>
-        <link rel="icon" href="/images/icon.webp" type="image/gif" sizes="16x16" />
+        <link rel="icon" href={siteIconUrl} sizes="32x32" />
+        <link rel="shortcut icon" href={siteIconUrl} />
+        <link rel="apple-touch-icon" href={siteIconUrl} />
         <link rel="stylesheet" href="/css/bootstrap.min.css" />
         <link rel="stylesheet" href="/css/plugins.css" />
         <link rel="stylesheet" href="/css/swiper.css" />

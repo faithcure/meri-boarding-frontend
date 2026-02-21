@@ -69,6 +69,12 @@ export default async function Header({ locale: localeProp }: HeaderProps = {}) {
                 <div className="de-flex-col header-col-mid">
                   <ul id="mainmenu">
                     <LocaleSwitcher variant="menu" />
+                    <li className="mobile-menu-cta">
+                      <Link className="menu-item mobile-menu-cta-link" href={withLocale("/reservation")}>
+                        {t.reservation} <i className="fa fa-arrow-right ms-2" aria-hidden="true"></i>
+                      </Link>
+                    </li>
+                    <li className="mobile-menu-section-title" aria-hidden="true">Menu</li>
                     <li>
                       <Link className="menu-item" href={withLocale("/")}>
                         {t.home}
