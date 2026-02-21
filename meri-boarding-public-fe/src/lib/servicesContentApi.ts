@@ -40,6 +40,7 @@ export type ServicesResolvedContent = {
 }
 
 const apiBaseUrl = getServerApiBaseUrl()
+const API_REVALIDATE_SECONDS = 60
 
 function withApiBaseIfNeeded(url: string) {
   return withPublicApiBaseIfNeeded(url)
@@ -108,13 +109,18 @@ function resolveContent(locale: Locale, cms?: CmsServicesContent): ServicesResol
 }
 
 export async function fetchServicesResolvedContent(locale: Locale): Promise<ServicesResolvedContent> {
-  const response = await fetch(`${apiBaseUrl}/api/v1/public/content/services?locale=${locale}`, {
-    cache: 'no-store'
-  })
-  if (!response.ok) {
-    throw new Error(`Failed to fetch services content (${response.status})`)
-  }
+  try {
+    const response = await fetch(`${apiBaseUrl}/api/v1/public/content/services?locale=${locale}`, {
+      next: { revalidate: API_REVALIDATE_SECONDS }
+    })
+    if (!response.ok) {
+      throw new Error(`Failed to fetch services content (${response.status})`)
+    }
 
-  const data = await response.json()
-  return resolveContent(locale, data?.content || {})
+    const data = await response.json()
+    return resolveContent(locale, data?.content || {})
+  } catch (error) {
+    console.error('[public-fe] falling back to local services content', error)
+    return resolveContent(locale, {})
+  }
 }

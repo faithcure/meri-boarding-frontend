@@ -1,4 +1,5 @@
 import BuyNow from "@/components/meri/BuyNow";
+import BookingPartnersSection from "@/components/meri/BookingPartnersSection";
 import Facilities from "@/components/meri/Facilities";
 import Faq from "@/components/meri/Faq";
 import Footer from "@/components/meri/Footer";
@@ -27,6 +28,7 @@ export default async function HomePage({ locale }: HomePageProps) {
     if (!content.sections[sectionKey].enabled) return null;
 
     if (sectionKey === "hero") return <Hero locale={locale} content={content.hero} />;
+    if (sectionKey === "bookingPartners") return <BookingPartnersSection partners={content.hero.bookingPartners} />;
     if (sectionKey === "rooms") return <Rooms locale={locale} content={content.rooms} />;
     if (sectionKey === "testimonials") return <Testimonials content={content.testimonials} />;
     if (sectionKey === "facilities") return <Facilities content={content.facilities} />;

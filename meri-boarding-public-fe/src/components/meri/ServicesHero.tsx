@@ -24,7 +24,14 @@ export default async function ServicesHero({ locale: localeProp, content }: Serv
   return (
     <section className="jarallax text-light relative rounded-1 overflow-hidden mt-80 mt-sm-70 mx-2">
       <div className="de-gradient-edge-top"></div>
-      <img src={t.backgroundImage} className="jarallax-img" alt="" />
+      <img
+        src={t.backgroundImage}
+        className="jarallax-img"
+        alt=""
+        loading="eager"
+        fetchPriority="high"
+        decoding="async"
+      />
       <div className="container relative z-2">
         <div className="row justify-content-center">
           <div className="col-lg-6 text-center">

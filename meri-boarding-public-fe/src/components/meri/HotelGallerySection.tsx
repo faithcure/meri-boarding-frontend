@@ -102,64 +102,60 @@ export default function HotelGallerySection({ items, labels }: HotelGallerySecti
     <>
       <div className='row'>
         <div className='col-md-12 text-center'>
-          <ul id='filters' className='wow fadeInUp d-inline-flex flex-wrap justify-content-center' data-wow-delay='0s'>
+          <ul className='gallery-filter-list hotel-gallery-filters d-inline-flex flex-wrap justify-content-center'>
             <li>
-              <a
-                href='#gallery'
-                className={activeFilter === 'all' ? 'selected' : ''}
-                onClick={event => {
-                  event.preventDefault()
+              <button
+                type='button'
+                className={`gallery-filter-btn ${activeFilter === 'all' ? 'is-selected' : ''}`}
+                onClick={() => {
                   setActiveFilter('all')
                   setPage(1)
                 }}
               >
                 {labels.all}
-              </a>
+              </button>
             </li>
             <li>
-              <a
-                href='#gallery'
-                className={activeFilter === 'rooms' ? 'selected' : ''}
-                onClick={event => {
-                  event.preventDefault()
+              <button
+                type='button'
+                className={`gallery-filter-btn ${activeFilter === 'rooms' ? 'is-selected' : ''}`}
+                onClick={() => {
                   setActiveFilter('rooms')
                   setPage(1)
                 }}
               >
                 {labels.rooms}
-              </a>
+              </button>
             </li>
             <li>
-              <a
-                href='#gallery'
-                className={activeFilter === 'dining' ? 'selected' : ''}
-                onClick={event => {
-                  event.preventDefault()
+              <button
+                type='button'
+                className={`gallery-filter-btn ${activeFilter === 'dining' ? 'is-selected' : ''}`}
+                onClick={() => {
                   setActiveFilter('dining')
                   setPage(1)
                 }}
               >
                 {labels.dining}
-              </a>
+              </button>
             </li>
             <li>
-              <a
-                href='#gallery'
-                className={activeFilter === 'facilities' ? 'selected' : ''}
-                onClick={event => {
-                  event.preventDefault()
+              <button
+                type='button'
+                className={`gallery-filter-btn ${activeFilter === 'facilities' ? 'is-selected' : ''}`}
+                onClick={() => {
                   setActiveFilter('facilities')
                   setPage(1)
                 }}
               >
                 {labels.facilities}
-              </a>
+              </button>
             </li>
           </ul>
         </div>
       </div>
 
-      <div id='gallery' className='row g-3 wow fadeIn' data-wow-delay='.3s'>
+      <div className='row g-3 hotel-gallery-grid'>
         {pagedItems.map((item, index) => (
           <div
             className={`col-md-3 col-sm-6 col-12 item ${item.category}`}

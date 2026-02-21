@@ -6,7 +6,7 @@
 
      const enableRtl = 'off'; // on - for enable RTL, off - for deactive RTL
      const preloader = 'on'; // on - for enable preloader, off - for disable preloader
-     const headerAutoshow = "on"; // on - for enable fixed header, off - for disable fixed header
+     const headerAutoshow = "off"; // on - for enable fixed header, off - for disable fixed header
      const topbar = "off"; // on - for enable fixed header, off - for disable fixed header
 
     /* predefined vars begin */
@@ -393,21 +393,34 @@
            }
         });
 
-        jQuery(".owl-single-static").owlCarousel({
-            loop:true,
-            items: 1,
-            nav:false,
-            dots:false,
-         });
+        function ensureOwlInit($elements, options) {
+          if (!$.fn.owlCarousel || !$elements || !$elements.length) return;
+          $elements.each(function () {
+            const $el = jQuery(this);
+            if ($el.hasClass('owl-loaded') || $el.data('owl.carousel')) {
+              $el.trigger('refresh.owl.carousel');
+            } else {
+              $el.owlCarousel(options);
+            }
+          });
+        }
 
-        jQuery(".owl-single").owlCarousel({
-            loop:true,
+        function initRouteAwareOwls() {
+          ensureOwlInit(jQuery(".owl-single-static"), {
+            loop: true,
             items: 1,
-            nav:false,
-            dots:false,
-         });
+            nav: false,
+            dots: false,
+          });
 
-        jQuery(".owl-single-dots").owlCarousel({
+          ensureOwlInit(jQuery(".owl-single"), {
+            loop: true,
+            items: 1,
+            nav: false,
+            dots: false,
+          });
+
+          ensureOwlInit(jQuery(".owl-single-dots"), {
             loop: true,
             items: 1,
             nav: false,
@@ -418,7 +431,10 @@
             smartSpeed: 800,
             animateOut: 'fadeOut',
             animateIn: 'fadeIn'
-        });
+          });
+        }
+
+        initRouteAwareOwls();
 
 
         jQuery("#slider-carousel").owlCarousel({
@@ -506,14 +522,6 @@
             }
          });
 
-
-         jQuery(".owl-single-dots").owlCarousel({
-            loop:true,
-            items: 1,
-            nav:false,
-            dots:true,
-         });
-         
          jQuery(".four-cols-center-dots").owlCarousel({
             center: true,
             loop:true,
@@ -1041,6 +1049,7 @@
        try { gridGallery(); } catch (e) {}
        try { filterGallery(); } catch (e) {}
        try { masonry(); } catch (e) {}
+       try { initRouteAwareOwls(); } catch (e) {}
        try { if ($.fn.jarallax) { $(".jarallax").jarallax(); } } catch (e) {}
        try { if ($.fn.magnificPopup) { loadMagnificPopup(); } } catch (e) {}
        try { if ($.fn.lazy) { $('.lazy').lazy(); } } catch (e) {}
@@ -1049,6 +1058,7 @@
          $('#mainmenu li:has(ul)').addClass('has-child');
          menuArrow();
        } catch (e) {}
+       try { owlnavcenter(); } catch (e) {}
        try { sequence(); } catch (e) {}
        try { sequenceA(); } catch (e) {}
        try { initWowSafe(); } catch (e) {}
@@ -1227,7 +1237,6 @@
          headerSticky();
          deCounter();
          deProgress();
-         init();
          backToTop();
         
          /* fade base scroll position */
@@ -1318,32 +1327,73 @@
     }
 
     function owlnavcenter(){
+     if (!$.fn.owlCarousel) return;
+
+     const ensureTargetReady = function (owl) {
+       if (!owl || !owl.length) return;
+       if (owl.hasClass('owl-single-static')) {
+         ensureOwlInit(owl, { loop: true, items: 1, nav: false, dots: false });
+       } else if (owl.hasClass('owl-single')) {
+         ensureOwlInit(owl, { loop: true, items: 1, nav: false, dots: false });
+       } else if (owl.hasClass('owl-single-dots')) {
+         ensureOwlInit(owl, {
+           loop: true,
+           items: 1,
+           nav: false,
+           dots: true,
+           autoplay: true,
+           autoplayTimeout: 3000,
+           autoplayHoverPause: true,
+           smartSpeed: 800,
+           animateOut: 'fadeOut',
+           animateIn: 'fadeIn'
+         });
+       } else if (!owl.hasClass('owl-loaded') && !owl.data('owl.carousel')) {
+         owl.owlCarousel();
+       } else {
+         owl.trigger('refresh.owl.carousel');
+       }
+     };
+
      jQuery('.owl-custom-nav').each(function () {
          const $nav = jQuery(this);
-         const owl = jQuery($nav.data('target')); // ambil id target carousel
+         const target = $nav.data('target');
+         if (!target) return;
+         const owl = jQuery(target);
 
-         owl.owlCarousel();
+         ensureTargetReady(owl);
 
-         // Custom Navigation Events khusus untuk nav ini
-         $nav.find(".btn-next").on("click", function () {
+         $nav.find(".btn-next").off("click.meri-owl-nav").on("click.meri-owl-nav", function (e) {
+             e.preventDefault();
              owl.trigger('next.owl.carousel');
          });
-         $nav.find(".btn-prev").on("click", function () {
+         $nav.find(".btn-prev").off("click.meri-owl-nav").on("click.meri-owl-nav", function (e) {
+             e.preventDefault();
              owl.trigger('prev.owl.carousel');
          });
+
+         window.requestAnimationFrame(function () {
+           owl.trigger('refresh.owl.carousel');
+         });
+         window.setTimeout(function () {
+           owl.trigger('refresh.owl.carousel');
+         }, 180);
      });
      
      jQuery('.de-custom-nav').each(function () {
          const $nav = jQuery(this);
-         const owl = jQuery($nav.data('target')); // ambil id target carousel
+         const target = $nav.data('target');
+         if (!target) return;
+         const owl = jQuery(target);
 
-         owl.owlCarousel();
+         ensureTargetReady(owl);
 
-         // Custom Navigation Events khusus untuk nav ini
-         $nav.find(".d-next").on("click", function () {
+         $nav.find(".d-next").off("click.meri-owl-nav").on("click.meri-owl-nav", function (e) {
+             e.preventDefault();
              owl.trigger('next.owl.carousel');
          });
-         $nav.find(".d-prev").on("click", function () {
+         $nav.find(".d-prev").off("click.meri-owl-nav").on("click.meri-owl-nav", function (e) {
+             e.preventDefault();
              owl.trigger('prev.owl.carousel');
          });
      });
@@ -1371,9 +1421,6 @@
 
     // text rotatation begin
     const circles = document.querySelectorAll('.text-circle');
-    if (circles.length === 0) {
-      console.warn('No .text-circle elements found.');
-    }
     circles.forEach(circle => {
       const text = circle.dataset.text || "";
       const chars = text.split('');
@@ -1597,21 +1644,54 @@
          // --------------------------------------------------
          // navigation for mobile
          // --------------------------------------------------
-         jQuery('#menu-btn').off("click").on("click", function(e) {
-             e.preventDefault();
+         const setMobileMenuState = (open) => {
              const $header = jQuery('header');
-             const h = $header[0].scrollHeight;
-
-             if (mobileMenuShow === 0) {
-                 $header.addClass('menu-open').css('height', $(window).innerHeight());
+             const $menuBtn = jQuery('#menu-btn');
+             if (open) {
+                 $header.addClass('menu-open').css('height', jQuery(window).innerHeight());
+                 $menuBtn.addClass('menu-open').attr('aria-expanded', 'true');
                  mobileMenuShow = 1;
-                 jQuery(this).addClass("menu-open");
              } else {
                  $header.removeClass('menu-open').css('height', 'auto');
+                 $menuBtn.removeClass('menu-open').attr('aria-expanded', 'false');
                  mobileMenuShow = 0;
-                 jQuery(this).removeClass("menu-open");
              }
+         };
+
+         jQuery('#menu-btn').off("click").on("click", function(e) {
+             e.preventDefault();
+             const isOpen = jQuery('header').hasClass('menu-open');
+             setMobileMenuState(!isOpen);
          });
+
+         jQuery(document)
+             .off("click.meriMobileMenu")
+             .on("click.meriMobileMenu", function(e) {
+                 const isMobile = window.matchMedia('(max-width: 992px)').matches;
+                 if (!isMobile) return;
+                 if (!jQuery('header').hasClass('menu-open')) return;
+                 const $target = jQuery(e.target);
+                 if ($target.closest('#menu-btn').length) return;
+                 if ($target.closest('#mainmenu').length) return;
+                 setMobileMenuState(false);
+             });
+
+         jQuery('#mainmenu a.menu-item')
+             .off("click.meriMobileMenu")
+             .on("click.meriMobileMenu", function() {
+                 const isMobile = window.matchMedia('(max-width: 992px)').matches;
+                 if (!isMobile) return;
+                 setMobileMenuState(false);
+             });
+
+         jQuery(window)
+             .off("resize.meriMobileMenu")
+             .on("resize.meriMobileMenu", function() {
+                 const isMobile = window.matchMedia('(max-width: 992px)').matches;
+                 if (!isMobile) {
+                     setMobileMenuState(false);
+                 }
+             });
 
          jQuery("a.btn").on("click", function(evn) {
              if (this.href.indexOf('#') === -1) {

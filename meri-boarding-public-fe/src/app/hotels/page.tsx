@@ -62,6 +62,9 @@ export default async function HotelsPage({ params }: HotelsPageProps = {}) {
             src="/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6821-Bearbeitet.jpg"
             className="jarallax-img"
             alt=""
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
           />
           <div className="container relative z-2">
             <div className="row justify-content-center">
@@ -145,7 +148,14 @@ export default async function HotelsPage({ params }: HotelsPageProps = {}) {
                     >
                       <div className="col-lg-5">
                         <div className="overflow-hidden rounded-1 media-frame">
-                          <img src={hotel.image} className="w-100 hover-scale-1-1" alt={hotel.name} />
+                          <img
+                            src={hotel.image}
+                            className="w-100 hover-scale-1-1"
+                            alt={hotel.name}
+                            loading="lazy"
+                            fetchPriority="low"
+                            decoding="async"
+                          />
                         </div>
                       </div>
                       <div className="col-lg-7">

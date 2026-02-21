@@ -1,9 +1,10 @@
-import Fastify from 'fastify';
+import Fastify, { type FastifyReply, type FastifyRequest } from 'fastify';
 import cors from '@fastify/cors';
 import dotenv from 'dotenv';
+import { spawn } from 'node:child_process';
 import { createHmac, randomBytes, scryptSync, timingSafeEqual } from 'node:crypto';
 import { createReadStream } from 'node:fs';
-import { mkdir, stat, unlink, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, readFile, rename, stat, unlink, writeFile } from 'node:fs/promises';
 import nodemailer from 'nodemailer';
 import path from 'node:path';
 import { MongoClient, ObjectId } from 'mongodb';
@@ -127,7 +128,7 @@ type HotelEntity = {
   updatedBy?: ObjectId;
 };
 
-type HomeSectionKey = 'hero' | 'rooms' | 'testimonials' | 'facilities' | 'gallery' | 'offers' | 'faq';
+type HomeSectionKey = 'hero' | 'bookingPartners' | 'rooms' | 'testimonials' | 'facilities' | 'gallery' | 'offers' | 'faq';
 
 type HomeSectionState = {
   enabled: boolean;
@@ -137,6 +138,12 @@ type HomeSectionState = {
 type HomeHeroSlide = {
   image: string;
   position: string;
+};
+
+type HomeBookingPartner = {
+  name: string;
+  logo: string;
+  url: string;
 };
 
 type HomeGalleryItem = {
@@ -251,6 +258,7 @@ type HomeCmsContent = {
     ctaQuote: string;
     ctaQuoteHref: string;
     slides: HomeHeroSlide[];
+    bookingPartners: HomeBookingPartner[];
   };
   rooms: {
     subtitle: string;
@@ -472,16 +480,17 @@ type ReservationCmsContent = {
 
 const allowedLocales: ContentLocale[] = ['de', 'en', 'tr'];
 const allowedGalleryCategories: HotelGalleryImage['category'][] = ['rooms', 'dining', 'facilities', 'other'];
-const homeSectionKeys: HomeSectionKey[] = ['hero', 'rooms', 'testimonials', 'facilities', 'gallery', 'offers', 'faq'];
+const homeSectionKeys: HomeSectionKey[] = ['hero', 'bookingPartners', 'rooms', 'testimonials', 'facilities', 'gallery', 'offers', 'faq'];
 const defaultHomeContent: HomeCmsContent = {
   sections: {
     hero: { enabled: true, order: 1 },
-    rooms: { enabled: true, order: 2 },
-    testimonials: { enabled: true, order: 3 },
-    facilities: { enabled: true, order: 4 },
-    gallery: { enabled: true, order: 5 },
-    offers: { enabled: true, order: 6 },
-    faq: { enabled: true, order: 7 },
+    bookingPartners: { enabled: true, order: 2 },
+    rooms: { enabled: true, order: 3 },
+    testimonials: { enabled: true, order: 4 },
+    facilities: { enabled: true, order: 5 },
+    gallery: { enabled: true, order: 6 },
+    offers: { enabled: true, order: 7 },
+    faq: { enabled: true, order: 8 },
   },
   hero: {
     titleLead: 'In Stuttgart,',
@@ -493,6 +502,7 @@ const defaultHomeContent: HomeCmsContent = {
     ctaLocationsHref: '/hotels',
     ctaQuote: 'Request a Quote Now',
     ctaQuoteHref: '/contact',
+    bookingPartners: [],
     slides: [
       { image: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6821-Bearbeitet.jpg', position: 'center 13%' },
       { image: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6699.jpg', position: 'center 45%' },
@@ -1060,6 +1070,26 @@ const avatarUploadDir = path.resolve(process.cwd(), 'uploads', 'avatars');
 const hotelUploadDir = path.resolve(process.cwd(), 'uploads', 'hotels');
 const homeUploadDir = path.resolve(process.cwd(), 'uploads', 'home');
 const defaultAvatarPath = '/images/avatars/user-silhouette.svg';
+const assetCacheDir = path.resolve(process.cwd(), 'uploads', '.cache');
+const cwebpBinary = String(process.env.CWEBP_BIN || 'cwebp').trim() || 'cwebp';
+const uploadImageQuality = Math.min(95, Math.max(55, Number(process.env.UPLOAD_IMAGE_QUALITY || 82)));
+const uploadImageMaxDimension = Math.max(640, Number(process.env.UPLOAD_IMAGE_MAX_DIMENSION || 2200));
+const assetImageQuality = Math.min(95, Math.max(55, Number(process.env.ASSET_IMAGE_QUALITY || 80)));
+const assetWidthCeiling = Math.max(640, Number(process.env.ASSET_IMAGE_MAX_WIDTH || 2560));
+const assetPrewarmOnStart = String(process.env.ASSET_PREWARM_ON_START || '').trim().toLowerCase() === 'true';
+const assetPrewarmWidths = String(process.env.ASSET_PREWARM_WIDTHS || '640,1280,1920')
+  .split(',')
+  .map((value) => Number(String(value || '').trim()))
+  .filter((value) => Number.isFinite(value))
+  .map((value) => Math.round(value))
+  .filter((value) => value >= 256 && value <= assetWidthCeiling)
+  .slice(0, 8);
+const imageVariantInFlight = new Map<string, Promise<boolean>>();
+
+type ImageFormat = 'jpg' | 'png' | 'webp';
+type AssetBucket = 'avatars' | 'hotels' | 'home';
+type ImageDimensions = { width: number; height: number };
+type UploadedImageResult = { fileName: string; url: string; optimized: boolean };
 
 function hashPassword(password: string) {
   const salt = randomBytes(16).toString('hex');
@@ -1183,6 +1213,329 @@ function parseDataUrl(dataUrl: string) {
   const base64 = match[2];
   const ext = mime.includes('png') ? 'png' : mime.includes('webp') ? 'webp' : 'jpg';
   return { mime, ext, buffer: Buffer.from(base64, 'base64') };
+}
+
+function extToMime(ext: string) {
+  const normalized = String(ext || '').toLowerCase();
+  if (normalized === 'png') return 'image/png';
+  if (normalized === 'webp') return 'image/webp';
+  return 'image/jpeg';
+}
+
+function parseRequestedDimension(input: unknown, min: number, max: number) {
+  const value = Number(String(input ?? '').trim());
+  if (!Number.isFinite(value)) return null;
+  const rounded = Math.round(value);
+  if (rounded < min || rounded > max) return null;
+  return rounded;
+}
+
+function sanitizeStem(input: string, fallback = 'image') {
+  const stem = sanitizeFilename(String(input || '').trim()).replace(/\.+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+  return stem || fallback;
+}
+
+function detectImageFormatFromBuffer(buffer: Buffer): ImageFormat | null {
+  if (buffer.length < 12) return null;
+  if (buffer[0] === 0xff && buffer[1] === 0xd8) return 'jpg';
+  if (buffer[0] === 0x89 && buffer[1] === 0x50 && buffer[2] === 0x4e && buffer[3] === 0x47) return 'png';
+  if (buffer.subarray(0, 4).toString('ascii') === 'RIFF' && buffer.subarray(8, 12).toString('ascii') === 'WEBP') return 'webp';
+  return null;
+}
+
+function parsePngDimensions(buffer: Buffer): ImageDimensions | null {
+  if (buffer.length < 24) return null;
+  if (buffer.subarray(12, 16).toString('ascii') !== 'IHDR') return null;
+  const width = buffer.readUInt32BE(16);
+  const height = buffer.readUInt32BE(20);
+  if (!width || !height) return null;
+  return { width, height };
+}
+
+function parseJpegDimensions(buffer: Buffer): ImageDimensions | null {
+  if (buffer.length < 4 || buffer[0] !== 0xff || buffer[1] !== 0xd8) return null;
+  let offset = 2;
+  while (offset + 9 < buffer.length) {
+    if (buffer[offset] !== 0xff) {
+      offset += 1;
+      continue;
+    }
+    let marker = buffer[offset + 1];
+    while (marker === 0xff) {
+      offset += 1;
+      marker = buffer[offset + 1];
+    }
+    offset += 2;
+    if (marker === 0xd8 || marker === 0xd9) continue;
+    if (offset + 2 > buffer.length) break;
+    const segmentLength = buffer.readUInt16BE(offset);
+    if (segmentLength < 2 || offset + segmentLength > buffer.length) break;
+    const isSofMarker =
+      (marker >= 0xc0 && marker <= 0xc3) ||
+      (marker >= 0xc5 && marker <= 0xc7) ||
+      (marker >= 0xc9 && marker <= 0xcb) ||
+      (marker >= 0xcd && marker <= 0xcf);
+    if (isSofMarker && offset + 7 < buffer.length) {
+      const height = buffer.readUInt16BE(offset + 3);
+      const width = buffer.readUInt16BE(offset + 5);
+      if (width > 0 && height > 0) return { width, height };
+    }
+    offset += segmentLength;
+  }
+  return null;
+}
+
+function parseWebpDimensions(buffer: Buffer): ImageDimensions | null {
+  if (buffer.length < 30) return null;
+  if (buffer.subarray(0, 4).toString('ascii') !== 'RIFF' || buffer.subarray(8, 12).toString('ascii') !== 'WEBP') {
+    return null;
+  }
+
+  let offset = 12;
+  while (offset + 8 <= buffer.length) {
+    const chunkType = buffer.subarray(offset, offset + 4).toString('ascii');
+    const chunkSize = buffer.readUInt32LE(offset + 4);
+    const chunkStart = offset + 8;
+    if (chunkStart + chunkSize > buffer.length) break;
+
+    if (chunkType === 'VP8X' && chunkSize >= 10) {
+      const width = 1 + buffer.readUIntLE(chunkStart + 4, 3);
+      const height = 1 + buffer.readUIntLE(chunkStart + 7, 3);
+      if (width > 0 && height > 0) return { width, height };
+    }
+
+    if (chunkType === 'VP8 ' && chunkSize >= 10) {
+      const signature = buffer.readUIntLE(chunkStart + 3, 3);
+      if (signature === 0x2a019d) {
+        const width = buffer.readUInt16LE(chunkStart + 6) & 0x3fff;
+        const height = buffer.readUInt16LE(chunkStart + 8) & 0x3fff;
+        if (width > 0 && height > 0) return { width, height };
+      }
+    }
+
+    if (chunkType === 'VP8L' && chunkSize >= 5 && buffer[chunkStart] === 0x2f) {
+      const b1 = buffer[chunkStart + 1];
+      const b2 = buffer[chunkStart + 2];
+      const b3 = buffer[chunkStart + 3];
+      const b4 = buffer[chunkStart + 4];
+      const width = 1 + (b1 | ((b2 & 0x3f) << 8));
+      const height = 1 + ((b2 >> 6) | (b3 << 2) | ((b4 & 0x0f) << 10));
+      if (width > 0 && height > 0) return { width, height };
+    }
+
+    offset = chunkStart + chunkSize + (chunkSize % 2);
+  }
+
+  return null;
+}
+
+function getImageDimensions(buffer: Buffer): ImageDimensions | null {
+  const format = detectImageFormatFromBuffer(buffer);
+  if (format === 'png') return parsePngDimensions(buffer);
+  if (format === 'jpg') return parseJpegDimensions(buffer);
+  if (format === 'webp') return parseWebpDimensions(buffer);
+  return null;
+}
+
+function constrainByMaxDimension(dimensions: ImageDimensions, maxDimension: number): ImageDimensions {
+  const maxSide = Math.max(dimensions.width, dimensions.height);
+  if (!maxSide || maxSide <= maxDimension) return dimensions;
+  const ratio = maxDimension / maxSide;
+  return {
+    width: Math.max(1, Math.round(dimensions.width * ratio)),
+    height: Math.max(1, Math.round(dimensions.height * ratio)),
+  };
+}
+
+function constrainByTargetWidth(dimensions: ImageDimensions, targetWidth: number): ImageDimensions | null {
+  if (!dimensions.width || !dimensions.height || targetWidth <= 0) return null;
+  if (dimensions.width <= targetWidth) return null;
+  const ratio = targetWidth / dimensions.width;
+  return { width: targetWidth, height: Math.max(1, Math.round(dimensions.height * ratio)) };
+}
+
+function supportsWebp(acceptHeader?: string) {
+  return /\bimage\/webp\b/i.test(String(acceptHeader || ''));
+}
+
+async function runCwebp(
+  inputPath: string,
+  outputPath: string,
+  quality: number,
+  resize?: ImageDimensions | null,
+): Promise<boolean> {
+  const args = ['-quiet', '-mt', '-q', String(Math.round(Math.min(95, Math.max(55, quality))))];
+  if (resize?.width && resize?.height) {
+    args.push('-resize', String(resize.width), String(resize.height));
+  }
+  args.push(inputPath, '-o', outputPath);
+
+  return await new Promise((resolve) => {
+    const child = spawn(cwebpBinary, args, { stdio: 'ignore' });
+    child.once('error', () => resolve(false));
+    child.once('close', (code) => resolve(code === 0));
+  });
+}
+
+type SaveUploadedImageOptions = {
+  uploadDir: string;
+  bucket: AssetBucket;
+  filePrefix: string;
+  requestedName: string;
+  sourceExt: ImageFormat;
+  sourceBuffer: Buffer;
+  maxDimension?: number;
+  quality?: number;
+};
+
+async function saveUploadedImage(options: SaveUploadedImageOptions): Promise<UploadedImageResult> {
+  const maxDimension = Math.max(640, Number(options.maxDimension || uploadImageMaxDimension));
+  const quality = Math.round(Math.min(95, Math.max(55, Number(options.quality || uploadImageQuality))));
+  const sourceExt: ImageFormat = options.sourceExt === 'png' || options.sourceExt === 'webp' ? options.sourceExt : 'jpg';
+  const prefix = sanitizeStem(options.filePrefix, 'asset');
+  const stem = sanitizeStem(path.parse(options.requestedName).name, 'image');
+  const nonce = `${Date.now()}-${randomBytes(4).toString('hex')}`;
+  const baseName = `${prefix}-${nonce}-${stem}`.replace(/-+/g, '-');
+  const tempInputPath = path.join(options.uploadDir, `.tmp-${baseName}.${sourceExt}`);
+  const outputFileName = `${baseName}.webp`;
+  const outputPath = path.join(options.uploadDir, outputFileName);
+
+  await writeFile(tempInputPath, options.sourceBuffer);
+  let optimized = false;
+
+  try {
+    const dimensions = getImageDimensions(options.sourceBuffer);
+    const resize = dimensions ? constrainByMaxDimension(dimensions, maxDimension) : null;
+    const shouldResize =
+      resize && dimensions ? resize.width !== dimensions.width || resize.height !== dimensions.height : false;
+    optimized = await runCwebp(tempInputPath, outputPath, quality, shouldResize ? resize : null);
+  } finally {
+    await unlink(tempInputPath).catch(() => undefined);
+  }
+
+  if (optimized) {
+    return {
+      fileName: outputFileName,
+      url: `/api/v1/assets/${options.bucket}/${outputFileName}`,
+      optimized: true,
+    };
+  }
+
+  const fallbackFileName = `${baseName}.${sourceExt}`;
+  await writeFile(path.join(options.uploadDir, fallbackFileName), options.sourceBuffer);
+  return {
+    fileName: fallbackFileName,
+    url: `/api/v1/assets/${options.bucket}/${fallbackFileName}`,
+    optimized: false,
+  };
+}
+
+type AssetVariantOptions = {
+  bucket: AssetBucket;
+  sourceFilePath: string;
+  sourceFileName: string;
+  sourceSize: number;
+  sourceMtimeMs: number;
+  width?: number | null;
+  quality?: number | null;
+};
+
+async function getOrCreateWebpVariant(options: AssetVariantOptions): Promise<string | null> {
+  const cacheBucketDir = path.join(assetCacheDir, options.bucket);
+  await mkdir(cacheBucketDir, { recursive: true });
+
+  const width = options.width && Number.isFinite(options.width) ? Math.round(options.width) : 0;
+  const quality = Math.round(
+    Math.min(95, Math.max(55, Number(options.quality && Number.isFinite(options.quality) ? options.quality : assetImageQuality))),
+  );
+  const sourceStem = sanitizeStem(path.parse(options.sourceFileName).name, 'asset');
+  const variantName = `${sourceStem}-${Math.round(options.sourceMtimeMs)}-${options.sourceSize}-w${width}-q${quality}.webp`;
+  const variantPath = path.join(cacheBucketDir, variantName);
+
+  try {
+    await stat(variantPath);
+    return variantPath;
+  } catch {}
+
+  const jobKey = `${options.bucket}:${variantName}`;
+  let pending = imageVariantInFlight.get(jobKey);
+
+  if (!pending) {
+    pending = (async () => {
+      const tempOutputPath = `${variantPath}.tmp-${randomBytes(4).toString('hex')}`;
+      try {
+        let resize: ImageDimensions | null = null;
+        if (width > 0) {
+          const bytes = await readFile(options.sourceFilePath);
+          const dimensions = getImageDimensions(bytes);
+          resize = dimensions ? constrainByTargetWidth(dimensions, width) : null;
+        }
+        const generated = await runCwebp(options.sourceFilePath, tempOutputPath, quality, resize);
+        if (!generated) return false;
+        await rename(tempOutputPath, variantPath);
+        return true;
+      } catch (error) {
+        server.log.warn({ err: error }, 'Could not generate cached image variant');
+        await unlink(tempOutputPath).catch(() => undefined);
+        return false;
+      }
+    })().finally(() => {
+      imageVariantInFlight.delete(jobKey);
+    });
+
+    imageVariantInFlight.set(jobKey, pending);
+  }
+
+  const ok = await pending;
+  return ok ? variantPath : null;
+}
+
+async function prewarmAssetBucket(
+  bucket: AssetBucket,
+  uploadDir: string,
+  widths: number[],
+  includeBase = true,
+): Promise<{ scanned: number; generated: number }> {
+  let scanned = 0;
+  let generated = 0;
+  const entries = await readdir(uploadDir, { withFileTypes: true }).catch(() => []);
+  for (const entry of entries) {
+    if (!entry.isFile()) continue;
+    if (entry.name.startsWith('.')) continue;
+    const ext = path.extname(entry.name).toLowerCase().replace('.', '');
+    if (ext !== 'jpg' && ext !== 'jpeg' && ext !== 'png' && ext !== 'webp') continue;
+    const sourcePath = path.join(uploadDir, entry.name);
+    const sourceStat = await stat(sourcePath).catch(() => null);
+    if (!sourceStat) continue;
+    scanned += 1;
+
+    if (includeBase) {
+      const baseVariant = await getOrCreateWebpVariant({
+        bucket,
+        sourceFilePath: sourcePath,
+        sourceFileName: entry.name,
+        sourceSize: sourceStat.size,
+        sourceMtimeMs: sourceStat.mtimeMs,
+        width: null,
+        quality: assetImageQuality,
+      });
+      if (baseVariant) generated += 1;
+    }
+
+    for (const width of widths) {
+      const variant = await getOrCreateWebpVariant({
+        bucket,
+        sourceFilePath: sourcePath,
+        sourceFileName: entry.name,
+        sourceSize: sourceStat.size,
+        sourceMtimeMs: sourceStat.mtimeMs,
+        width,
+        quality: assetImageQuality,
+      });
+      if (variant) generated += 1;
+    }
+  }
+  return { scanned, generated };
 }
 
 async function getDb() {
@@ -1383,6 +1736,9 @@ function normalizeHomeContent(input: Partial<HomeCmsContent> | undefined, fallba
   }, {} as Record<HomeSectionKey, HomeSectionState>);
 
   const heroSlidesSource = Array.isArray(input?.hero?.slides) ? input?.hero?.slides : fallback.hero.slides;
+  const bookingPartnersSource = Array.isArray(input?.hero?.bookingPartners)
+    ? input?.hero?.bookingPartners
+    : fallback.hero.bookingPartners;
   const gallerySource = Array.isArray(input?.gallery?.items) ? input?.gallery?.items : fallback.gallery.items;
   const galleryCategoriesSource = Array.isArray(input?.gallery?.categories) ? input?.gallery?.categories : fallback.gallery.categories;
   const offersSource = Array.isArray(input?.offers?.cards) ? input?.offers?.cards : fallback.offers.cards;
@@ -1444,6 +1800,14 @@ function normalizeHomeContent(input: Partial<HomeCmsContent> | undefined, fallba
       ctaLocationsHref: String(input?.hero?.ctaLocationsHref ?? fallback.hero.ctaLocationsHref ?? '').trim(),
       ctaQuote: String(input?.hero?.ctaQuote ?? fallback.hero.ctaQuote ?? '').trim(),
       ctaQuoteHref: String(input?.hero?.ctaQuoteHref ?? fallback.hero.ctaQuoteHref ?? '').trim(),
+      bookingPartners: bookingPartnersSource
+        .map((item) => ({
+          name: String(item?.name || '').trim(),
+          logo: String(item?.logo || '').trim(),
+          url: String(item?.url || '').trim(),
+        }))
+        .filter((item) => Boolean(item.name) || Boolean(item.logo) || Boolean(item.url))
+        .slice(0, 12),
       slides: heroSlidesSource
         .map((item) => ({
           image: String(item?.image || '').trim(),
@@ -1555,6 +1919,20 @@ function validateHomeContent(input: HomeCmsContent) {
     if (!slide.image) return 'Hero slide image is required';
     if (!isValidBackgroundPosition(slide.position)) {
       return 'Hero slide position is invalid. Example: "center 35%"';
+    }
+  }
+  if (!Array.isArray(input.hero.bookingPartners)) {
+    return 'Hero booking partners must be an array';
+  }
+  if (input.hero.bookingPartners.length > 12) {
+    return 'Hero booking partner limit is 12';
+  }
+  for (const [index, partner] of input.hero.bookingPartners.entries()) {
+    if (!partner.name || !partner.logo || !partner.url) {
+      return `Booking partner ${index + 1}: name, logo and link are required`;
+    }
+    if (!isValidLink(partner.url)) {
+      return `Booking partner ${index + 1}: link must start with "/" or "http(s)://"`;
     }
   }
 
@@ -2891,6 +3269,9 @@ async function ensureStorageFolders() {
   await mkdir(avatarUploadDir, { recursive: true });
   await mkdir(hotelUploadDir, { recursive: true });
   await mkdir(homeUploadDir, { recursive: true });
+  await mkdir(path.join(assetCacheDir, 'avatars'), { recursive: true });
+  await mkdir(path.join(assetCacheDir, 'hotels'), { recursive: true });
+  await mkdir(path.join(assetCacheDir, 'home'), { recursive: true });
 }
 
 async function getRequestAdmin(authorization?: string) {
@@ -3218,58 +3599,65 @@ server.get('/api/v1/public/hotels/:slug', async (request, reply) => {
   });
 });
 
-server.get('/api/v1/assets/avatars/:fileName', async (request, reply) => {
-  const params = request.params as { fileName?: string };
-  const fileName = sanitizeFilename(String(params.fileName || ''));
+type AssetRouteRequest = FastifyRequest<{
+  Params: { fileName?: string };
+  Querystring: { w?: string; q?: string; original?: string };
+}>;
 
+async function serveAssetRequest(request: AssetRouteRequest, reply: FastifyReply, bucket: AssetBucket, uploadDir: string) {
+  const fileName = sanitizeFilename(String(request.params.fileName || ''));
   if (!fileName) {
     return reply.code(404).send({ error: 'File not found' });
   }
 
-  const filePath = path.join(avatarUploadDir, fileName);
-
-  try {
-    await stat(filePath);
-    return reply.type('image/*').send(createReadStream(filePath));
-  } catch {
+  const filePath = path.join(uploadDir, fileName);
+  const sourceStats = await stat(filePath).catch(() => null);
+  if (!sourceStats) {
     return reply.code(404).send({ error: 'File not found' });
   }
+
+  const query = request.query || {};
+  const forceOriginal = String(query.original || '').trim() === '1';
+  const requestedWidth = parseRequestedDimension(query.w, 256, assetWidthCeiling);
+  const requestedQuality = parseRequestedDimension(query.q, 55, 95);
+  const sourceExt = path.extname(fileName).toLowerCase().replace('.', '');
+  const isImageSource = sourceExt === 'jpg' || sourceExt === 'jpeg' || sourceExt === 'png' || sourceExt === 'webp';
+  const shouldTryWebp = !forceOriginal && isImageSource && supportsWebp(request.headers.accept);
+
+  if (shouldTryWebp && (sourceExt !== 'webp' || Boolean(requestedWidth))) {
+    const variantPath = await getOrCreateWebpVariant({
+      bucket,
+      sourceFilePath: filePath,
+      sourceFileName: fileName,
+      sourceSize: sourceStats.size,
+      sourceMtimeMs: sourceStats.mtimeMs,
+      width: requestedWidth,
+      quality: requestedQuality,
+    });
+    if (variantPath) {
+      reply.header('Cache-Control', 'public, max-age=31536000, immutable');
+      reply.header('Vary', 'Accept');
+      return reply.type('image/webp').send(createReadStream(variantPath));
+    }
+  }
+
+  reply.header('Cache-Control', 'public, max-age=31536000, immutable');
+  if (isImageSource) {
+    reply.header('Vary', 'Accept');
+  }
+  return reply.type(extToMime(sourceExt)).send(createReadStream(filePath));
+}
+
+server.get('/api/v1/assets/avatars/:fileName', async (request, reply) => {
+  return serveAssetRequest(request as AssetRouteRequest, reply, 'avatars', avatarUploadDir);
 });
 
 server.get('/api/v1/assets/hotels/:fileName', async (request, reply) => {
-  const params = request.params as { fileName?: string };
-  const fileName = sanitizeFilename(String(params.fileName || ''));
-
-  if (!fileName) {
-    return reply.code(404).send({ error: 'File not found' });
-  }
-
-  const filePath = path.join(hotelUploadDir, fileName);
-
-  try {
-    await stat(filePath);
-    return reply.type('image/*').send(createReadStream(filePath));
-  } catch {
-    return reply.code(404).send({ error: 'File not found' });
-  }
+  return serveAssetRequest(request as AssetRouteRequest, reply, 'hotels', hotelUploadDir);
 });
 
 server.get('/api/v1/assets/home/:fileName', async (request, reply) => {
-  const params = request.params as { fileName?: string };
-  const fileName = sanitizeFilename(String(params.fileName || ''));
-
-  if (!fileName) {
-    return reply.code(404).send({ error: 'File not found' });
-  }
-
-  const filePath = path.join(homeUploadDir, fileName);
-
-  try {
-    await stat(filePath);
-    return reply.type('image/*').send(createReadStream(filePath));
-  } catch {
-    return reply.code(404).send({ error: 'File not found' });
-  }
+  return serveAssetRequest(request as AssetRouteRequest, reply, 'home', homeUploadDir);
 });
 
 server.post('/api/v1/auth/login', async (request, reply) => {
@@ -3467,12 +3855,19 @@ server.post('/api/v1/auth/me/avatar', async (request, reply) => {
     return reply.code(400).send({ error: 'Image size cannot exceed 5MB' });
   }
 
-  const nowStamp = Date.now();
-  const requestedName = sanitizeFilename(String(body?.fileName || `avatar-${nowStamp}.${parsed.ext}`));
-  const fileName = `${admin._id.toHexString()}-${nowStamp}-${requestedName}`.replace(/\.+/g, '.');
-  const filePath = path.join(avatarUploadDir, fileName);
-
-  await writeFile(filePath, parsed.buffer);
+  const requestedName = sanitizeFilename(String(body?.fileName || `avatar.${parsed.ext}`));
+  const sourceExt: ImageFormat = parsed.ext === 'png' || parsed.ext === 'webp' ? parsed.ext : 'jpg';
+  const savedAvatar = await saveUploadedImage({
+    uploadDir: avatarUploadDir,
+    bucket: 'avatars',
+    filePrefix: admin._id.toHexString(),
+    requestedName,
+    sourceExt,
+    sourceBuffer: parsed.buffer,
+    maxDimension: 720,
+    quality: 86,
+  });
+  const fileName = savedAvatar.fileName;
 
   if (admin.avatarPath) {
     const oldPath = path.join(avatarUploadDir, sanitizeFilename(admin.avatarPath));
@@ -3864,23 +4259,40 @@ server.post('/api/v1/admin/hotels/:hotelId/gallery', async (request, reply) => {
     return reply.code(404).send({ error: 'Hotel not found' });
   }
 
-  const requestedName = sanitizeFilename(String(body?.fileName || `hotel-${Date.now()}.${parsed.ext}`));
-  const fileName = `${row.slug}-${Date.now()}-${requestedName}`.replace(/\.+/g, '.');
-  const filePath = path.join(hotelUploadDir, fileName);
-  await writeFile(filePath, parsed.buffer);
+  const requestedName = sanitizeFilename(String(body?.fileName || `hotel.${parsed.ext}`));
+  const sourceExt: ImageFormat = parsed.ext === 'png' || parsed.ext === 'webp' ? parsed.ext : 'jpg';
+  const savedMain = await saveUploadedImage({
+    uploadDir: hotelUploadDir,
+    bucket: 'hotels',
+    filePrefix: row.slug,
+    requestedName,
+    sourceExt,
+    sourceBuffer: parsed.buffer,
+    maxDimension: 2400,
+    quality: 82,
+  });
+
   let thumbnailUrl = '';
   if (thumbnailParsed) {
-    const thumbName = `${row.slug}-${Date.now()}-thumb-${requestedName}`.replace(/\.+/g, '.');
-    const thumbPath = path.join(hotelUploadDir, thumbName);
-    await writeFile(thumbPath, thumbnailParsed.buffer);
-    thumbnailUrl = `/api/v1/assets/hotels/${thumbName}`;
+    const thumbnailExt: ImageFormat = thumbnailParsed.ext === 'png' || thumbnailParsed.ext === 'webp' ? thumbnailParsed.ext : 'jpg';
+    const savedThumbnail = await saveUploadedImage({
+      uploadDir: hotelUploadDir,
+      bucket: 'hotels',
+      filePrefix: `${row.slug}-thumb`,
+      requestedName,
+      sourceExt: thumbnailExt,
+      sourceBuffer: thumbnailParsed.buffer,
+      maxDimension: 900,
+      quality: 78,
+    });
+    thumbnailUrl = savedThumbnail.url;
   }
 
   const current = normalizeHotelLocaleContent('en', row.locales?.en, row.locales?.[locale]);
   const image: HotelGalleryImage = {
     id: randomBytes(12).toString('hex'),
-    url: `/api/v1/assets/hotels/${fileName}`,
-    thumbnailUrl: thumbnailUrl || `/api/v1/assets/hotels/${fileName}`,
+    url: savedMain.url,
+    thumbnailUrl: thumbnailUrl || savedMain.url,
     category: parseGalleryCategory(body?.category),
     alt: String(body?.alt || `${current.name} image`).trim(),
     sortOrder: current.gallery.length + 1,
@@ -3941,12 +4353,19 @@ server.post('/api/v1/admin/hotels/:hotelId/cover', async (request, reply) => {
     return reply.code(404).send({ error: 'Hotel not found' });
   }
 
-  const requestedName = sanitizeFilename(String(body?.fileName || `cover-${Date.now()}.${parsed.ext}`));
-  const fileName = `${row.slug}-${Date.now()}-${requestedName}`.replace(/\.+/g, '.');
-  const filePath = path.join(hotelUploadDir, fileName);
-  await writeFile(filePath, parsed.buffer);
-
-  const coverImageUrl = `/api/v1/assets/hotels/${fileName}`;
+  const requestedName = sanitizeFilename(String(body?.fileName || `cover.${parsed.ext}`));
+  const sourceExt: ImageFormat = parsed.ext === 'png' || parsed.ext === 'webp' ? parsed.ext : 'jpg';
+  const savedCover = await saveUploadedImage({
+    uploadDir: hotelUploadDir,
+    bucket: 'hotels',
+    filePrefix: `${row.slug}-cover`,
+    requestedName,
+    sourceExt,
+    sourceBuffer: parsed.buffer,
+    maxDimension: 2400,
+    quality: 82,
+  });
+  const coverImageUrl = savedCover.url;
 
   await hotels.updateOne(
     { _id: row._id },
@@ -4499,6 +4918,42 @@ server.put('/api/v1/admin/content/home', async (request, reply) => {
     }
   }
 
+  // Keep booking partners shared for all locales.
+  if (Array.isArray(body?.content?.hero?.bookingPartners)) {
+    for (const localeKey of allowedLocales) {
+      if (localeKey === locale) continue;
+      const row = await contents.findOne({ key: 'page.home', locale: localeKey });
+      const current = row ? normalizeHomeContent(row.value, defaultHomeContent) : defaultHomeContent;
+      const patched = normalizeHomeContent(
+        {
+          ...current,
+          hero: {
+            ...current.hero,
+            bookingPartners: nextContent.hero.bookingPartners,
+          },
+        },
+        current,
+      );
+      await contents.updateOne(
+        { key: 'page.home', locale: localeKey },
+        {
+          $set: {
+            value: patched,
+            updatedAt: now,
+            updatedBy: admin._id,
+          },
+          $setOnInsert: {
+            _id: new ObjectId(),
+            key: 'page.home',
+            locale: localeKey,
+            createdAt: now,
+          },
+        },
+        { upsert: true },
+      );
+    }
+  }
+
   // Keep rooms card image + icon shared for all locales.
   if (body?.content?.rooms?.cards) {
     for (const localeKey of allowedLocales) {
@@ -4711,12 +5166,20 @@ server.post('/api/v1/admin/content/home/hero-image', async (request, reply) => {
     return reply.code(400).send({ error: 'Image size cannot exceed 8MB' });
   }
 
-  const requestedName = sanitizeFilename(String(body?.fileName || `home-hero-${Date.now()}.${parsed.ext}`));
-  const fileName = `home-hero-${Date.now()}-${requestedName}`.replace(/\.+/g, '.');
-  const filePath = path.join(homeUploadDir, fileName);
-  await writeFile(filePath, parsed.buffer);
+  const requestedName = sanitizeFilename(String(body?.fileName || `home-hero.${parsed.ext}`));
+  const sourceExt: ImageFormat = parsed.ext === 'png' || parsed.ext === 'webp' ? parsed.ext : 'jpg';
+  const savedImage = await saveUploadedImage({
+    uploadDir: homeUploadDir,
+    bucket: 'home',
+    filePrefix: 'home-hero',
+    requestedName,
+    sourceExt,
+    sourceBuffer: parsed.buffer,
+    maxDimension: 2400,
+    quality: 82,
+  });
 
-  return reply.send({ ok: true, imageUrl: `/api/v1/assets/home/${fileName}` });
+  return reply.send({ ok: true, imageUrl: savedImage.url });
 });
 
 server.post('/api/v1/admin/content/home/rooms-image', async (request, reply) => {
@@ -4734,12 +5197,20 @@ server.post('/api/v1/admin/content/home/rooms-image', async (request, reply) => 
     return reply.code(400).send({ error: 'Image size cannot exceed 8MB' });
   }
 
-  const requestedName = sanitizeFilename(String(body?.fileName || `home-rooms-${Date.now()}.${parsed.ext}`));
-  const fileName = `home-rooms-${Date.now()}-${requestedName}`.replace(/\.+/g, '.');
-  const filePath = path.join(homeUploadDir, fileName);
-  await writeFile(filePath, parsed.buffer);
+  const requestedName = sanitizeFilename(String(body?.fileName || `home-rooms.${parsed.ext}`));
+  const sourceExt: ImageFormat = parsed.ext === 'png' || parsed.ext === 'webp' ? parsed.ext : 'jpg';
+  const savedImage = await saveUploadedImage({
+    uploadDir: homeUploadDir,
+    bucket: 'home',
+    filePrefix: 'home-rooms',
+    requestedName,
+    sourceExt,
+    sourceBuffer: parsed.buffer,
+    maxDimension: 2200,
+    quality: 82,
+  });
 
-  return reply.send({ ok: true, imageUrl: `/api/v1/assets/home/${fileName}` });
+  return reply.send({ ok: true, imageUrl: savedImage.url });
 });
 
 server.post('/api/v1/admin/content/home/testimonials-image', async (request, reply) => {
@@ -4757,12 +5228,20 @@ server.post('/api/v1/admin/content/home/testimonials-image', async (request, rep
     return reply.code(400).send({ error: 'Image size cannot exceed 8MB' });
   }
 
-  const requestedName = sanitizeFilename(String(body?.fileName || `home-testimonials-${Date.now()}.${parsed.ext}`));
-  const fileName = `home-testimonials-${Date.now()}-${requestedName}`.replace(/\.+/g, '.');
-  const filePath = path.join(homeUploadDir, fileName);
-  await writeFile(filePath, parsed.buffer);
+  const requestedName = sanitizeFilename(String(body?.fileName || `home-testimonials.${parsed.ext}`));
+  const sourceExt: ImageFormat = parsed.ext === 'png' || parsed.ext === 'webp' ? parsed.ext : 'jpg';
+  const savedImage = await saveUploadedImage({
+    uploadDir: homeUploadDir,
+    bucket: 'home',
+    filePrefix: 'home-testimonials',
+    requestedName,
+    sourceExt,
+    sourceBuffer: parsed.buffer,
+    maxDimension: 2200,
+    quality: 82,
+  });
 
-  return reply.send({ ok: true, imageUrl: `/api/v1/assets/home/${fileName}` });
+  return reply.send({ ok: true, imageUrl: savedImage.url });
 });
 
 server.post('/api/v1/admin/content/home/facilities-image', async (request, reply) => {
@@ -4780,12 +5259,20 @@ server.post('/api/v1/admin/content/home/facilities-image', async (request, reply
     return reply.code(400).send({ error: 'Image size cannot exceed 8MB' });
   }
 
-  const requestedName = sanitizeFilename(String(body?.fileName || `home-facilities-${Date.now()}.${parsed.ext}`));
-  const fileName = `home-facilities-${Date.now()}-${requestedName}`.replace(/\.+/g, '.');
-  const filePath = path.join(homeUploadDir, fileName);
-  await writeFile(filePath, parsed.buffer);
+  const requestedName = sanitizeFilename(String(body?.fileName || `home-facilities.${parsed.ext}`));
+  const sourceExt: ImageFormat = parsed.ext === 'png' || parsed.ext === 'webp' ? parsed.ext : 'jpg';
+  const savedImage = await saveUploadedImage({
+    uploadDir: homeUploadDir,
+    bucket: 'home',
+    filePrefix: 'home-facilities',
+    requestedName,
+    sourceExt,
+    sourceBuffer: parsed.buffer,
+    maxDimension: 2200,
+    quality: 82,
+  });
 
-  return reply.send({ ok: true, imageUrl: `/api/v1/assets/home/${fileName}` });
+  return reply.send({ ok: true, imageUrl: savedImage.url });
 });
 
 server.post('/api/v1/admin/content/home/gallery-image', async (request, reply) => {
@@ -4803,12 +5290,20 @@ server.post('/api/v1/admin/content/home/gallery-image', async (request, reply) =
     return reply.code(400).send({ error: 'Image size cannot exceed 8MB' });
   }
 
-  const requestedName = sanitizeFilename(String(body?.fileName || `home-gallery-${Date.now()}.${parsed.ext}`));
-  const fileName = `home-gallery-${Date.now()}-${requestedName}`.replace(/\.+/g, '.');
-  const filePath = path.join(homeUploadDir, fileName);
-  await writeFile(filePath, parsed.buffer);
+  const requestedName = sanitizeFilename(String(body?.fileName || `home-gallery.${parsed.ext}`));
+  const sourceExt: ImageFormat = parsed.ext === 'png' || parsed.ext === 'webp' ? parsed.ext : 'jpg';
+  const savedImage = await saveUploadedImage({
+    uploadDir: homeUploadDir,
+    bucket: 'home',
+    filePrefix: 'home-gallery',
+    requestedName,
+    sourceExt,
+    sourceBuffer: parsed.buffer,
+    maxDimension: 2200,
+    quality: 82,
+  });
 
-  return reply.send({ ok: true, imageUrl: `/api/v1/assets/home/${fileName}` });
+  return reply.send({ ok: true, imageUrl: savedImage.url });
 });
 
 server.post('/api/v1/admin/content/home/offers-image', async (request, reply) => {
@@ -4826,12 +5321,20 @@ server.post('/api/v1/admin/content/home/offers-image', async (request, reply) =>
     return reply.code(400).send({ error: 'Image size cannot exceed 8MB' });
   }
 
-  const requestedName = sanitizeFilename(String(body?.fileName || `home-offers-${Date.now()}.${parsed.ext}`));
-  const fileName = `home-offers-${Date.now()}-${requestedName}`.replace(/\.+/g, '.');
-  const filePath = path.join(homeUploadDir, fileName);
-  await writeFile(filePath, parsed.buffer);
+  const requestedName = sanitizeFilename(String(body?.fileName || `home-offers.${parsed.ext}`));
+  const sourceExt: ImageFormat = parsed.ext === 'png' || parsed.ext === 'webp' ? parsed.ext : 'jpg';
+  const savedImage = await saveUploadedImage({
+    uploadDir: homeUploadDir,
+    bucket: 'home',
+    filePrefix: 'home-offers',
+    requestedName,
+    sourceExt,
+    sourceBuffer: parsed.buffer,
+    maxDimension: 2200,
+    quality: 82,
+  });
 
-  return reply.send({ ok: true, imageUrl: `/api/v1/assets/home/${fileName}` });
+  return reply.send({ ok: true, imageUrl: savedImage.url });
 });
 
 server.post('/api/v1/admin/content/page-image', async (request, reply) => {
@@ -4850,12 +5353,52 @@ server.post('/api/v1/admin/content/page-image', async (request, reply) => {
   }
 
   const context = sanitizeFilename(String(body?.context || 'page')).replace(/\.+/g, '-').slice(0, 24) || 'page';
-  const requestedName = sanitizeFilename(String(body?.fileName || `${context}-${Date.now()}.${parsed.ext}`));
-  const fileName = `${context}-${Date.now()}-${requestedName}`.replace(/\.+/g, '.');
-  const filePath = path.join(homeUploadDir, fileName);
-  await writeFile(filePath, parsed.buffer);
+  const requestedName = sanitizeFilename(String(body?.fileName || `${context}.${parsed.ext}`));
+  const sourceExt: ImageFormat = parsed.ext === 'png' || parsed.ext === 'webp' ? parsed.ext : 'jpg';
+  const savedImage = await saveUploadedImage({
+    uploadDir: homeUploadDir,
+    bucket: 'home',
+    filePrefix: context,
+    requestedName,
+    sourceExt,
+    sourceBuffer: parsed.buffer,
+    maxDimension: 2200,
+    quality: 82,
+  });
 
-  return reply.send({ ok: true, imageUrl: `/api/v1/assets/home/${fileName}` });
+  return reply.send({ ok: true, imageUrl: savedImage.url });
+});
+
+server.post('/api/v1/admin/assets/prewarm', async (request, reply) => {
+  const admin = await getRequestAdmin(request.headers.authorization);
+  if (!admin || (admin.role !== 'super_admin' && admin.role !== 'moderator')) {
+    return reply.code(403).send({ error: 'Only super_admin or moderator can prewarm assets' });
+  }
+
+  const body = request.body as { widths?: number[]; runBase?: boolean } | undefined;
+  const customWidths = Array.isArray(body?.widths)
+    ? body.widths
+        .map((value) => Number(value))
+        .filter((value) => Number.isFinite(value))
+        .map((value) => Math.round(value))
+        .filter((value) => value >= 256 && value <= assetWidthCeiling)
+        .slice(0, 8)
+    : [];
+  const widths = customWidths.length > 0 ? customWidths : assetPrewarmWidths.length > 0 ? assetPrewarmWidths : [640, 1280, 1920];
+  const runBase = body?.runBase !== false;
+
+  const [avatars, hotels, home] = await Promise.all([
+    prewarmAssetBucket('avatars', avatarUploadDir, widths, runBase),
+    prewarmAssetBucket('hotels', hotelUploadDir, widths, runBase),
+    prewarmAssetBucket('home', homeUploadDir, widths, runBase),
+  ]);
+
+  return reply.send({
+    ok: true,
+    widths,
+    runBase,
+    summary: { avatars, hotels, home },
+  });
 });
 
 server.post('/api/v1/admin/users', async (request, reply) => {
@@ -4921,6 +5464,32 @@ const start = async () => {
     }
     await server.listen({ port, host });
     server.log.info(`API running on http://${host}:${port}`);
+    if (assetPrewarmOnStart) {
+      const widths = assetPrewarmWidths.length > 0 ? assetPrewarmWidths : [640, 1280, 1920];
+      server.log.info({ widths }, 'Asset prewarm started in background (ASSET_PREWARM_ON_START=true).');
+      void (async () => {
+        try {
+          const [avatars, hotels, home] = await Promise.all([
+            prewarmAssetBucket('avatars', avatarUploadDir, widths),
+            prewarmAssetBucket('hotels', hotelUploadDir, widths),
+            prewarmAssetBucket('home', homeUploadDir, widths),
+          ]);
+          server.log.info(
+            {
+              widths,
+              avatars,
+              hotels,
+              home,
+            },
+            'Asset prewarm completed (ASSET_PREWARM_ON_START=true).',
+          );
+        } catch (error) {
+          server.log.warn({ err: error }, 'Asset prewarm failed');
+        }
+      })();
+    } else {
+      server.log.info('Asset prewarm skipped (set ASSET_PREWARM_ON_START=true to enable).');
+    }
   } catch (error) {
     server.log.error(error);
     process.exit(1);

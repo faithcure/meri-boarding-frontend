@@ -1,5 +1,5 @@
 import type { Locale } from '@/i18n/getLocale'
-import { getServerApiBaseUrl, withPublicApiBaseIfNeeded } from '@/lib/apiBaseUrl'
+import { getServerApiBaseUrl, withAssetImageParams, withPublicApiBaseIfNeeded } from '@/lib/apiBaseUrl'
 
 export type PublicHotelFact = {
   text: string
@@ -53,9 +53,14 @@ export type PublicHotelDetail = {
 }
 
 const apiBaseUrl = getServerApiBaseUrl()
+const API_REVALIDATE_SECONDS = 60
 
 function withApiBaseIfNeeded(url: string) {
   return withPublicApiBaseIfNeeded(url)
+}
+
+function withOptimizedAsset(url: string, width: number, quality = 80) {
+  return withAssetImageParams(withApiBaseIfNeeded(url), { width, quality })
 }
 
 function normalizeFact(input: unknown): PublicHotelFact {
@@ -112,47 +117,57 @@ function normalizeGalleryMeta(input: unknown) {
 }
 
 export async function fetchPublicHotels(locale: Locale): Promise<PublicHotelListItem[]> {
-  const response = await fetch(`${apiBaseUrl}/api/v1/public/hotels?locale=${locale}`, {
-    cache: 'no-store'
-  })
-  if (!response.ok) {
-    throw new Error(`Failed to fetch hotels (${response.status})`)
+  try {
+    const response = await fetch(`${apiBaseUrl}/api/v1/public/hotels?locale=${locale}`, {
+      next: { revalidate: API_REVALIDATE_SECONDS }
+    })
+    if (!response.ok) {
+      throw new Error(`Failed to fetch hotels (${response.status})`)
+    }
+
+    const data = await response.json()
+    const hotels = (data?.hotels || []) as PublicHotelListItem[]
+
+    return hotels.map(item => ({
+      ...item,
+      facts: Array.isArray(item.facts) ? item.facts.map(fact => normalizeFact(fact)).filter(fact => Boolean(fact.text)) : [],
+      coverImageUrl: withOptimizedAsset(item.coverImageUrl, 1400, 80)
+    }))
+  } catch (error) {
+    console.error('[public-fe] falling back to empty hotel list', error)
+    return []
   }
-
-  const data = await response.json()
-  const hotels = (data?.hotels || []) as PublicHotelListItem[]
-
-  return hotels.map(item => ({
-    ...item,
-    facts: Array.isArray(item.facts) ? item.facts.map(fact => normalizeFact(fact)).filter(fact => Boolean(fact.text)) : [],
-    coverImageUrl: withApiBaseIfNeeded(item.coverImageUrl)
-  }))
 }
 
 export async function fetchPublicHotelBySlug(locale: Locale, slug: string): Promise<PublicHotelDetail | null> {
-  const response = await fetch(`${apiBaseUrl}/api/v1/public/hotels/${slug}?locale=${locale}`, {
-    cache: 'no-store'
-  })
-  if (response.status === 404) {
+  try {
+    const response = await fetch(`${apiBaseUrl}/api/v1/public/hotels/${slug}?locale=${locale}`, {
+      next: { revalidate: API_REVALIDATE_SECONDS }
+    })
+    if (response.status === 404) {
+      return null
+    }
+    if (!response.ok) {
+      throw new Error(`Failed to fetch hotel "${slug}" (${response.status})`)
+    }
+
+    const data = await response.json()
+    const hotel = (data?.hotel || null) as PublicHotelDetail | null
+    if (!hotel) return null
+
+    return {
+      ...hotel,
+      facts: Array.isArray(hotel.facts) ? hotel.facts.map(fact => normalizeFact(fact)).filter(fact => Boolean(fact.text)) : [],
+      coverImageUrl: withOptimizedAsset(hotel.coverImageUrl, 2200, 80),
+      gallery: (hotel.gallery || []).map(image => ({
+        ...image,
+        url: withOptimizedAsset(image.url, 1900, 80),
+        thumbnailUrl: withOptimizedAsset(String(image.thumbnailUrl || image.url || ''), 900, 78),
+        meta: normalizeGalleryMeta(image.meta)
+      }))
+    }
+  } catch (error) {
+    console.error(`[public-fe] failed to fetch hotel detail for "${slug}"`, error)
     return null
-  }
-  if (!response.ok) {
-    throw new Error(`Failed to fetch hotel "${slug}" (${response.status})`)
-  }
-
-  const data = await response.json()
-  const hotel = (data?.hotel || null) as PublicHotelDetail | null
-  if (!hotel) return null
-
-  return {
-    ...hotel,
-    facts: Array.isArray(hotel.facts) ? hotel.facts.map(fact => normalizeFact(fact)).filter(fact => Boolean(fact.text)) : [],
-    coverImageUrl: withApiBaseIfNeeded(hotel.coverImageUrl),
-    gallery: (hotel.gallery || []).map(image => ({
-      ...image,
-      url: withApiBaseIfNeeded(image.url),
-      thumbnailUrl: withApiBaseIfNeeded(String(image.thumbnailUrl || image.url || '')),
-      meta: normalizeGalleryMeta(image.meta)
-    }))
   }
 }

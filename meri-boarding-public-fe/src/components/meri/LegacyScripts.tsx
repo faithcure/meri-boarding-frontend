@@ -2,6 +2,12 @@
 
 import { useEffect } from 'react'
 
+declare global {
+  interface Window {
+    __meriLegacyScriptsReady?: boolean
+  }
+}
+
 const legacyScriptPaths = [
   '/js/vendors.js',
   '/js/moment.js',
@@ -45,13 +51,20 @@ export default function LegacyScripts() {
     const run = async () => {
       for (const src of legacyScriptPaths) {
         if (cancelled) return
-        await loadScriptSequentially(src)
+        try {
+          await loadScriptSequentially(src)
+        } catch (error) {
+          // Keep bootstrapping even when one optional legacy script fails.
+          console.error(`[legacy] failed to load ${src}`, error)
+        }
       }
 
       const win = window as Window & { $?: unknown; jQuery?: unknown }
       if (win.$ && !win.jQuery) {
         win.jQuery = win.$
       }
+      window.__meriLegacyScriptsReady = true
+      window.dispatchEvent(new Event('meri:legacy-ready'))
     }
 
     void run()

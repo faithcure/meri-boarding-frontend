@@ -10,7 +10,7 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
 import { alpha, useTheme } from '@mui/material/styles'
-type SectionKey = 'hero' | 'rooms' | 'testimonials' | 'facilities' | 'gallery' | 'offers' | 'faq'
+type SectionKey = 'hero' | 'bookingPartners' | 'rooms' | 'testimonials' | 'facilities' | 'gallery' | 'offers' | 'faq'
 
 type HomeSectionState = {
   enabled: boolean
@@ -21,16 +21,17 @@ type HomeContent = {
   sections: Record<SectionKey, HomeSectionState>
 }
 
-const sectionKeys: SectionKey[] = ['hero', 'rooms', 'testimonials', 'facilities', 'gallery', 'offers', 'faq']
+const sectionKeys: SectionKey[] = ['hero', 'bookingPartners', 'rooms', 'testimonials', 'facilities', 'gallery', 'offers', 'faq']
 
 const defaultSections = (): Record<SectionKey, HomeSectionState> => ({
   hero: { enabled: true, order: 1 },
-  rooms: { enabled: true, order: 2 },
-  testimonials: { enabled: true, order: 3 },
-  facilities: { enabled: true, order: 4 },
-  gallery: { enabled: true, order: 5 },
-  offers: { enabled: true, order: 6 },
-  faq: { enabled: true, order: 7 }
+  bookingPartners: { enabled: true, order: 2 },
+  rooms: { enabled: true, order: 3 },
+  testimonials: { enabled: true, order: 4 },
+  facilities: { enabled: true, order: 5 },
+  gallery: { enabled: true, order: 6 },
+  offers: { enabled: true, order: 7 },
+  faq: { enabled: true, order: 8 }
 })
 
 const normalizeSections = (input: unknown): Record<SectionKey, HomeSectionState> => {

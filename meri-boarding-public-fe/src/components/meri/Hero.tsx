@@ -36,29 +36,29 @@ export default async function Hero({ locale: localeProp, content }: HeroProps = 
           <div className="container-fluid">
             <div className="row g-4 justify-content-between align-items-end">
               <div className="col-md-10 offset-md-1">
-                <div className="hero-logo wow fadeInUp">
-                  <img src="/images/meri/meri-herosection-logo.svg" alt="Meri Boarding Group" />
+                <div className="hero-intro">
+                  <div className="hero-logo">
+                    <img src="/images/meri/meri-herosection-logo.svg" alt="Meri Boarding Group" />
+                  </div>
+                  <h1 className="fs-96 lh-1 fs-xs-10vw mb-0">
+                    {t.titleLead} <span>{t.titleHighlight}</span> {t.titleTail}
+                  </h1>
                 </div>
-                <h1 className="fs-96 lh-1 fs-xs-10vw wow fadeInUp mb-2">
-                  {t.titleLead} <span>{t.titleHighlight}</span> {t.titleTail}
-                </h1>
               </div>
-              <div className="col-md-6 offset-md-1">
-                <p className="col-md-8 text-white wow fadeInUp" data-wow-delay=".4s">
-                  {t.description}
-                </p>
-                <div className="d-flex align-items-center gap-3 flex-wrap">
+              <div className="col-md-7 offset-md-1">
+                <div className="hero-copy-shell">
+                  <p className="hero-copy mb-0">{t.description}</p>
+                </div>
+                <div className="hero-cta-row d-flex align-items-center gap-3 flex-wrap">
                   <Link
                     href={locationsHref}
-                    className="btn-main fx-slide hover-white wow fadeInUp"
-                    data-wow-delay=".8s"
+                    className="btn-main fx-slide hover-white"
                   >
                     <span>{t.ctaLocations}</span>
                   </Link>
                   <Link
                     href={quoteHref}
-                    className="btn-main btn-hero-quote fx-slide hover-white wow fadeInUp"
-                    data-wow-delay=".9s"
+                    className="btn-main btn-hero-quote fx-slide hover-white"
                     data-hover={t.ctaQuote}
                   >
                     <span>{t.ctaQuote}</span>
@@ -69,7 +69,7 @@ export default async function Hero({ locale: localeProp, content }: HeroProps = 
           </div>
         </div>
 
-        <div className="swiper">
+        <div className="swiper hero-swiper">
           <div className="swiper-wrapper">
             {slides.map((slide) => (
               <div className="swiper-slide text-light" key={slide.image}>

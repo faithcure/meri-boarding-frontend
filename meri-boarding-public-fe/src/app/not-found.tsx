@@ -22,6 +22,9 @@ export default async function NotFound() {
             src="/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6639.jpg"
             className="jarallax-img"
             alt=""
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
           />
           <div className="container relative z-2">
             <div className="row justify-content-center">

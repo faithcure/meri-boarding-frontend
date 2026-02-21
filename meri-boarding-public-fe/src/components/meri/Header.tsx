@@ -14,13 +14,20 @@ type HeaderProps = {
 export default async function Header({ locale: localeProp }: HeaderProps = {}) {
   const locale = localeProp ?? (await getLocale());
   const apiBaseUrl = getServerApiBaseUrl();
-  const tResponse = await fetch(`${apiBaseUrl}/api/v1/public/content/header?locale=${locale}`, {
-    next: { revalidate: 60 },
-  });
-  if (!tResponse.ok) {
-    throw new Error(`Failed to fetch header content (${tResponse.status})`);
+  let remoteHeaderContent: Record<string, unknown> = {};
+  try {
+    const tResponse = await fetch(`${apiBaseUrl}/api/v1/public/content/header?locale=${locale}`, {
+      next: { revalidate: 60 },
+    });
+    if (!tResponse.ok) {
+      throw new Error(`Failed to fetch header content (${tResponse.status})`);
+    }
+    const tData = await tResponse.json();
+    remoteHeaderContent = (tData?.content || {}) as Record<string, unknown>;
+  } catch (error) {
+    console.error("[public-fe] falling back to local header labels", error);
   }
-  const tData = await tResponse.json();
+
   const t = {
     home: "",
     hotels: "",
@@ -29,7 +36,7 @@ export default async function Header({ locale: localeProp }: HeaderProps = {}) {
     ourAmenities: "",
     contact: "",
     reservation: "",
-    ...(tData?.content || {}),
+    ...remoteHeaderContent,
   };
 
   const hotels = await fetchPublicHotels(locale);
@@ -53,7 +60,7 @@ export default async function Header({ locale: localeProp }: HeaderProps = {}) {
                   <Link href={withLocale("/")}>
                     <img className="logo-main" src="/images/meri/meri-logo-black.png" alt="Meri Boarding Group" />
                     <img className="logo-scroll" src="/images/meri/meri-logo-black.png" alt="Meri Boarding Group" />
-                    <img className="logo-mobile" src="/images/meri/meri-logo-black.png" alt="Meri Boarding Group" />
+                    <img className="logo-mobile" src="/meri-logo-mark.svg" alt="Meri Boarding Group" />
                   </Link>
                 </div>
               </div>
@@ -113,17 +120,20 @@ export default async function Header({ locale: localeProp }: HeaderProps = {}) {
               <div className="de-flex-col">
                 <div className="menu_side_area">
                   <LocaleSwitcher variant="header" />
-                  <Link href={withLocale("/reservation")} className="btn-main btn-slide-duo hover-white">
-                    <span className="btn-slide-front">
-                      <i className="fa fa-heart" aria-hidden="true"></i>
-                      {t.reservation}
-                    </span>
-                    <span className="btn-slide-back" aria-hidden="true">
-                      <i className="fa fa-heart" aria-hidden="true"></i>
-                      {t.reservation}
+                  <Link
+                    href={withLocale("/reservation")}
+                    className="btn-main fx-slide btn-cta-pulse btn-cta-solid"
+                    data-hover={t.reservation}
+                  >
+                    <span>
+                      {t.reservation} <i className="fa fa-arrow-right ms-2" aria-hidden="true"></i>
                     </span>
                   </Link>
-                  <span id="menu-btn"></span>
+                  <span id="menu-btn" role="button" aria-label="Toggle menu" aria-controls="mainmenu" aria-expanded="false">
+                    <span className="menu-btn-bar menu-btn-bar--top" aria-hidden="true"></span>
+                    <span className="menu-btn-bar menu-btn-bar--middle" aria-hidden="true"></span>
+                    <span className="menu-btn-bar menu-btn-bar--bottom" aria-hidden="true"></span>
+                  </span>
                 </div>
               </div>
             </div>

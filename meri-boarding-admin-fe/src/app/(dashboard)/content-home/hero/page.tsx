@@ -17,6 +17,12 @@ type HeroSlide = {
   position: string
 }
 
+type BookingPartner = {
+  name: string
+  logo: string
+  url: string
+}
+
 type HeroContent = {
   titleLead: string
   titleHighlight: string
@@ -26,6 +32,7 @@ type HeroContent = {
   ctaLocationsHref: string
   ctaQuote: string
   ctaQuoteHref: string
+  bookingPartners: BookingPartner[]
   slides: HeroSlide[]
 }
 
@@ -51,6 +58,16 @@ const normalizeHero = (input: unknown): HeroContent => {
         }))
         .filter(item => Boolean(item.image))
     : []
+  const bookingPartners = Array.isArray(value.bookingPartners)
+    ? value.bookingPartners
+        .map(item => ({
+          name: String(item?.name || '').trim(),
+          logo: String(item?.logo || '').trim(),
+          url: String(item?.url || '').trim()
+        }))
+        .filter(item => Boolean(item.name) || Boolean(item.logo) || Boolean(item.url))
+        .slice(0, 12)
+    : []
 
   return {
     titleLead: String(value.titleLead || '').trim(),
@@ -61,6 +78,7 @@ const normalizeHero = (input: unknown): HeroContent => {
     ctaLocationsHref: String(value.ctaLocationsHref || '/hotels').trim(),
     ctaQuote: String(value.ctaQuote || '').trim(),
     ctaQuoteHref: String(value.ctaQuoteHref || '/contact').trim(),
+    bookingPartners,
     slides
   }
 }
@@ -74,7 +92,7 @@ export default function HeroSettingsPage() {
   const [allowed, setAllowed] = useState(false)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [uploadingIndex, setUploadingIndex] = useState<number | null>(null)
+  const [uploadingTarget, setUploadingTarget] = useState<{ kind: 'slide' | 'partner'; index: number } | null>(null)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [locale, setLocale] = useState<Locale>('en')
@@ -87,6 +105,7 @@ export default function HeroSettingsPage() {
     ctaLocationsHref: '/hotels',
     ctaQuote: '',
     ctaQuoteHref: '/contact',
+    bookingPartners: [],
     slides: []
   })
 
@@ -167,7 +186,7 @@ export default function HeroSettingsPage() {
       return
     }
 
-    setUploadingIndex(slideIndex)
+    setUploadingTarget({ kind: 'slide', index: slideIndex })
     setError('')
     setSuccess('')
     try {
@@ -197,7 +216,54 @@ export default function HeroSettingsPage() {
     } catch {
       setError('Hero image upload failed.')
     } finally {
-      setUploadingIndex(null)
+      setUploadingTarget(null)
+    }
+  }
+
+  const uploadBookingPartnerLogo = async (file: File, partnerIndex: number) => {
+    const token = window.localStorage.getItem('admin_token')
+    if (!token) return
+
+    if (!['image/png', 'image/jpeg', 'image/jpg', 'image/webp'].includes(file.type)) {
+      setError('Only PNG, JPG or WEBP files are allowed.')
+      return
+    }
+    if (file.size > 8 * 1024 * 1024) {
+      setError('Image size cannot exceed 8MB.')
+      return
+    }
+
+    setUploadingTarget({ kind: 'partner', index: partnerIndex })
+    setError('')
+    setSuccess('')
+    try {
+      const dataUrl = await toDataUrl(file)
+      const response = await fetch(`${apiBaseUrl}/api/v1/admin/content/home/hero-image`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          fileName: file.name,
+          dataUrl
+        })
+      })
+      const data = await response.json()
+      if (!response.ok) {
+        setError(data?.error || 'Booking partner logo upload failed.')
+        return
+      }
+
+      setHero(prev => ({
+        ...prev,
+        bookingPartners: prev.bookingPartners.map((item, i) => (i === partnerIndex ? { ...item, logo: String(data?.imageUrl || '') } : item))
+      }))
+      setSuccess('Booking partner logo uploaded.')
+    } catch {
+      setError('Booking partner logo upload failed.')
+    } finally {
+      setUploadingTarget(null)
     }
   }
 
@@ -214,6 +280,15 @@ export default function HeroSettingsPage() {
     for (const [index, slide] of value.slides.entries()) {
       if (!slide.image) return `Slide ${index + 1}: image is required.`
       if (!isValidPosition(slide.position)) return `Slide ${index + 1}: position is invalid (e.g. "center 35%").`
+    }
+    if (value.bookingPartners.length > 12) return 'Booking partner limit is 12.'
+    for (const [index, partner] of value.bookingPartners.entries()) {
+      if (!partner.name || !partner.logo || !partner.url) {
+        return `Booking partner ${index + 1}: name, logo and link are required.`
+      }
+      if (!isValidLink(partner.url)) {
+        return `Booking partner ${index + 1}: link must start with "/" or "http(s)://".`
+      }
     }
     return null
   }
@@ -431,8 +506,13 @@ export default function HeroSettingsPage() {
                       />
                     </Grid>
                     <Grid size={{ xs: 12, md: 6 }}>
-                      <Button component='label' variant='outlined' fullWidth disabled={uploadingIndex === index}>
-                        {uploadingIndex === index ? 'Uploading...' : 'Upload Image'}
+                      <Button
+                        component='label'
+                        variant='outlined'
+                        fullWidth
+                        disabled={uploadingTarget?.kind === 'slide' && uploadingTarget?.index === index}
+                      >
+                        {uploadingTarget?.kind === 'slide' && uploadingTarget?.index === index ? 'Uploading...' : 'Upload Image'}
                         <input
                           hidden
                           type='file'
@@ -476,6 +556,102 @@ export default function HeroSettingsPage() {
               </Card>
             ))}
 
+            <Typography variant='h6'>Booking Partners</Typography>
+            {hero.bookingPartners.map((partner, index) => (
+              <Card key={`booking-partner-${index}`} variant='outlined'>
+                <CardContent className='flex flex-col gap-3'>
+                  <Grid container spacing={2}>
+                    <Grid size={{ xs: 12, md: 4 }}>
+                      <CustomTextField
+                        label='Partner Name'
+                        value={partner.name}
+                        onChange={e =>
+                          setHero(prev => ({
+                            ...prev,
+                            bookingPartners: prev.bookingPartners.map((item, i) => (i === index ? { ...item, name: e.target.value } : item))
+                          }))
+                        }
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid size={{ xs: 12, md: 4 }}>
+                      <CustomTextField
+                        label='Reservation Link'
+                        value={partner.url}
+                        onChange={e =>
+                          setHero(prev => ({
+                            ...prev,
+                            bookingPartners: prev.bookingPartners.map((item, i) => (i === index ? { ...item, url: e.target.value } : item))
+                          }))
+                        }
+                        helperText='Use /reservation or https://...'
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid size={{ xs: 12, md: 4 }}>
+                      <CustomTextField
+                        label='Logo URL'
+                        value={partner.logo}
+                        onChange={e =>
+                          setHero(prev => ({
+                            ...prev,
+                            bookingPartners: prev.bookingPartners.map((item, i) => (i === index ? { ...item, logo: e.target.value } : item))
+                          }))
+                        }
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid size={{ xs: 12, md: 6 }}>
+                      <Button
+                        component='label'
+                        variant='outlined'
+                        fullWidth
+                        disabled={uploadingTarget?.kind === 'partner' && uploadingTarget?.index === index}
+                      >
+                        {uploadingTarget?.kind === 'partner' && uploadingTarget?.index === index ? 'Uploading...' : 'Upload Logo'}
+                        <input
+                          hidden
+                          type='file'
+                          accept='image/png,image/jpeg,image/jpg,image/webp'
+                          onChange={e => {
+                            const file = e.target.files?.[0] || null
+                            if (file) {
+                              void uploadBookingPartnerLogo(file, index)
+                            }
+                            e.currentTarget.value = ''
+                          }}
+                        />
+                      </Button>
+                    </Grid>
+                    <Grid size={{ xs: 12, md: 6 }}>
+                      <Button
+                        color='error'
+                        variant='outlined'
+                        fullWidth
+                        onClick={() =>
+                          setHero(prev => ({
+                            ...prev,
+                            bookingPartners: prev.bookingPartners.filter((_, i) => i !== index)
+                          }))
+                        }
+                      >
+                        Remove Partner
+                      </Button>
+                    </Grid>
+                    {partner.logo ? (
+                      <Grid size={{ xs: 12 }}>
+                        <img
+                          src={resolvePreviewUrl(partner.logo)}
+                          alt={partner.name || `Partner ${index + 1}`}
+                          style={{ width: 180, maxHeight: 64, objectFit: 'contain', borderRadius: 8, border: '1px solid rgba(0,0,0,0.12)', padding: 8 }}
+                        />
+                      </Grid>
+                    ) : null}
+                  </Grid>
+                </CardContent>
+              </Card>
+            ))}
+
             <div className='flex gap-2'>
               <Button
                 variant='outlined'
@@ -488,6 +664,18 @@ export default function HeroSettingsPage() {
                 }
               >
                 Add Slide
+              </Button>
+              <Button
+                variant='outlined'
+                disabled={hero.bookingPartners.length >= 12}
+                onClick={() =>
+                  setHero(prev => ({
+                    ...prev,
+                    bookingPartners: [...prev.bookingPartners, { name: '', logo: '', url: '' }]
+                  }))
+                }
+              >
+                Add Booking Partner
               </Button>
               <Button variant='contained' onClick={() => void handleSave()} disabled={saving}>
                 {saving ? 'Saving...' : 'Save Hero Settings'}

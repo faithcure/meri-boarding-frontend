@@ -1,12 +1,14 @@
 (function () {
+  const heroSelector = ".hero-swiper";
+
   function initHeroSwiper() {
     if (typeof window === "undefined" || typeof window.Swiper === "undefined") return;
-    const el = document.querySelector(".swiper");
+    const el = document.querySelector(heroSelector);
     if (!el) return;
     if (window.__meriHeroSwiper && typeof window.__meriHeroSwiper.destroy === "function") {
       window.__meriHeroSwiper.destroy(true, true);
     }
-    window.__meriHeroSwiper = new Swiper(".swiper", {
+    window.__meriHeroSwiper = new Swiper(heroSelector, {
       autoplay: {
         delay: 4000,
         disableOnInteraction: false

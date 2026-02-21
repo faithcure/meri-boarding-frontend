@@ -62,3 +62,35 @@ export function withPublicApiBaseIfNeeded(url: string): string {
 
   return `${publicApiBaseUrl}${value}`
 }
+
+export function withAssetImageParams(
+  url: string,
+  options?: {
+    width?: number
+    quality?: number
+  }
+): string {
+  const value = String(url || '').trim()
+  if (!value || !value.includes('/api/v1/assets/')) return value
+
+  const width = Number(options?.width)
+  const quality = Number(options?.quality)
+  const useWidth = Number.isFinite(width) && width >= 256 && width <= 4096 ? Math.round(width) : null
+  const useQuality = Number.isFinite(quality) && quality >= 55 && quality <= 95 ? Math.round(quality) : null
+  if (!useWidth && !useQuality) return value
+
+  try {
+    const isAbsolute = ABSOLUTE_HTTP_URL.test(value)
+    const parsed = new URL(value, isAbsolute ? undefined : 'http://assets.local')
+    if (useWidth && !parsed.searchParams.has('w')) {
+      parsed.searchParams.set('w', String(useWidth))
+    }
+    if (useQuality && !parsed.searchParams.has('q')) {
+      parsed.searchParams.set('q', String(useQuality))
+    }
+    if (isAbsolute) return parsed.toString()
+    return `${parsed.pathname}${parsed.search}${parsed.hash}`
+  } catch {
+    return value
+  }
+}

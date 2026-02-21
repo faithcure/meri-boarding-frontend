@@ -1,8 +1,8 @@
 import type { Locale } from '@/i18n/getLocale'
 import { getMessages } from '@/i18n/messages'
-import { getServerApiBaseUrl, withPublicApiBaseIfNeeded } from '@/lib/apiBaseUrl'
+import { getServerApiBaseUrl, withAssetImageParams, withPublicApiBaseIfNeeded } from '@/lib/apiBaseUrl'
 
-type SectionKey = 'hero' | 'rooms' | 'testimonials' | 'facilities' | 'gallery' | 'offers' | 'faq'
+type SectionKey = 'hero' | 'bookingPartners' | 'rooms' | 'testimonials' | 'facilities' | 'gallery' | 'offers' | 'faq'
 
 type CmsHomeContent = {
   sections?: Partial<Record<SectionKey, { enabled?: boolean; order?: number }>>
@@ -15,6 +15,7 @@ type CmsHomeContent = {
     ctaLocationsHref?: string
     ctaQuote?: string
     ctaQuoteHref?: string
+    bookingPartners?: Array<{ name?: string; logo?: string; url?: string }>
     slides?: Array<{ image?: string; position?: string }>
   }
   rooms?: {
@@ -75,6 +76,7 @@ export type HomeResolvedContent = {
   hero: ReturnType<typeof getMessages>['hero'] & {
     ctaLocationsHref: string
     ctaQuoteHref: string
+    bookingPartners: Array<{ name: string; logo: string; url: string }>
     slides: Array<{ image: string; position: string }>
   }
   rooms: ReturnType<typeof getMessages>['rooms'] & {
@@ -125,11 +127,15 @@ export type HomeResolvedContent = {
   }
 }
 
-const sectionKeys: SectionKey[] = ['hero', 'rooms', 'testimonials', 'facilities', 'gallery', 'offers', 'faq']
+const sectionKeys: SectionKey[] = ['hero', 'bookingPartners', 'rooms', 'testimonials', 'facilities', 'gallery', 'offers', 'faq']
 const apiBaseUrl = getServerApiBaseUrl()
 
 function withApiBaseIfNeeded(url: string) {
   return withPublicApiBaseIfNeeded(url)
+}
+
+function withOptimizedAsset(url: string, width: number, quality = 80) {
+  return withAssetImageParams(withApiBaseIfNeeded(url), { width, quality })
 }
 
 function sanitizeCategoryKey(input?: string): string {
@@ -157,9 +163,10 @@ function resolveContent(locale: Locale, cms?: CmsHomeContent): HomeResolvedConte
   )
 
   const slidesSource = Array.isArray(cms?.hero?.slides) ? cms.hero.slides : []
+  const bookingPartnersSource = Array.isArray(cms?.hero?.bookingPartners) ? cms.hero.bookingPartners : []
   const slides = slidesSource
     .map(item => ({
-      image: withApiBaseIfNeeded(String(item?.image || '').trim()),
+      image: withOptimizedAsset(String(item?.image || '').trim(), 2200, 80),
       position: String(item?.position || '').trim() || 'center center'
     }))
     .filter(item => Boolean(item.image))
@@ -177,7 +184,7 @@ function resolveContent(locale: Locale, cms?: CmsHomeContent): HomeResolvedConte
   const gallerySource = Array.isArray(cms?.gallery?.items) ? cms.gallery.items : []
   const galleryItems = gallerySource
     .map(item => ({
-      image: withApiBaseIfNeeded(String(item?.image || '').trim()),
+      image: withOptimizedAsset(String(item?.image || '').trim(), 1400, 80),
       category: sanitizeCategoryKey(item?.category),
       alt: String(item?.alt || '').trim()
     }))
@@ -194,7 +201,7 @@ function resolveContent(locale: Locale, cms?: CmsHomeContent): HomeResolvedConte
       badge: String(item?.badge || '').trim(),
       title: String(item?.title || '').trim(),
       text: String(item?.text || '').trim(),
-      image: withApiBaseIfNeeded(String(item?.image || ''))
+      image: withOptimizedAsset(String(item?.image || ''), 1400, 80)
     }))
     .filter(item => Boolean(item.title) || Boolean(item.text) || Boolean(item.image))
     .slice(0, 4)
@@ -213,6 +220,14 @@ function resolveContent(locale: Locale, cms?: CmsHomeContent): HomeResolvedConte
       ctaLocationsHref: String(cms?.hero?.ctaLocationsHref || '/hotels'),
       ctaQuote: String(cms?.hero?.ctaQuote || ''),
       ctaQuoteHref: String(cms?.hero?.ctaQuoteHref || '/contact'),
+      bookingPartners: bookingPartnersSource
+        .map(item => ({
+          name: String(item?.name || '').trim(),
+          logo: withOptimizedAsset(String(item?.logo || '').trim(), 420, 82),
+          url: String(item?.url || '').trim()
+        }))
+        .filter(item => Boolean(item.name) && Boolean(item.logo) && Boolean(item.url))
+        .slice(0, 12),
       slides
     },
     rooms: {
@@ -229,7 +244,7 @@ function resolveContent(locale: Locale, cms?: CmsHomeContent): HomeResolvedConte
         .map(item => ({
           title: String(item?.title || '').trim(),
           icon: String(item?.icon || '').trim() || 'fa fa-home',
-          image: withApiBaseIfNeeded(String(item?.image || '').trim()),
+          image: withOptimizedAsset(String(item?.image || '').trim(), 1400, 80),
           description: String(item?.description || '').trim(),
           highlights: Array.isArray(item?.highlights) ? item.highlights.map(v => String(v || '').trim()).filter(Boolean) : []
         }))
@@ -238,7 +253,7 @@ function resolveContent(locale: Locale, cms?: CmsHomeContent): HomeResolvedConte
     testimonials: {
       ...messages.testimonials,
       apartmentsCount: Number(cms?.testimonials?.apartmentsCount) || 0,
-      backgroundImage: withApiBaseIfNeeded(String(cms?.testimonials?.backgroundImage || '')),
+      backgroundImage: withOptimizedAsset(String(cms?.testimonials?.backgroundImage || ''), 2200, 80),
       apartments: String(cms?.testimonials?.apartments || ''),
       locations: String(cms?.testimonials?.locations || ''),
       slides: (Array.isArray(cms?.testimonials?.slides) ? cms?.testimonials?.slides : [])
@@ -261,8 +276,8 @@ function resolveContent(locale: Locale, cms?: CmsHomeContent): HomeResolvedConte
         }))
         .filter(item => Boolean(item.label) && Boolean(item.suffix))
         .slice(0, 3),
-      primaryImage: withApiBaseIfNeeded(String(cms?.facilities?.primaryImage || '')),
-      secondaryImage: withApiBaseIfNeeded(String(cms?.facilities?.secondaryImage || '')),
+      primaryImage: withOptimizedAsset(String(cms?.facilities?.primaryImage || ''), 1600, 80),
+      secondaryImage: withOptimizedAsset(String(cms?.facilities?.secondaryImage || ''), 1600, 80),
       statsNumbers: [
         Number(statsNumbers[0]) || 0,
         Number(statsNumbers[1]) || 0,
@@ -299,13 +314,18 @@ function resolveContent(locale: Locale, cms?: CmsHomeContent): HomeResolvedConte
 }
 
 export async function fetchHomeResolvedContent(locale: Locale): Promise<HomeResolvedContent> {
-  const response = await fetch(`${apiBaseUrl}/api/v1/public/content/home?locale=${locale}`, {
-    cache: 'no-store'
-  })
-  if (!response.ok) {
-    throw new Error(`Failed to fetch home content (${response.status})`)
-  }
+  try {
+    const response = await fetch(`${apiBaseUrl}/api/v1/public/content/home?locale=${locale}`, {
+      cache: 'no-store'
+    })
+    if (!response.ok) {
+      throw new Error(`Failed to fetch home content (${response.status})`)
+    }
 
-  const data = await response.json()
-  return resolveContent(locale, data?.content || {})
+    const data = await response.json()
+    return resolveContent(locale, data?.content || {})
+  } catch (error) {
+    console.error('[public-fe] falling back to local home content', error)
+    return resolveContent(locale, {})
+  }
 }

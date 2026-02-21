@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { HomeResolvedContent } from "@/lib/homeContentApi";
 
 type GalleryProps = {
@@ -16,8 +16,10 @@ export default function Gallery({ content }: GalleryProps = {}) {
     description: content?.description || "",
     view: content?.view || "",
     categories: content?.categories || [],
-    items: content?.items || []
+    items: content?.items || [],
   };
+  const defaultCategoryKey = t.categories[0]?.key || "all";
+  const [activeCategory, setActiveCategory] = useState(defaultCategoryKey);
   const parallaxImage = t.items[0]?.image || "/images/background/1.webp";
 
   useEffect(() => {
@@ -50,6 +52,20 @@ export default function Gallery({ content }: GalleryProps = {}) {
     };
   }, []);
 
+  useEffect(() => {
+    const availableKeys = new Set(t.categories.map((category) => category.key));
+    if (activeCategory === "all") return;
+    if (!availableKeys.has(activeCategory)) {
+      setActiveCategory(defaultCategoryKey);
+    }
+  }, [activeCategory, defaultCategoryKey, t.categories]);
+
+  const filteredItems = useMemo(() => {
+    if (activeCategory === "all") return t.items;
+    const selected = t.items.filter((item) => item.category === activeCategory);
+    return selected.length > 0 ? selected : t.items;
+  }, [activeCategory, t.items]);
+
   return (
     <section ref={sectionRef} className="bg-color-op-1 rounded-1 mx-2 gallery-parallax-section">
       <div className="gallery-parallax-bg" style={{ backgroundImage: `url(${parallaxImage})` }} aria-hidden="true"></div>
@@ -58,11 +74,11 @@ export default function Gallery({ content }: GalleryProps = {}) {
       <div className="container position-relative">
         <div className="row g-4 gx-5 align-items-center justify-content-between">
           <div className="col-lg-6">
-            <div className="subtitle wow fadeInUp" data-wow-delay=".0s">{t.subtitle}</div>
-            <h2 className="wow fadeInUp" data-wow-delay=".2s">{t.title}</h2>
+            <div className="subtitle">{t.subtitle}</div>
+            <h2>{t.title}</h2>
           </div>
           <div className="col-lg-6">
-            <p className="wow fadeInUp" data-wow-delay=".4s">{t.description}</p>
+            <p>{t.description}</p>
           </div>
         </div>
 
@@ -70,18 +86,24 @@ export default function Gallery({ content }: GalleryProps = {}) {
 
         <div className="row">
           <div className="col-md-12 text-center">
-            <ul id="filters" className="wow fadeInUp" data-wow-delay="0s">
-              {t.categories.map((category, index) => (
+            <ul className="gallery-filter-list home-gallery-filters">
+              {t.categories.map((category) => (
                 <li key={category.key}>
-                  <a href="#" data-filter={`.${category.key}`} className={index === 0 ? "selected" : ""}>{category.label}</a>
+                  <button
+                    type="button"
+                    className={`gallery-filter-btn ${activeCategory === category.key ? "is-selected" : ""}`}
+                    onClick={() => setActiveCategory(category.key)}
+                  >
+                    {category.label}
+                  </button>
                 </li>
               ))}
             </ul>
           </div>
         </div>
 
-        <div id="gallery" className="row g-3 wow fadeIn" data-wow-delay=".3s">
-          {t.items.map((item, index) => (
+        <div className="row g-3 home-gallery-grid">
+          {filteredItems.map((item, index) => (
             <div className={`col-md-3 col-sm-6 col-12 item ${item.category}`} key={`${item.image}-${index}`} data-gallery-item="1">
               <a
                 href={item.image}
@@ -96,7 +118,7 @@ export default function Gallery({ content }: GalleryProps = {}) {
                     boxShadow:
                       hoveredImageKey === `${item.image}-${index}`
                         ? "0 2px 6px rgba(0,0,0,0.16), 0 18px 28px -14px rgba(0,0,0,0.34), 0 36px 40px -30px rgba(0,0,0,0.42)"
-                        : "0 2px 4px rgba(0,0,0,0.12), 0 14px 22px -14px rgba(0,0,0,0.28), 0 28px 30px -28px rgba(0,0,0,0.36)"
+                        : "0 2px 4px rgba(0,0,0,0.12), 0 14px 22px -14px rgba(0,0,0,0.28), 0 28px 30px -28px rgba(0,0,0,0.36)",
                   }}
                 >
                   <div className="absolute start-0 w-100 hover-op-1 p-5 abs-middle z-3 text-center text-white">
@@ -111,7 +133,7 @@ export default function Gallery({ content }: GalleryProps = {}) {
                         boxShadow:
                           hoveredImageKey === `${item.image}-${index}`
                             ? "0 0 18px color-mix(in srgb, var(--primary-color) 70%, transparent)"
-                            : "none"
+                            : "none",
                       }}
                     >
                       <i className="fa fa-search" aria-hidden="true" style={{ fontSize: 18, color: "var(--primary-color)" }} />

@@ -70,10 +70,14 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
   const [input, setInput] = useState("");
   const [stage, setStage] = useState<"collect" | "ready">("collect");
   const [contactDraft, setContactDraft] = useState({ name: "", email: "" });
+  const [contactError, setContactError] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const nameRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
+  const normalizedName = contactDraft.name.trim();
+  const normalizedEmail = contactDraft.email.trim();
+  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -89,6 +93,27 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
       listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
     }
   }, [messages, isOpen, isTyping]);
+
+  useEffect(() => {
+    const localeMessages = getMessages(locale).chatWidget;
+    setMessages(initialMessages(localeMessages));
+    setInput("");
+    setStage("collect");
+    setContactDraft({ name: "", email: "" });
+    setContactError("");
+    setIsTyping(false);
+  }, [locale]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      setIsExpanded(false);
+      setIsOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [isOpen]);
 
   const handleSend = async () => {
     if (stage !== "ready" || isTyping) return;
@@ -163,9 +188,15 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
 
   const handleContactSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    const name = contactDraft.name.trim();
-    const email = contactDraft.email.trim();
+    const name = normalizedName;
+    const email = normalizedEmail;
+    if (!name) return;
+    if (!isEmailValid) {
+      setContactError(t.emailInvalid);
+      return;
+    }
 
+    setContactError("");
     setContactDraft({ name, email });
     setStage("ready");
     setIsTyping(true);
@@ -193,13 +224,14 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
         aria-expanded={isOpen}
         aria-controls="meri-chat-panel"
         onClick={() => setIsOpen((prev) => !prev)}
+        aria-label={t.toggle}
       >
         <span className="chat-toggle-label">{t.toggle}</span>
         <span className="chat-toggle-badge">{t.badge}</span>
         <i className="fa fa-comments" aria-hidden="true"></i>
       </button>
 
-      <div id="meri-chat-panel" className="chat-panel" role="dialog" aria-label={t.panelTitle}>
+      <div id="meri-chat-panel" className="chat-panel" role="dialog" aria-modal={false} aria-label={t.panelTitle}>
         <div className="chat-panel-header">
           <div className="chat-header-brand">
             <div className="chat-avatar" aria-hidden="true">
@@ -217,7 +249,7 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
             <button
               type="button"
               className="chat-expand"
-              aria-label={isExpanded ? "Collapse chat" : "Expand chat"}
+              aria-label={isExpanded ? t.collapse : t.expand}
               aria-pressed={isExpanded}
               onClick={() => setIsExpanded((prev) => !prev)}
             >
@@ -226,15 +258,18 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
             <button
               type="button"
               className="chat-close"
-              aria-label="Close chat"
-              onClick={() => setIsOpen(false)}
+              aria-label={t.close}
+              onClick={() => {
+                setIsExpanded(false);
+                setIsOpen(false);
+              }}
             >
               <i className="fa fa-times" aria-hidden="true"></i>
             </button>
           </div>
         </div>
 
-        <div className="chat-panel-body" ref={listRef}>
+        <div className="chat-panel-body" ref={listRef} role="log" aria-live="polite" aria-relevant="additions text">
           {messages.map((message, index) => (
             <div
               key={`${message.role}-${index}`}
@@ -255,22 +290,35 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
                 id="chat-name"
                 type="text"
                 value={contactDraft.name}
-                onChange={(event) =>
-                  setContactDraft((prev) => ({ ...prev, name: event.target.value }))
-                }
+                onChange={(event) => {
+                  setContactDraft((prev) => ({ ...prev, name: event.target.value }));
+                  if (contactError) setContactError("");
+                }}
                 placeholder={t.namePlaceholder}
+                autoComplete="name"
+                required
               />
               <label htmlFor="chat-email">{t.email}</label>
               <input
                 id="chat-email"
                 type="email"
                 value={contactDraft.email}
-                onChange={(event) =>
-                  setContactDraft((prev) => ({ ...prev, email: event.target.value }))
-                }
+                onChange={(event) => {
+                  setContactDraft((prev) => ({ ...prev, email: event.target.value }));
+                  if (contactError) setContactError("");
+                }}
                 placeholder={t.emailPlaceholder}
+                autoComplete="email"
+                required
               />
-              <button type="submit">{t.continue}</button>
+              {contactError ? (
+                <p className="chat-contact-error" role="alert">
+                  {contactError}
+                </p>
+              ) : null}
+              <button type="submit" disabled={!normalizedName || !isEmailValid}>
+                {t.continue}
+              </button>
             </form>
           )}
           {isTyping && (

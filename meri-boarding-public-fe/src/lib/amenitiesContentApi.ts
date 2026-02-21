@@ -42,6 +42,7 @@ export type AmenitiesResolvedContent = {
 }
 
 const apiBaseUrl = getServerApiBaseUrl()
+const API_REVALIDATE_SECONDS = 60
 
 function withApiBaseIfNeeded(url: string) {
   return withPublicApiBaseIfNeeded(url)
@@ -112,13 +113,18 @@ function resolveContent(locale: Locale, cms?: CmsAmenitiesContent): AmenitiesRes
 }
 
 export async function fetchAmenitiesResolvedContent(locale: Locale): Promise<AmenitiesResolvedContent> {
-  const response = await fetch(`${apiBaseUrl}/api/v1/public/content/amenities?locale=${locale}`, {
-    cache: 'no-store'
-  })
-  if (!response.ok) {
-    throw new Error(`Failed to fetch amenities content (${response.status})`)
-  }
+  try {
+    const response = await fetch(`${apiBaseUrl}/api/v1/public/content/amenities?locale=${locale}`, {
+      next: { revalidate: API_REVALIDATE_SECONDS }
+    })
+    if (!response.ok) {
+      throw new Error(`Failed to fetch amenities content (${response.status})`)
+    }
 
-  const data = await response.json()
-  return resolveContent(locale, data?.content || {})
+    const data = await response.json()
+    return resolveContent(locale, data?.content || {})
+  } catch (error) {
+    console.error('[public-fe] falling back to local amenities content', error)
+    return resolveContent(locale, {})
+  }
 }

@@ -29,6 +29,9 @@ export default async function PrivacyPage({ params }: PrivacyPageProps = {}) {
             src="/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6754.jpg"
             className="jarallax-img"
             alt=""
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
           />
           <div className="container relative z-2">
             <div className="row justify-content-center">

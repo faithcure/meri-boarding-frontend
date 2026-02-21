@@ -191,7 +191,14 @@ export default async function HotelDynamicPage({ params }: HotelDynamicPageProps
 
         <section className='jarallax text-light relative rounded-1 overflow-hidden mt-80 mt-sm-70 mx-2'>
           <div className='de-gradient-edge-top'></div>
-          <img src={withApiHost(hotel.coverImageUrl || fallbackHotelImage)} className='jarallax-img' alt='' />
+          <img
+            src={withApiHost(hotel.coverImageUrl || fallbackHotelImage)}
+            className='jarallax-img'
+            alt=''
+            loading='eager'
+            fetchPriority='high'
+            decoding='async'
+          />
           <div className='container relative z-2'>
             <div className='row justify-content-center'>
               <div className='col-lg-7 text-center'>
@@ -241,7 +248,7 @@ export default async function HotelDynamicPage({ params }: HotelDynamicPageProps
                       <div className='item' key={`carousel-${item.id}`}>
                         <div className='relative'>
                           <div className='overflow-hidden rounded-1 media-frame relative'>
-                            <img src={item.src} className='w-100' alt={item.alt} />
+                            <img src={item.src} className='w-100' alt={item.alt} loading='lazy' fetchPriority='low' decoding='async' />
                             {(item.meta?.sections?.length || 0) > 0 ? (
                               <div
                                 className='position-absolute start-0 bottom-0 w-100 text-white'
