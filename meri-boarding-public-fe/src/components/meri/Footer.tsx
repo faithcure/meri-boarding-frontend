@@ -3,6 +3,7 @@ import type { Locale } from "@/i18n/getLocale";
 import { getLocale } from "@/i18n/getLocale";
 import { localePath } from "@/i18n/localePath";
 import { getMessages } from "@/i18n/messages";
+import { fetchGeneralSocialLinks } from "@/lib/siteSettingsApi";
 import Link from "next/link";
 import styles from "./Footer.module.css";
 
@@ -13,6 +14,7 @@ type FooterProps = {
 export default async function Footer({ locale: localeProp }: FooterProps = {}) {
   const locale = localeProp ?? (await getLocale());
   const t = getMessages(locale).footer;
+  const socialLinks = await fetchGeneralSocialLinks();
   const withLocale = (path: string) => localePath(locale, path);
   return (
     <footer className={styles.footer}>
@@ -27,18 +29,11 @@ export default async function Footer({ locale: localeProp }: FooterProps = {}) {
               {t.addressLine2}
             </div>
             <div className={styles.socials}>
-              <a href="#" aria-label="Facebook">
-                <i className="fa-brands fa-facebook-f" aria-hidden="true"></i>
-              </a>
-              <a href="#" aria-label="Instagram">
-                <i className="fa-brands fa-instagram" aria-hidden="true"></i>
-              </a>
-              <a href="#" aria-label="Twitter">
-                <i className="fa-brands fa-twitter" aria-hidden="true"></i>
-              </a>
-              <a href="#" aria-label="YouTube">
-                <i className="fa-brands fa-youtube" aria-hidden="true"></i>
-              </a>
+              {socialLinks.map((item) => (
+                <a key={item.id} href={item.url} aria-label={item.label} target="_blank" rel="noreferrer">
+                  <i className={item.iconClass} aria-hidden="true"></i>
+                </a>
+              ))}
             </div>
           </div>
 

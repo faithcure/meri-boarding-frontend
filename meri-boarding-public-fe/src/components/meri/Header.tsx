@@ -5,6 +5,7 @@ import { getLocale } from "@/i18n/getLocale";
 import { localePath } from "@/i18n/localePath";
 import { getServerApiBaseUrl } from "@/lib/apiBaseUrl";
 import { fetchPublicHotels } from "@/lib/hotelsApi";
+import { fetchGeneralSocialLinks } from "@/lib/siteSettingsApi";
 import Link from "next/link";
 
 type HeaderProps = {
@@ -40,6 +41,7 @@ export default async function Header({ locale: localeProp }: HeaderProps = {}) {
   };
 
   const hotels = await fetchPublicHotels(locale);
+  const socialLinks = await fetchGeneralSocialLinks();
   const hotelLinks: Array<{ slug: string; menuName: string; available: boolean }> = hotels.map((item) => ({
     slug: item.slug,
     menuName: item.slug,
@@ -121,18 +123,18 @@ export default async function Header({ locale: localeProp }: HeaderProps = {}) {
                       </Link>
                     </li>
                     <li className="mobile-menu-socials">
-                      <a className="mobile-menu-social" href="https://www.instagram.com/" aria-label="Instagram" target="_blank" rel="noreferrer">
-                        <i className="fa-brands fa-instagram" aria-hidden="true"></i>
-                      </a>
-                      <a className="mobile-menu-social" href="https://www.linkedin.com/" aria-label="LinkedIn" target="_blank" rel="noreferrer">
-                        <i className="fa-brands fa-linkedin-in" aria-hidden="true"></i>
-                      </a>
-                      <a className="mobile-menu-social" href="#" aria-label="Facebook">
-                        <i className="fa-brands fa-facebook-f" aria-hidden="true"></i>
-                      </a>
-                      <a className="mobile-menu-social" href="#" aria-label="YouTube">
-                        <i className="fa-brands fa-youtube" aria-hidden="true"></i>
-                      </a>
+                      {socialLinks.map((item) => (
+                        <a
+                          key={item.id}
+                          className="mobile-menu-social"
+                          href={item.url}
+                          aria-label={item.label}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          <i className={item.iconClass} aria-hidden="true"></i>
+                        </a>
+                      ))}
                     </li>
                   </ul>
                 </div>

@@ -2,6 +2,7 @@ import type { Locale } from "@/i18n/getLocale";
 import { getLocale } from "@/i18n/getLocale";
 import { getMessages } from "@/i18n/messages";
 import type { ContactResolvedContent } from "@/lib/contactContentApi";
+import { fetchGeneralSocialLinks } from "@/lib/siteSettingsApi";
 
 type ContactDetailsProps = {
   locale?: Locale;
@@ -10,6 +11,7 @@ type ContactDetailsProps = {
 
 export default async function ContactDetails({ locale: localeProp, content }: ContactDetailsProps = {}) {
   const locale = localeProp ?? (await getLocale());
+  const socialLinks = await fetchGeneralSocialLinks();
   const fallback = getMessages(locale).contactDetails;
   const fallbackItems = [
     {
@@ -33,16 +35,11 @@ export default async function ContactDetails({ locale: localeProp, content }: Co
       value: "+49 (0) 152 06419253",
     },
   ];
-  const fallbackSocials = [
-    { icon: "fa-brands fa-instagram", label: "Instagram", url: "https://www.instagram.com/" },
-    { icon: "fa-brands fa-linkedin-in", label: "LinkedIn", url: "https://www.linkedin.com/" },
-  ];
   const t = {
     subtitle: String(content?.subtitle || fallback.subtitle || ""),
     title: String(content?.title || fallback.title || ""),
     description: String(content?.description || fallback.description || ""),
     items: Array.isArray(content?.items) ? content.items : fallbackItems,
-    socials: Array.isArray(content?.socials) ? content.socials : fallbackSocials,
   };
 
   const renderValue = (value: string) => {
@@ -77,9 +74,9 @@ export default async function ContactDetails({ locale: localeProp, content }: Co
       </div>
 
       <div className="contact-socials mt-4">
-        {t.socials.map((item) => (
+        {socialLinks.map((item) => (
           <a className="contact-social" href={item.url} aria-label={item.label} key={item.label}>
-            <i className={item.icon}></i>
+            <i className={item.iconClass}></i>
           </a>
         ))}
       </div>

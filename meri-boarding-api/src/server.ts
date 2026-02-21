@@ -71,6 +71,14 @@ type HeaderContent = {
 
 type GeneralSettingsContent = {
   siteIconUrl: string;
+  socialLinks: Array<{
+    id: string;
+    platform: string;
+    label: string;
+    url: string;
+    enabled: boolean;
+    order: number;
+  }>;
 };
 
 type ContentEntry<T> = {
@@ -484,6 +492,24 @@ type ReservationCmsContent = {
 
 const allowedLocales: ContentLocale[] = ['de', 'en', 'tr'];
 const allowedGalleryCategories: HotelGalleryImage['category'][] = ['rooms', 'dining', 'facilities', 'other'];
+const allowedSocialPlatforms = [
+  'instagram',
+  'facebook',
+  'x',
+  'tiktok',
+  'youtube',
+  'linkedin',
+  'threads',
+  'pinterest',
+  'telegram',
+  'whatsapp',
+  'snapchat',
+  'discord',
+  'reddit',
+  'github',
+  'medium',
+  'vimeo',
+] as const;
 const homeSectionKeys: HomeSectionKey[] = ['hero', 'bookingPartners', 'rooms', 'testimonials', 'facilities', 'gallery', 'offers', 'faq'];
 const defaultHomeContent: HomeCmsContent = {
   sections: {
@@ -1058,6 +1084,24 @@ const defaultHeaderContent: Record<ContentLocale, HeaderContent> = {
 };
 const defaultGeneralSettingsContent: GeneralSettingsContent = {
   siteIconUrl: '/images/icon.webp',
+  socialLinks: [
+    {
+      id: 'instagram',
+      platform: 'instagram',
+      label: 'Instagram',
+      url: 'https://www.instagram.com/',
+      enabled: true,
+      order: 1,
+    },
+    {
+      id: 'linkedin',
+      platform: 'linkedin',
+      label: 'LinkedIn',
+      url: 'https://www.linkedin.com/',
+      enabled: true,
+      order: 2,
+    },
+  ],
 };
 
 const server = Fastify({
@@ -1222,10 +1266,24 @@ function parseDataUrl(dataUrl: string) {
   return { mime, ext, buffer: Buffer.from(base64, 'base64') };
 }
 
+function parseSiteIconDataUrl(dataUrl: string) {
+  const match = /^data:(image\/(?:png|svg\+xml|x-icon|vnd\.microsoft\.icon));base64,(.+)$/i.exec(dataUrl);
+  if (!match) {
+    return null;
+  }
+
+  const mime = match[1].toLowerCase();
+  const base64 = match[2];
+  const ext: 'png' | 'svg' | 'ico' = mime.includes('svg') ? 'svg' : mime.includes('icon') ? 'ico' : 'png';
+  return { mime, ext, buffer: Buffer.from(base64, 'base64') };
+}
+
 function extToMime(ext: string) {
   const normalized = String(ext || '').toLowerCase();
   if (normalized === 'png') return 'image/png';
   if (normalized === 'webp') return 'image/webp';
+  if (normalized === 'svg') return 'image/svg+xml';
+  if (normalized === 'ico') return 'image/x-icon';
   return 'image/jpeg';
 }
 
@@ -1394,6 +1452,30 @@ type SaveUploadedImageOptions = {
   maxDimension?: number;
   quality?: number;
 };
+
+type SaveRawUploadedAssetOptions = {
+  uploadDir: string;
+  bucket: AssetBucket;
+  filePrefix: string;
+  requestedName: string;
+  ext: 'png' | 'svg' | 'ico';
+  sourceBuffer: Buffer;
+};
+
+async function saveRawUploadedAsset(options: SaveRawUploadedAssetOptions): Promise<UploadedImageResult> {
+  const prefix = sanitizeStem(options.filePrefix, 'asset');
+  const stem = sanitizeStem(path.parse(options.requestedName).name, 'image');
+  const nonce = `${Date.now()}-${randomBytes(4).toString('hex')}`;
+  const baseName = `${prefix}-${nonce}-${stem}`.replace(/-+/g, '-');
+  const outputFileName = `${baseName}.${options.ext}`;
+  await writeFile(path.join(options.uploadDir, outputFileName), options.sourceBuffer);
+
+  return {
+    fileName: outputFileName,
+    url: `/api/v1/assets/${options.bucket}/${outputFileName}`,
+    optimized: false,
+  };
+}
 
 async function saveUploadedImage(options: SaveUploadedImageOptions): Promise<UploadedImageResult> {
   const maxDimension = Math.max(640, Number(options.maxDimension || uploadImageMaxDimension));
@@ -1579,8 +1661,37 @@ function normalizeGeneralSettingsContent(
   input: Partial<GeneralSettingsContent> | undefined,
   fallback: GeneralSettingsContent,
 ): GeneralSettingsContent {
+  const normalizedSocials = (Array.isArray(input?.socialLinks) ? input?.socialLinks : fallback.socialLinks)
+    .map((item, index) => {
+      const fallbackItem = fallback.socialLinks[index] || fallback.socialLinks[0];
+      const platformRaw = String(item?.platform || fallbackItem?.platform || '').trim().toLowerCase();
+      const platform = allowedSocialPlatforms.includes(platformRaw as (typeof allowedSocialPlatforms)[number])
+        ? platformRaw
+        : 'instagram';
+      const normalizedId = String(item?.id || `${platform}-${index + 1}`)
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9-]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .slice(0, 64);
+
+      return {
+        id: normalizedId || `${platform}-${index + 1}`,
+        platform,
+        label: String(item?.label || fallbackItem?.label || '').trim(),
+        url: String(item?.url || fallbackItem?.url || '').trim(),
+        enabled: item?.enabled !== false,
+        order: Number.isFinite(item?.order) ? Number(item?.order) : index + 1,
+      };
+    })
+    .filter((item) => Boolean(item.label) && Boolean(item.url))
+    .sort((a, b) => a.order - b.order)
+    .slice(0, 40)
+    .map((item, index) => ({ ...item, order: index + 1 }));
+
   return {
     siteIconUrl: String(input?.siteIconUrl ?? fallback.siteIconUrl).trim(),
+    socialLinks: normalizedSocials,
   };
 }
 
@@ -1623,6 +1734,13 @@ function isValidImagePathOrUrl(input: string) {
   if (!value || value.length > 400) return false;
   if (/\s/.test(value)) return false;
   if (value.startsWith('/')) return true;
+  return /^https?:\/\//i.test(value);
+}
+
+function isValidSocialUrl(input: string) {
+  const value = String(input || '').trim();
+  if (!value || value.length > 600) return false;
+  if (/\s/.test(value)) return false;
   return /^https?:\/\//i.test(value);
 }
 
@@ -4570,6 +4688,24 @@ server.put('/api/v1/admin/settings/general', async (request, reply) => {
   if (!isValidImagePathOrUrl(nextContent.siteIconUrl)) {
     return reply.code(400).send({ error: 'Site icon URL must start with "/" or "http(s)://".' });
   }
+  if (!Array.isArray(nextContent.socialLinks)) {
+    return reply.code(400).send({ error: 'Social links must be an array.' });
+  }
+  if (nextContent.socialLinks.length > 40) {
+    return reply.code(400).send({ error: 'Social link limit is 40.' });
+  }
+  for (const [index, item] of nextContent.socialLinks.entries()) {
+    const platform = String(item?.platform || '').trim().toLowerCase();
+    if (!allowedSocialPlatforms.includes(platform as (typeof allowedSocialPlatforms)[number])) {
+      return reply.code(400).send({ error: `Social link ${index + 1}: invalid platform.` });
+    }
+    if (!String(item?.label || '').trim()) {
+      return reply.code(400).send({ error: `Social link ${index + 1}: label is required.` });
+    }
+    if (!isValidSocialUrl(String(item?.url || ''))) {
+      return reply.code(400).send({ error: `Social link ${index + 1}: URL must start with "http(s)://".` });
+    }
+  }
 
   const db = await getDb();
   const contents = db.collection<ContentEntry<GeneralSettingsContent>>('content_entries');
@@ -5446,27 +5582,50 @@ server.post('/api/v1/admin/content/page-image', async (request, reply) => {
   }
 
   const body = request.body as { fileName?: string; dataUrl?: string; context?: string } | undefined;
-  const parsed = parseDataUrl(String(body?.dataUrl || ''));
-  if (!parsed) {
-    return reply.code(400).send({ error: 'Invalid image format. Use PNG, JPG or WEBP data URL.' });
-  }
-  if (parsed.buffer.length > 8 * 1024 * 1024) {
-    return reply.code(400).send({ error: 'Image size cannot exceed 8MB' });
-  }
-
   const context = sanitizeFilename(String(body?.context || 'page')).replace(/\.+/g, '-').slice(0, 24) || 'page';
-  const requestedName = sanitizeFilename(String(body?.fileName || `${context}.${parsed.ext}`));
-  const sourceExt: ImageFormat = parsed.ext === 'png' || parsed.ext === 'webp' ? parsed.ext : 'jpg';
-  const savedImage = await saveUploadedImage({
-    uploadDir: homeUploadDir,
-    bucket: 'home',
-    filePrefix: context,
-    requestedName,
-    sourceExt,
-    sourceBuffer: parsed.buffer,
-    maxDimension: 2200,
-    quality: 82,
-  });
+  const dataUrl = String(body?.dataUrl || '');
+  let savedImage: UploadedImageResult;
+
+  if (context === 'general-site-icon') {
+    const parsedIcon = parseSiteIconDataUrl(dataUrl);
+    if (!parsedIcon) {
+      return reply.code(400).send({ error: 'Invalid icon format. Use ICO, PNG or SVG data URL.' });
+    }
+    if (parsedIcon.buffer.length > 8 * 1024 * 1024) {
+      return reply.code(400).send({ error: 'Image size cannot exceed 8MB' });
+    }
+
+    const requestedName = sanitizeFilename(String(body?.fileName || `${context}.${parsedIcon.ext}`));
+    savedImage = await saveRawUploadedAsset({
+      uploadDir: homeUploadDir,
+      bucket: 'home',
+      filePrefix: context,
+      requestedName,
+      ext: parsedIcon.ext,
+      sourceBuffer: parsedIcon.buffer,
+    });
+  } else {
+    const parsed = parseDataUrl(dataUrl);
+    if (!parsed) {
+      return reply.code(400).send({ error: 'Invalid image format. Use PNG, JPG or WEBP data URL.' });
+    }
+    if (parsed.buffer.length > 8 * 1024 * 1024) {
+      return reply.code(400).send({ error: 'Image size cannot exceed 8MB' });
+    }
+
+    const requestedName = sanitizeFilename(String(body?.fileName || `${context}.${parsed.ext}`));
+    const sourceExt: ImageFormat = parsed.ext === 'png' || parsed.ext === 'webp' ? parsed.ext : 'jpg';
+    savedImage = await saveUploadedImage({
+      uploadDir: homeUploadDir,
+      bucket: 'home',
+      filePrefix: context,
+      requestedName,
+      sourceExt,
+      sourceBuffer: parsed.buffer,
+      maxDimension: 2200,
+      quality: 82,
+    });
+  }
 
   return reply.send({ ok: true, imageUrl: savedImage.url });
 });
