@@ -17,9 +17,9 @@ import '@/app/globals.css'
 import '@assets/iconify-icons/generated-icons.css'
 
 export const metadata = {
-  title: 'Sneat - MUI Next.js Admin Dashboard Template',
+  title: 'meri - MUI Next.js Admin Dashboard Template',
   description:
-    'Sneat - MUI Next.js Admin Dashboard Template - is the most developer friendly & highly customizable Admin Dashboard Template based on MUI v5.'
+    'meri - MUI Next.js Admin Dashboard Template - is the most developer friendly & highly customizable Admin Dashboard Template based on MUI v5.'
 }
 
 async function fetchAdminSiteIconUrl() {
