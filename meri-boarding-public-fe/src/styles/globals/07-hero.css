@@ -1,0 +1,114 @@
+@media (max-width: 991px) {
+  .hero-intro {
+    border-radius: 0;
+  }
+
+  .hero-copy-shell {
+    margin-top: 10px;
+    padding: 0;
+  }
+}
+
+@media (max-width: 767px) {
+  .hero-logo img {
+    height: 52px;
+  }
+
+  .hero-copy {
+    max-width: none;
+    font-size: 14px;
+  }
+
+  .home-booking-partner-card {
+    width: 186px;
+    height: 87px;
+  }
+
+  .home-booking-partner-card img {
+    width: 90%;
+    height: 90%;
+  }
+}
+
+.policy-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+  max-width: 100%;
+}
+
+.policy-check input[type="checkbox"] {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 1.5px solid rgba(20, 20, 20, 0.35);
+  border-radius: 6px;
+  background: #fff;
+  display: grid;
+  place-items: center;
+  margin-top: 2px;
+  flex: 0 0 auto;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.policy-check input[type="checkbox"]::after {
+  content: "";
+  width: 10px;
+  height: 6px;
+  border-left: 2px solid #0f6b4c;
+  border-bottom: 2px solid #0f6b4c;
+  transform: rotate(-45deg) scale(0);
+  transition: transform 0.18s ease;
+}
+
+.policy-check input[type="checkbox"]:checked {
+  border-color: rgba(15, 107, 76, 0.8);
+  background: rgba(15, 107, 76, 0.08);
+}
+
+.policy-check input[type="checkbox"]:checked::after {
+  transform: rotate(-45deg) scale(1);
+}
+
+.policy-check input[type="checkbox"]:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(15, 107, 76, 0.2);
+}
+
+.policy-check span {
+  flex: 1 1 240px;
+  min-width: 0;
+  color: rgba(25, 25, 25, 0.8);
+  line-height: 1.55;
+}
+
+.policy-check a {
+  margin-left: 4px;
+  color: #0f6b4c;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+
+a.btn-main.fx-slide span {
+  transition: transform 0.25s ease-in-out, opacity 0.2s ease-in-out;
+  transition-delay: 0.12s;
+}
+
+a.btn-main.fx-slide:before {
+  transition: transform 0.25s ease-in-out, opacity 0.2s ease-in-out;
+  transition-delay: 0s;
+}
+
+a.btn-main.fx-slide:hover span {
+  transform: translate(0, 40px);
+  opacity: 0;
+  transition-delay: 0s;
+}
+
+a.btn-main.fx-slide:hover:before {
+  opacity: 1;
+  transform: translate(0, 0);
+  transition-delay: 0.12s;
+}
