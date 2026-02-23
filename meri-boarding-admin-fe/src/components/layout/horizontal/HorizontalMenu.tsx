@@ -126,6 +126,9 @@ const HorizontalMenu = () => {
           <MenuItem href='/contact-submissions' icon={<i className='bx-mail-send' />}>
             Contact Submissions
           </MenuItem>
+          <MenuItem href='/chat-sessions' icon={<i className='bx-chat' />}>
+            Chat Sessions
+          </MenuItem>
           <MenuItem href='/form-messages/partners' icon={<i className='bx-images' />}>
             Partner Logos
           </MenuItem>

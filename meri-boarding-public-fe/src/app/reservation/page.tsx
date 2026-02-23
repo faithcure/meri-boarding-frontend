@@ -207,7 +207,7 @@ export default async function ReservationPage({ params }: ReservationPageProps =
         </section>
 
         <div id="long-stay-inquiry">
-          <BookingInquiryForm locale={locale} content={t.inquiry} />
+          <BookingInquiryForm locale={locale} />
         </div>
       </main>
       <Footer locale={locale} />

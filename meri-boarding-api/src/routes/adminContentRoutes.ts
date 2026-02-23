@@ -59,6 +59,14 @@ export async function registerAdminContentRoutes(ctx: RouteContext) {
     ObjectId,
   } = ctx;
 
+const csvEscape = (value: unknown) => {
+  const text = String(value ?? '');
+  if (text.includes('"') || text.includes(',') || text.includes('\n') || text.includes('\r')) {
+    return `"${text.replace(/"/g, '""')}"`;
+  }
+  return text;
+};
+
 server.get('/api/v1/admin/content/header', async (request, reply) => {
   const admin = await getRequestAdmin(request.headers.authorization);
   if (!admin || (admin.role !== 'super_admin' && admin.role !== 'moderator')) {
@@ -151,6 +159,45 @@ server.put('/api/v1/admin/settings/general', async (request, reply) => {
     if (!isValidSocialUrl(String(item?.url || ''))) {
       return reply.code(400).send({ error: `Social link ${index + 1}: URL must start with "http(s)://".` });
     }
+  }
+  if (!nextContent.formDelivery || typeof nextContent.formDelivery !== 'object') {
+    return reply.code(400).send({ error: 'Form delivery settings are required.' });
+  }
+  if (!isValidSocialUrl(String(nextContent.formDelivery.requestFormActionUrl || ''))) {
+    return reply.code(400).send({ error: 'Request form action URL must start with "http(s)://".' });
+  }
+  if (!Array.isArray(nextContent.formDelivery.contactNotificationEmails)) {
+    return reply.code(400).send({ error: 'Contact notification emails must be an array.' });
+  }
+  if (nextContent.formDelivery.contactNotificationEmails.length > 30) {
+    return reply.code(400).send({ error: 'Contact notification email limit is 30.' });
+  }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  for (const [index, email] of nextContent.formDelivery.contactNotificationEmails.entries()) {
+    const value = String(email || '').trim().toLowerCase();
+    if (!emailRegex.test(value)) {
+      return reply.code(400).send({ error: `Contact notification email ${index + 1} is invalid.` });
+    }
+  }
+  if (!nextContent.smtp || typeof nextContent.smtp !== 'object') {
+    return reply.code(400).send({ error: 'SMTP settings are required.' });
+  }
+  const smtpHost = String(nextContent.smtp.host || '').trim();
+  const smtpFrom = String(nextContent.smtp.from || '').trim();
+  const smtpUser = String(nextContent.smtp.user || '').trim();
+  const smtpPass = String(nextContent.smtp.pass || '').trim();
+  const smtpPort = Number(nextContent.smtp.port || 0);
+  if (!smtpHost) {
+    return reply.code(400).send({ error: 'SMTP host is required.' });
+  }
+  if (!Number.isFinite(smtpPort) || smtpPort < 1 || smtpPort > 65535) {
+    return reply.code(400).send({ error: 'SMTP port must be between 1 and 65535.' });
+  }
+  if (!smtpFrom || !emailRegex.test(smtpFrom.includes('<') ? String((smtpFrom.match(/<([^>]+)>/) || [])[1] || '') : smtpFrom)) {
+    return reply.code(400).send({ error: 'SMTP from email is invalid.' });
+  }
+  if ((smtpUser && !smtpPass) || (!smtpUser && smtpPass)) {
+    return reply.code(400).send({ error: 'SMTP user and password must be set together.' });
   }
 
   const db = await getDb();
@@ -532,6 +579,204 @@ server.delete('/api/v1/admin/contact-submissions/:submissionId', async (request,
   if (!result.deletedCount) {
     return reply.code(404).send({ error: 'Submission not found' });
   }
+
+  return reply.send({ ok: true });
+});
+
+server.get('/api/v1/admin/chat-sessions', async (request, reply) => {
+  const admin = await getRequestAdmin(request.headers.authorization);
+  if (!canManageContent(admin)) {
+    return reply.code(403).send({ error: 'Only super_admin or moderator can access this route' });
+  }
+
+  const query = request.query as
+    | {
+        page?: string | number;
+        limit?: string | number;
+        search?: string;
+        locale?: string;
+      }
+    | undefined;
+
+  const page = Math.max(1, Number(query?.page || 1));
+  const limit = Math.min(100, Math.max(10, Number(query?.limit || 25)));
+  const search = String(query?.search || '').trim().slice(0, 120);
+  const locale = String(query?.locale || 'all').trim().toLowerCase();
+  const skip = (page - 1) * limit;
+  const filter: Record<string, unknown> = {};
+
+  if (locale === 'de' || locale === 'en' || locale === 'tr') {
+    filter.locale = locale;
+  }
+  if (search) {
+    const regex = new RegExp(escapeRegex(search), 'i');
+    filter.$or = [{ name: regex }, { email: regex }, { sourcePage: regex }, { lastPreview: regex }];
+  }
+
+  const db = await getDb();
+  const sessions = db.collection('chat_sessions');
+  await sessions.createIndex({ createdAt: -1 });
+  await sessions.createIndex({ email: 1, createdAt: -1 });
+  await sessions.createIndex({ locale: 1, createdAt: -1 });
+
+  const [items, total] = await Promise.all([
+    sessions.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit).toArray(),
+    sessions.countDocuments(filter),
+  ]);
+
+  return reply.send({
+    items: items.map((row: any) => ({
+      id: row._id.toHexString(),
+      name: String(row.name || ''),
+      email: String(row.email || ''),
+      locale: String(row.locale || 'en'),
+      sourcePage: String(row.sourcePage || '/'),
+      status: String(row.status || 'open'),
+      messageCount: Number(row.messageCount || 0),
+      lastMessageAt: row.lastMessageAt instanceof Date ? row.lastMessageAt.toISOString() : '',
+      lastRole: String(row.lastRole || ''),
+      lastPreview: String(row.lastPreview || ''),
+      createdAt: row.createdAt instanceof Date ? row.createdAt.toISOString() : '',
+    })),
+    total,
+    page,
+    limit,
+  });
+});
+
+server.get('/api/v1/admin/chat-sessions/:sessionId/messages', async (request, reply) => {
+  const admin = await getRequestAdmin(request.headers.authorization);
+  if (!canManageContent(admin)) {
+    return reply.code(403).send({ error: 'Only super_admin or moderator can access this route' });
+  }
+
+  const params = request.params as { sessionId?: string } | undefined;
+  const sessionId = String(params?.sessionId || '').trim();
+  if (!ObjectId.isValid(sessionId)) {
+    return reply.code(400).send({ error: 'Invalid session id' });
+  }
+
+  const db = await getDb();
+  const sessions = db.collection('chat_sessions');
+  const messages = db.collection('chat_messages');
+  const objectId = new ObjectId(sessionId);
+
+  const [session, rows] = await Promise.all([
+    sessions.findOne({ _id: objectId }),
+    messages.find({ sessionId: objectId }).sort({ createdAt: 1 }).limit(5000).toArray(),
+  ]);
+
+  if (!session) {
+    return reply.code(404).send({ error: 'Session not found' });
+  }
+
+  return reply.send({
+    session: {
+      id: session._id.toHexString(),
+      name: String(session.name || ''),
+      email: String(session.email || ''),
+      locale: String(session.locale || 'en'),
+      sourcePage: String(session.sourcePage || '/'),
+      status: String(session.status || 'open'),
+      messageCount: Number(session.messageCount || 0),
+      lastMessageAt: session.lastMessageAt instanceof Date ? session.lastMessageAt.toISOString() : '',
+      createdAt: session.createdAt instanceof Date ? session.createdAt.toISOString() : '',
+    },
+    messages: rows.map((row: any) => ({
+      id: row._id.toHexString(),
+      role: String(row.role || 'user'),
+      text: String(row.text || ''),
+      kind: String(row.kind || ''),
+      model: String(row.model || ''),
+      intent: String(row.intent || ''),
+      locale: String(row.locale || ''),
+      createdAt: row.createdAt instanceof Date ? row.createdAt.toISOString() : '',
+    })),
+  });
+});
+
+server.get('/api/v1/admin/chat-sessions-export.csv', async (request, reply) => {
+  const admin = await getRequestAdmin(request.headers.authorization);
+  if (!canManageContent(admin)) {
+    return reply.code(403).send({ error: 'Only super_admin or moderator can access this route' });
+  }
+
+  const query = request.query as { search?: string; locale?: string } | undefined;
+  const search = String(query?.search || '').trim().slice(0, 120);
+  const locale = String(query?.locale || 'all').trim().toLowerCase();
+  const filter: Record<string, unknown> = {};
+
+  if (locale === 'de' || locale === 'en' || locale === 'tr') {
+    filter.locale = locale;
+  }
+  if (search) {
+    const regex = new RegExp(escapeRegex(search), 'i');
+    filter.$or = [{ name: regex }, { email: regex }, { sourcePage: regex }, { lastPreview: regex }];
+  }
+
+  const db = await getDb();
+  const sessions = db.collection('chat_sessions');
+  const messages = db.collection('chat_messages');
+  const rows = await sessions.find(filter).sort({ createdAt: -1 }).limit(50000).toArray();
+
+  const lines = ['session_id,name,email,locale,source_page,status,message_count,last_message_at,created_at,messages'];
+
+  for (const session of rows) {
+    const sessionId = session._id.toHexString();
+    const msgs = await messages.find({ sessionId: session._id }).sort({ createdAt: 1 }).limit(5000).toArray();
+    const messageText = msgs
+      .map((msg: any) => `[${msg.createdAt instanceof Date ? msg.createdAt.toISOString() : ''}] ${String(msg.role || '')}: ${String(msg.text || '')}`)
+      .join('\n');
+
+    lines.push(
+      [
+        csvEscape(sessionId),
+        csvEscape(String(session.name || '')),
+        csvEscape(String(session.email || '')),
+        csvEscape(String(session.locale || '')),
+        csvEscape(String(session.sourcePage || '')),
+        csvEscape(String(session.status || 'open')),
+        csvEscape(Number(session.messageCount || 0)),
+        csvEscape(session.lastMessageAt instanceof Date ? session.lastMessageAt.toISOString() : ''),
+        csvEscape(session.createdAt instanceof Date ? session.createdAt.toISOString() : ''),
+        csvEscape(messageText),
+      ].join(','),
+    );
+  }
+
+  const csv = lines.join('\n');
+  reply.header('Content-Type', 'text/csv; charset=utf-8');
+  reply.header('Content-Disposition', `attachment; filename=\"chat_sessions_${new Date().toISOString().slice(0, 10)}.csv\"`);
+  return reply.send(csv);
+});
+
+server.delete('/api/v1/admin/chat-sessions/:sessionId', async (request, reply) => {
+  const admin = await getRequestAdmin(request.headers.authorization);
+  if (!canManageContent(admin)) {
+    return reply.code(403).send({ error: 'Only super_admin or moderator can delete this route' });
+  }
+
+  const params = request.params as { sessionId?: string } | undefined;
+  const sessionId = String(params?.sessionId || '').trim();
+  if (!ObjectId.isValid(sessionId)) {
+    return reply.code(400).send({ error: 'Invalid session id' });
+  }
+
+  const db = await getDb();
+  const sessions = db.collection('chat_sessions');
+  const messages = db.collection('chat_messages');
+  const events = db.collection('chat_events');
+  const objectId = new ObjectId(sessionId);
+
+  const deleteSessionResult = await sessions.deleteOne({ _id: objectId });
+  if (!deleteSessionResult.deletedCount) {
+    return reply.code(404).send({ error: 'Session not found' });
+  }
+
+  await Promise.all([
+    messages.deleteMany({ sessionId: objectId }),
+    events.deleteMany({ sessionId: objectId }),
+  ]);
 
   return reply.send({ ok: true });
 });

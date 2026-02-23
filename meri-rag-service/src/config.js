@@ -28,6 +28,7 @@ export const config = {
 
   ragTopK: intEnv('RAG_TOP_K', 5),
   ragMaxContextChunks: intEnv('RAG_MAX_CONTEXT_CHUNKS', 6),
+  ragMinTopScore: Number(String(process.env.RAG_MIN_TOP_SCORE || '0.2').trim()) || 0.2,
   ragChunkSize: intEnv('RAG_CHUNK_SIZE', 900),
   ragChunkOverlap: intEnv('RAG_CHUNK_OVERLAP', 120)
 };

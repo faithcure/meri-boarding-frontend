@@ -1,4 +1,5 @@
 import BuyNow from '@/components/meri/BuyNow'
+import BookingPartnersSection from '@/components/meri/BookingPartnersSection'
 import Footer from '@/components/meri/Footer'
 import Header from '@/components/meri/Header'
 import HotelCheckinCard from '@/components/meri/HotelCheckinCard'
@@ -10,6 +11,7 @@ import type { Locale } from '@/i18n/getLocale'
 import { getLocale } from '@/i18n/getLocale'
 import { localePath } from '@/i18n/localePath'
 import { getMessages } from '@/i18n/messages'
+import { fetchHomeResolvedContent } from '@/lib/homeContentApi'
 import { fetchPublicHotelBySlug, fetchPublicHotels } from '@/lib/hotelsApi'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -35,6 +37,7 @@ export default async function HotelDynamicPage({ params }: HotelDynamicPageProps
   }
   const hotel = await fetchPublicHotelBySlug(locale, slug)
   const allHotels = await fetchPublicHotels(locale)
+  const homeContent = await fetchHomeResolvedContent(locale)
   const messages = getMessages(locale)
   const hotelDetailMessages = messages.hotelDetail
   const detail = (hotelDetailMessages as Record<string, (typeof hotelDetailMessages)['flamingo']>)[slug] || hotelDetailMessages.europaplatz
@@ -406,6 +409,11 @@ export default async function HotelDynamicPage({ params }: HotelDynamicPageProps
             )}
           </div>
         </section>
+        <BookingPartnersSection
+          partners={homeContent.hero.bookingPartners}
+          title={homeContent.hero.bookingPartnersTitle}
+          description={homeContent.hero.bookingPartnersDescription}
+        />
       </main>
       <Footer locale={locale} />
       <BuyNow />

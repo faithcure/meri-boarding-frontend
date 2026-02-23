@@ -1,5 +1,7 @@
 import dotenv from 'dotenv';
 import crypto from 'node:crypto';
+import path from 'node:path';
+import { readdir, readFile } from 'node:fs/promises';
 import { MongoClient } from 'mongodb';
 import { config } from '../src/config.js';
 import { chunkText, toSearchText } from '../src/chunker.js';
@@ -91,6 +93,80 @@ async function loadHotels(db) {
   return docs;
 }
 
+async function loadForAiDocs() {
+  const root = path.resolve(process.cwd(), 'data/forai');
+  let files = [];
+  try {
+    files = await readdir(root);
+  } catch (_err) {
+    return [];
+  }
+
+  const docs = [];
+
+  for (const fileName of files) {
+    if (!fileName.endsWith('.json')) continue;
+    const fullPath = path.join(root, fileName);
+    let parsed;
+    try {
+      const raw = await readFile(fullPath, 'utf8');
+      parsed = JSON.parse(raw);
+    } catch (err) {
+      console.warn(`[index] skip invalid JSON: ${fileName}`, err?.message || err);
+      continue;
+    }
+
+    const source = String(parsed?.source || fileName);
+    const updatedAt = String(parsed?.updatedAt || new Date().toISOString().slice(0, 10));
+    const locale = String(parsed?.locale || 'tr').trim().toLowerCase();
+
+    if (Array.isArray(parsed?.items)) {
+      for (const item of parsed.items) {
+        const id = String(item?.id || '').trim();
+        const question = String(item?.question || '').trim();
+        const answer = String(item?.answer || '').trim();
+        if (!id || !question || !answer) continue;
+
+        const category = String(item?.category || 'faq').trim();
+        const title = String(item?.title || question).trim();
+        const tags = Array.isArray(item?.tags) ? item.tags.map((t) => String(t || '').trim()).filter(Boolean) : [];
+        const text = [
+          `category: ${category}`,
+          `title: ${title}`,
+          `question: ${question}`,
+          `answer: ${answer}`,
+          tags.length ? `tags: ${tags.join(', ')}` : ''
+        ].filter(Boolean).join('\n');
+
+        docs.push({
+          sourceId: `forai:qa:${id}:${locale}`,
+          title: `forai.qa.${id} (${locale})`,
+          locale,
+          url: '/contact',
+          updatedAt,
+          text
+        });
+      }
+      continue;
+    }
+
+    const payloadText = toSearchText(parsed);
+    if (!payloadText || payloadText.length < 20) continue;
+
+    docs.push({
+      sourceId: `forai:policy:${fileName.replace(/\.json$/i, '')}`,
+      title: `forai.policy.${fileName}`,
+      locale,
+      url: '/contact',
+      updatedAt,
+      text: payloadText
+    });
+    console.log(`[index] loaded forai policy doc: ${source}`);
+  }
+
+  return docs;
+}
+
 async function main() {
   const mongo = new MongoClient(config.mongoUri);
   await mongo.connect();
@@ -99,7 +175,8 @@ async function main() {
     const db = mongo.db(config.mongoDb);
     const docs = [
       ...(await loadContentEntries(db)),
-      ...(await loadHotels(db))
+      ...(await loadHotels(db)),
+      ...(await loadForAiDocs())
     ];
 
     if (docs.length === 0) {

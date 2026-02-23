@@ -65,6 +65,9 @@ export default async function RootLayout({
         <link rel="apple-touch-icon" href={siteIconUrl} />
         <link rel="stylesheet" href="/css/bootstrap.min.css" />
         <link rel="stylesheet" href="/css/plugins.css" />
+        <link rel="stylesheet" href="/fonts/fontawesome6/css/fontawesome.css" />
+        <link rel="stylesheet" href="/fonts/fontawesome6/css/brands.css" />
+        <link rel="stylesheet" href="/fonts/fontawesome6/css/solid.css" />
         <link rel="stylesheet" href="/css/swiper.css" />
         <link rel="stylesheet" href="/css/swiper-custom-1.css" />
         <link rel="stylesheet" href="/css/style.css" />

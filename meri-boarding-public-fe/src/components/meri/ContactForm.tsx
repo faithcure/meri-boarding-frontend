@@ -1,9 +1,11 @@
 'use client'
 
 import { FormEvent, useMemo, useState } from 'react'
+import Link from 'next/link'
 
 import type { Locale } from '@/i18n/getLocale'
 import { getMessages } from '@/i18n/messages'
+import { localePath } from '@/i18n/localePath'
 import type { ContactResolvedContent } from '@/lib/contactContentApi'
 
 type ContactFormProps = {
@@ -44,7 +46,8 @@ export default function ContactForm({ locale: localeProp, content }: ContactForm
       return {
         sending: 'Gönderiliyor...',
         validationSummary: 'Lütfen işaretli alanları kontrol edin.',
-        successTitle: 'Mesajınız gönderildi 😊',
+        modalTitle: 'Talebiniz alındı',
+        modalBody: 'Ekibimiz en kısa sürede sizinle iletişime geçecek.',
         nameRequired: 'Lütfen adınızı girin.',
         emailInvalid: 'Lütfen geçerli bir e-posta girin.',
         phoneInvalid: 'Lütfen geçerli bir telefon girin.',
@@ -55,6 +58,10 @@ export default function ContactForm({ locale: localeProp, content }: ContactForm
         countryPlaceholder: 'Ülke seçin',
         subjectLabel: 'Başvuru Konusu',
         subjectPlaceholder: 'Konu seçin',
+        policyRequired: 'Lütfen gizlilik sözleşmesini onaylayın.',
+        policyText: '* Bu formu göndererek, verilerinizin talebinizi işlemek için kullanılmasını kabul edersiniz. Veri koruma bilgilerine ',
+        policyLinkText: 'buradan',
+        modalClose: 'Kapat',
         assistantNote: 'Dilerseniz AI asistanımız Meri size hızlıca yardımcı olabilir.'
       }
     }
@@ -63,7 +70,8 @@ export default function ContactForm({ locale: localeProp, content }: ContactForm
       return {
         sending: 'Sending...',
         validationSummary: 'Please check the highlighted fields.',
-        successTitle: 'Message sent 😊',
+        modalTitle: 'Your request has been received',
+        modalBody: 'Our team will contact you shortly.',
         nameRequired: 'Please enter your name.',
         emailInvalid: 'Please enter a valid email.',
         phoneInvalid: 'Please enter a valid phone number.',
@@ -74,6 +82,10 @@ export default function ContactForm({ locale: localeProp, content }: ContactForm
         countryPlaceholder: 'Select country',
         subjectLabel: 'Inquiry Topic',
         subjectPlaceholder: 'Select topic',
+        policyRequired: 'Please accept the privacy policy.',
+        policyText: '* By submitting this form, you agree that we may use your data to process your request. You can find data protection information ',
+        policyLinkText: 'here',
+        modalClose: 'Close',
         assistantNote: 'If you prefer, our AI assistant Meri can help you right away.'
       }
     }
@@ -81,7 +93,8 @@ export default function ContactForm({ locale: localeProp, content }: ContactForm
     return {
       sending: 'Wird gesendet...',
       validationSummary: 'Bitte prüfen Sie die markierten Felder.',
-      successTitle: 'Nachricht gesendet 😊',
+      modalTitle: 'Ihre Anfrage wurde erhalten',
+      modalBody: 'Unser Team wird sich in Kürze bei Ihnen melden.',
       nameRequired: 'Bitte geben Sie Ihren Namen ein.',
       emailInvalid: 'Bitte geben Sie eine gültige E-Mail ein.',
       phoneInvalid: 'Bitte geben Sie eine gültige Telefonnummer ein.',
@@ -92,6 +105,10 @@ export default function ContactForm({ locale: localeProp, content }: ContactForm
       countryPlaceholder: 'Land auswählen',
       subjectLabel: 'Anliegen',
       subjectPlaceholder: 'Anliegen auswählen',
+      policyRequired: 'Bitte akzeptieren Sie die Datenschutzerklärung.',
+      policyText: '* Mit dem Absenden dieses Formulars stimmen Sie zu, dass wir Ihre Daten zur Bearbeitung Ihrer Anfrage verwenden dürfen. Informationen zum Datenschutz finden Sie ',
+      policyLinkText: 'hier',
+      modalClose: 'Schließen',
       assistantNote: 'Wenn Sie möchten, kann unser KI-Assistent Meri Ihnen sofort helfen.'
     }
   }, [locale])
@@ -172,6 +189,10 @@ export default function ContactForm({ locale: localeProp, content }: ContactForm
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
+  const [policyAccepted, setPolicyAccepted] = useState(false)
+  const [policyError, setPolicyError] = useState('')
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const privacyHref = localePath(locale, '/privacy')
 
   const validateField = (field: ContactField, value: string) => {
     const trimmedValue = value.trim()
@@ -245,6 +266,13 @@ export default function ContactForm({ locale: localeProp, content }: ContactForm
     setTouchedFields({ name: true, email: true, phone: true, country: true, subject: true, message: true })
     const nextErrors = validateForm(formValues)
     setFieldErrors(nextErrors)
+    if (!policyAccepted) {
+      setPolicyError(ui.policyRequired)
+      setSuccessMessage('')
+      setErrorMessage(ui.validationSummary)
+      return
+    }
+    setPolicyError('')
     if (Object.keys(nextErrors).length > 0) {
       setSuccessMessage('')
       setErrorMessage(ui.validationSummary)
@@ -266,7 +294,7 @@ export default function ContactForm({ locale: localeProp, content }: ContactForm
           email: formValues.email.trim(),
           phone: formValues.phone.trim(),
           country: formValues.country.trim(),
-          subject: formValues.subject.trim(),
+          subject: String(subjectOptions.find(item => item.value === formValues.subject)?.label || formValues.subject).trim(),
           message: formValues.message.trim()
         })
       })
@@ -289,7 +317,10 @@ export default function ContactForm({ locale: localeProp, content }: ContactForm
       setTouchedFields({})
       setFieldErrors({})
       setHasAttemptedSubmit(false)
-      setSuccessMessage(t.success || 'Mesajınız alındı.')
+      setSuccessMessage(t.success || 'Message received.')
+      setShowSuccessModal(true)
+      setPolicyAccepted(false)
+      setPolicyError('')
     } catch {
       setErrorMessage(t.error || 'Form gönderilemedi.')
     } finally {
@@ -310,20 +341,24 @@ export default function ContactForm({ locale: localeProp, content }: ContactForm
         >
           <div className='row g-4'>
             <div className='col-md-6'>
-              <h3 className='fs-18'>{t.name}</h3>
-              <input
-                type='text'
-                name='name'
-                id='name'
-                className={`bg-white form-control contact-form-control${fieldErrors.name ? ' contact-form-control-invalid' : ''}`}
-                placeholder={t.namePlaceholder}
-                value={formValues.name}
-                onChange={event => handleFieldChange('name', event.target.value)}
-                onBlur={() => handleFieldBlur('name')}
-                aria-invalid={Boolean(fieldErrors.name)}
-                aria-describedby={fieldErrors.name ? 'contact_name_error' : undefined}
-                required
-              />
+              <div className='modern-contact-field'>
+                <input
+                  type='text'
+                  name='name'
+                  id='name'
+                  className={`bg-white form-control contact-form-control modern-contact-input${fieldErrors.name ? ' contact-form-control-invalid' : ''}`}
+                  placeholder=' '
+                  value={formValues.name}
+                  onChange={event => handleFieldChange('name', event.target.value)}
+                  onBlur={() => handleFieldBlur('name')}
+                  aria-invalid={Boolean(fieldErrors.name)}
+                  aria-describedby={fieldErrors.name ? 'contact_name_error' : undefined}
+                  required
+                />
+                <label htmlFor='name' className='modern-contact-label'>
+                  {t.name}
+                </label>
+              </div>
               {fieldErrors.name && (touchedFields.name || hasAttemptedSubmit) ? (
                 <div id='contact_name_error' className='contact-field-error'>
                   {fieldErrors.name}
@@ -332,20 +367,24 @@ export default function ContactForm({ locale: localeProp, content }: ContactForm
             </div>
 
             <div className='col-md-6'>
-              <h3 className='fs-18'>{t.email}</h3>
-              <input
-                type='email'
-                name='email'
-                id='email'
-                className={`bg-white form-control contact-form-control${fieldErrors.email ? ' contact-form-control-invalid' : ''}`}
-                placeholder={t.emailPlaceholder}
-                value={formValues.email}
-                onChange={event => handleFieldChange('email', event.target.value)}
-                onBlur={() => handleFieldBlur('email')}
-                aria-invalid={Boolean(fieldErrors.email)}
-                aria-describedby={fieldErrors.email ? 'contact_email_error' : undefined}
-                required
-              />
+              <div className='modern-contact-field'>
+                <input
+                  type='email'
+                  name='email'
+                  id='email'
+                  className={`bg-white form-control contact-form-control modern-contact-input${fieldErrors.email ? ' contact-form-control-invalid' : ''}`}
+                  placeholder=' '
+                  value={formValues.email}
+                  onChange={event => handleFieldChange('email', event.target.value)}
+                  onBlur={() => handleFieldBlur('email')}
+                  aria-invalid={Boolean(fieldErrors.email)}
+                  aria-describedby={fieldErrors.email ? 'contact_email_error' : undefined}
+                  required
+                />
+                <label htmlFor='email' className='modern-contact-label'>
+                  {t.email}
+                </label>
+              </div>
               {fieldErrors.email && (touchedFields.email || hasAttemptedSubmit) ? (
                 <div id='contact_email_error' className='contact-field-error'>
                   {fieldErrors.email}
@@ -354,20 +393,24 @@ export default function ContactForm({ locale: localeProp, content }: ContactForm
             </div>
 
             <div className='col-md-12'>
-              <h3 className='fs-18'>{t.phone}</h3>
-              <input
-                type='text'
-                name='phone'
-                id='phone'
-                className={`bg-white form-control contact-form-control${fieldErrors.phone ? ' contact-form-control-invalid' : ''}`}
-                placeholder={t.phonePlaceholder}
-                value={formValues.phone}
-                onChange={event => handleFieldChange('phone', event.target.value)}
-                onBlur={() => handleFieldBlur('phone')}
-                aria-invalid={Boolean(fieldErrors.phone)}
-                aria-describedby={fieldErrors.phone ? 'contact_phone_error' : undefined}
-                required
-              />
+              <div className='modern-contact-field'>
+                <input
+                  type='text'
+                  name='phone'
+                  id='phone'
+                  className={`bg-white form-control contact-form-control modern-contact-input${fieldErrors.phone ? ' contact-form-control-invalid' : ''}`}
+                  placeholder=' '
+                  value={formValues.phone}
+                  onChange={event => handleFieldChange('phone', event.target.value)}
+                  onBlur={() => handleFieldBlur('phone')}
+                  aria-invalid={Boolean(fieldErrors.phone)}
+                  aria-describedby={fieldErrors.phone ? 'contact_phone_error' : undefined}
+                  required
+                />
+                <label htmlFor='phone' className='modern-contact-label'>
+                  {t.phone}
+                </label>
+              </div>
               {fieldErrors.phone && (touchedFields.phone || hasAttemptedSubmit) ? (
                 <div id='contact_phone_error' className='contact-field-error'>
                   {fieldErrors.phone}
@@ -376,25 +419,29 @@ export default function ContactForm({ locale: localeProp, content }: ContactForm
             </div>
 
             <div className='col-md-6'>
-              <h3 className='fs-18'>{ui.countryLabel}</h3>
-              <select
-                name='country'
-                id='country'
-                className={`bg-white form-control contact-form-control${fieldErrors.country ? ' contact-form-control-invalid' : ''}`}
-                value={formValues.country}
-                onChange={event => handleFieldChange('country', event.target.value)}
-                onBlur={() => handleFieldBlur('country')}
-                aria-invalid={Boolean(fieldErrors.country)}
-                aria-describedby={fieldErrors.country ? 'contact_country_error' : undefined}
-                required
-              >
-                <option value=''>{ui.countryPlaceholder}</option>
-                {countryOptions.map(option => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+              <div className='modern-contact-field select-field'>
+                <select
+                  name='country'
+                  id='country'
+                  className={`bg-white form-control contact-form-control modern-contact-input${fieldErrors.country ? ' contact-form-control-invalid' : ''}`}
+                  value={formValues.country}
+                  onChange={event => handleFieldChange('country', event.target.value)}
+                  onBlur={() => handleFieldBlur('country')}
+                  aria-invalid={Boolean(fieldErrors.country)}
+                  aria-describedby={fieldErrors.country ? 'contact_country_error' : undefined}
+                  required
+                >
+                  <option value=''>{ui.countryPlaceholder}</option>
+                  {countryOptions.map(option => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+                <label htmlFor='country' className='modern-contact-label'>
+                  {ui.countryLabel}
+                </label>
+              </div>
               {fieldErrors.country && (touchedFields.country || hasAttemptedSubmit) ? (
                 <div id='contact_country_error' className='contact-field-error'>
                   {fieldErrors.country}
@@ -403,25 +450,29 @@ export default function ContactForm({ locale: localeProp, content }: ContactForm
             </div>
 
             <div className='col-md-6'>
-              <h3 className='fs-18'>{ui.subjectLabel}</h3>
-              <select
-                name='subject'
-                id='subject'
-                className={`bg-white form-control contact-form-control${fieldErrors.subject ? ' contact-form-control-invalid' : ''}`}
-                value={formValues.subject}
-                onChange={event => handleFieldChange('subject', event.target.value)}
-                onBlur={() => handleFieldBlur('subject')}
-                aria-invalid={Boolean(fieldErrors.subject)}
-                aria-describedby={fieldErrors.subject ? 'contact_subject_error' : undefined}
-                required
-              >
-                <option value=''>{ui.subjectPlaceholder}</option>
-                {subjectOptions.map(option => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+              <div className='modern-contact-field select-field'>
+                <select
+                  name='subject'
+                  id='subject'
+                  className={`bg-white form-control contact-form-control modern-contact-input${fieldErrors.subject ? ' contact-form-control-invalid' : ''}`}
+                  value={formValues.subject}
+                  onChange={event => handleFieldChange('subject', event.target.value)}
+                  onBlur={() => handleFieldBlur('subject')}
+                  aria-invalid={Boolean(fieldErrors.subject)}
+                  aria-describedby={fieldErrors.subject ? 'contact_subject_error' : undefined}
+                  required
+                >
+                  <option value=''>{ui.subjectPlaceholder}</option>
+                  {subjectOptions.map(option => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+                <label htmlFor='subject' className='modern-contact-label'>
+                  {ui.subjectLabel}
+                </label>
+              </div>
               {fieldErrors.subject && (touchedFields.subject || hasAttemptedSubmit) ? (
                 <div id='contact_subject_error' className='contact-field-error'>
                   {fieldErrors.subject}
@@ -430,19 +481,23 @@ export default function ContactForm({ locale: localeProp, content }: ContactForm
             </div>
 
             <div className='col-md-12'>
-              <h3 className='fs-18'>{t.message}</h3>
-              <textarea
-                name='message'
-                id='message'
-                className={`bg-white form-control h-100px contact-form-control${fieldErrors.message ? ' contact-form-control-invalid' : ''}`}
-                placeholder={t.messagePlaceholder}
-                value={formValues.message}
-                onChange={event => handleFieldChange('message', event.target.value)}
-                onBlur={() => handleFieldBlur('message')}
-                aria-invalid={Boolean(fieldErrors.message)}
-                aria-describedby={fieldErrors.message ? 'contact_message_error' : undefined}
-                required
-              />
+              <div className='modern-contact-field textarea-field'>
+                <textarea
+                  name='message'
+                  id='message'
+                  className={`bg-white form-control h-100px contact-form-control modern-contact-input modern-contact-textarea${fieldErrors.message ? ' contact-form-control-invalid' : ''}`}
+                  placeholder=' '
+                  value={formValues.message}
+                  onChange={event => handleFieldChange('message', event.target.value)}
+                  onBlur={() => handleFieldBlur('message')}
+                  aria-invalid={Boolean(fieldErrors.message)}
+                  aria-describedby={fieldErrors.message ? 'contact_message_error' : undefined}
+                  required
+                />
+                <label htmlFor='message' className='modern-contact-label'>
+                  {t.message}
+                </label>
+              </div>
               {fieldErrors.message && (touchedFields.message || hasAttemptedSubmit) ? (
                 <div id='contact_message_error' className='contact-field-error'>
                   {fieldErrors.message}
@@ -451,38 +506,62 @@ export default function ContactForm({ locale: localeProp, content }: ContactForm
             </div>
 
             <div className='col-md-12'>
-              <div id='submit'>
+              <label className='policy-check'>
+                <input
+                  type='checkbox'
+                  name='datenschutz'
+                  className='policy-check-input'
+                  checked={policyAccepted}
+                  onChange={event => {
+                    setPolicyAccepted(event.target.checked)
+                    if (event.target.checked) setPolicyError('')
+                  }}
+                  required
+                />
+                <span>
+                  {ui.policyText}
+                  <Link href={privacyHref}>{ui.policyLinkText}</Link>.
+                </span>
+              </label>
+              {policyError ? (
+                <div className='contact-field-error' role='alert'>
+                  {policyError}
+                </div>
+              ) : null}
+            </div>
+
+            <div className='col-md-12'>
+              <div id='submit' className='contact-submit-row'>
                 <button type='submit' id='send_message' className='btn-main contact-submit-btn' disabled={submitting}>
                   {submitting ? <span className='contact-submit-spinner' aria-hidden='true' /> : null}
                   <span>{submitting ? ui.sending : t.send}</span>
                 </button>
+                <div className='contact-assistant-note'>
+                  <span>{ui.assistantNote}</span>
+                </div>
               </div>
 
-              {successMessage ? (
-                <div className='contact-feedback contact-feedback-success' role='status' aria-live='polite'>
-                  <div className='contact-feedback-icon' aria-hidden='true'>
-                    😊
-                  </div>
-                  <div>
-                    <div className='contact-feedback-title'>{ui.successTitle}</div>
-                    <div>{successMessage}</div>
-                  </div>
-                </div>
-              ) : null}
               {errorMessage ? (
                 <div className='contact-feedback contact-feedback-error' role='alert'>
                   {errorMessage}
                 </div>
               ) : null}
-
-              <div className='contact-assistant-note'>
-                <i className='fa fa-robot' aria-hidden='true' />
-                <span>{ui.assistantNote}</span>
-              </div>
             </div>
           </div>
         </form>
       </div>
+
+      {showSuccessModal ? (
+        <div className='booking-inquiry-modal-backdrop' role='dialog' aria-modal='true' aria-label={ui.modalTitle} onClick={() => setShowSuccessModal(false)}>
+          <div className='booking-inquiry-modal-card' onClick={event => event.stopPropagation()}>
+            <h4 className='mb-2'>{ui.modalTitle}</h4>
+            <p className='mb-3'>{ui.modalBody}</p>
+            <button type='button' className='btn-main' onClick={() => setShowSuccessModal(false)}>
+              {ui.modalClose}
+            </button>
+          </div>
+        </div>
+      ) : null}
     </div>
   )
 }

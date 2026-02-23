@@ -3,6 +3,7 @@ import { getMessages } from "@/i18n/messages";
 import { getServerApiBaseUrl, withPublicApiBaseIfNeeded } from "@/lib/apiBaseUrl";
 
 type CmsContactContent = {
+  sections?: Partial<Record<'details' | 'inquiry' | 'bookingPartners', { enabled?: boolean; order?: number }>>;
   hero?: {
     subtitle?: string;
     title?: string;
@@ -34,6 +35,7 @@ type CmsContactContent = {
 };
 
 export type ContactResolvedContent = {
+  sections: Record<'details' | 'inquiry' | 'bookingPartners', { enabled: boolean; order: number }>;
   hero: ReturnType<typeof getMessages>["contactHero"] & { backgroundImage: string };
   details: ReturnType<typeof getMessages>["contactDetails"] & {
     items: Array<{ icon: string; title: string; value: string }>;
@@ -52,6 +54,17 @@ function withApiBaseIfNeeded(url: string) {
 
 function resolveContent(locale: Locale, cms?: CmsContactContent): ContactResolvedContent {
   const messages = getMessages(locale);
+  const sectionKeys: Array<'details' | 'inquiry' | 'bookingPartners'> = ['details', 'inquiry', 'bookingPartners'];
+  const sections = sectionKeys.reduce(
+    (acc, key, index) => {
+      acc[key] = {
+        enabled: Boolean(cms?.sections?.[key]?.enabled ?? true),
+        order: Number(cms?.sections?.[key]?.order) || index + 1
+      };
+      return acc;
+    },
+    {} as Record<'details' | 'inquiry' | 'bookingPartners', { enabled: boolean; order: number }>
+  );
   const fallbackDetailsItems = [
     { icon: "icofont-location-pin", title: messages.contactDetails.address, value: "Flamingoweg 70\nD-70378 Stuttgart" },
     { icon: "icofont-envelope", title: messages.contactDetails.email, value: "info@meri-boarding.de" },
@@ -84,6 +97,7 @@ function resolveContent(locale: Locale, cms?: CmsContactContent): ContactResolve
     .slice(0, 12);
 
   return {
+    sections,
     hero: {
       subtitle: String(cms?.hero?.subtitle || messages.contactHero.subtitle || "").trim(),
       title: String(cms?.hero?.title || messages.contactHero.title || "").trim(),

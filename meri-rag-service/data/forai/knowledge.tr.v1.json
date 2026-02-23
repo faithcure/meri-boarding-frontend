@@ -1,0 +1,240 @@
+{
+  "version": "1.0.0",
+  "locale": "tr",
+  "updatedAt": "2026-02-23",
+  "source": "HOTEL_AI_MASTER_FORM_v8.docx",
+  "items": [
+    {
+      "id": "gen-what-is-meri",
+      "category": "general",
+      "title": "Meri Boarding nedir?",
+      "question": "Meri Boarding nedir?",
+      "answer": "Meri Boarding, Stuttgart ve Hildesheim bolgelerinde kisa ve uzun sureli konaklama icin tamamen mobilyali ve donanimli serviced apartment hizmeti sunar.",
+      "tags": ["general", "company"]
+    },
+    {
+      "id": "gen-locations-count",
+      "category": "general",
+      "title": "Lokasyon sayisi",
+      "question": "Kac lokasyon mevcut?",
+      "answer": "Toplam 3 lokasyon vardir: Stuttgart Flamingo, Stuttgart Europaplatz ve Hildesheim.",
+      "tags": ["locations"]
+    },
+    {
+      "id": "gen-stay-min-max",
+      "category": "reservation",
+      "title": "Konaklama suresi",
+      "question": "Minimum ve maksimum konaklama suresi var mi?",
+      "answer": "Minimum ve maksimum sure kisiti yoktur; 1 gece veya daha uzun konaklamalar mumkundur.",
+      "tags": ["reservation", "stay"]
+    },
+    {
+      "id": "gen-anmeldung",
+      "category": "policy",
+      "title": "Anmeldung destegi",
+      "question": "Anmeldung (ikamet kaydi) yapilabilir mi?",
+      "answer": "Evet. Meri Boarding, misafirler icin ikamet kaydi (Anmeldung/Meldebescheinigung) destegi saglar.",
+      "tags": ["anmeldung", "documents"]
+    },
+    {
+      "id": "room-furnished",
+      "category": "rooms",
+      "title": "Daire donanimi",
+      "question": "Daireler mobilyali mi?",
+      "answer": "Evet. Tum daireler tamamen mobilyali ve temel yasam ihtiyaclari icin donanimlidir.",
+      "tags": ["rooms", "furniture"]
+    },
+    {
+      "id": "room-kitchen",
+      "category": "rooms",
+      "title": "Mutfak",
+      "question": "Odalarda mutfak var mi?",
+      "answer": "Evet. Tum dairelerde tam donanimli mutfak bulunur.",
+      "tags": ["kitchen"]
+    },
+    {
+      "id": "room-tv",
+      "category": "rooms",
+      "title": "Smart TV",
+      "question": "TV var mi?",
+      "answer": "Evet. Dairelerde Smart TV bulunur.",
+      "tags": ["tv"]
+    },
+    {
+      "id": "room-laundry",
+      "category": "amenities",
+      "title": "Camasir",
+      "question": "Odalarda camasir makinesi var mi?",
+      "answer": "Flamingo ve Europaplatz lokasyonlarinda ortak camasirhane vardir. Hildesheim lokasyonunda daire icinde camasir makinesi ve kurutucu bulunur.",
+      "tags": ["laundry"]
+    },
+    {
+      "id": "room-climate",
+      "category": "amenities",
+      "title": "Klima",
+      "question": "Klima var mi?",
+      "answer": "Klima bulunmaz, odalarda vantilator mevcuttur.",
+      "tags": ["climate"]
+    },
+    {
+      "id": "room-extra-bed",
+      "category": "amenities",
+      "title": "Ek yatak",
+      "question": "Bebek yatagi veya ek yatak var mi?",
+      "answer": "Evet. Talep uzerine bebek/ek yatak temin edilir.",
+      "tags": ["family", "extra-bed"]
+    },
+    {
+      "id": "svc-included",
+      "category": "services",
+      "title": "Dahil hizmetler",
+      "question": "Konaklamaya neler dahil?",
+      "answer": "Ucretsiz internet, camasirhane kullanimi, mobilya/equipman, yan giderler ve temizlik hizmeti dahildir.",
+      "tags": ["services", "included"]
+    },
+    {
+      "id": "svc-wifi",
+      "category": "services",
+      "title": "Wi-Fi",
+      "question": "Wi-Fi ucretsiz mi ve hizi nasil?",
+      "answer": "Wi-Fi ucretsizdir. Ozellikle Europaplatz'da her odada ayri modem oldugu icin baglanti hizli ve stabil olur.",
+      "tags": ["wifi", "internet"]
+    },
+    {
+      "id": "svc-wifi-troubleshoot",
+      "category": "support",
+      "title": "Wi-Fi sorunu",
+      "question": "Wi-Fi calismiyorsa ne yapmaliyim?",
+      "answer": "Modemin kablosunu cikarip birkac dakika bekleyin, sonra tekrar takin. Sorun surerse +49 152 064 19253 numarasina ulasin.",
+      "tags": ["wifi", "support"]
+    },
+    {
+      "id": "svc-breakfast",
+      "category": "services",
+      "title": "Kahvalti",
+      "question": "Kahvalti var mi?",
+      "answer": "Tesis icinde standart kahvalti servisi yoktur. Talebe gore ek ucretli kupon secenegi degerlendirilebilir.",
+      "tags": ["breakfast"]
+    },
+    {
+      "id": "svc-cleaning-frequency",
+      "category": "services",
+      "title": "Temizlik sikligi",
+      "question": "Oda temizligi ne siklikta yapiliyor?",
+      "answer": "Kisa sureli konaklamalarda daha sik, uzun sureli konaklamalarda haftalik plan uygulanir. Net plan rezervasyon anlasmasina gore belirlenir.",
+      "tags": ["housekeeping"]
+    },
+    {
+      "id": "svc-pets",
+      "category": "policy",
+      "title": "Evcil hayvan",
+      "question": "Evcil hayvan kabul ediliyor mu?",
+      "answer": "Evcil hayvan talepleri daire ve musaitlik durumuna gore degerlendirilir. On onay gerekir.",
+      "tags": ["pets", "policy"]
+    },
+    {
+      "id": "svc-smoking",
+      "category": "policy",
+      "title": "Sigara politikasi",
+      "question": "Odada sigara icilebilir mi?",
+      "answer": "Odalarin icinde sigara icmek yasaktir. Balkonlu daire talebi icin rezervasyon ekibine iletisim saglanir.",
+      "tags": ["smoking", "policy"]
+    },
+    {
+      "id": "svc-accessibility",
+      "category": "services",
+      "title": "Engelli altyapisi",
+      "question": "Engelli misafirler icin altyapi var mi?",
+      "answer": "Bazi lokasyonlarda engelli otopark ve WC altyapisi mevcuttur. Ozel ihtiyaclar icin onceden bilgi verilmelidir.",
+      "tags": ["accessibility"]
+    },
+    {
+      "id": "res-how-to-book",
+      "category": "reservation",
+      "title": "Rezervasyon kanallari",
+      "question": "Rezervasyon nasil yapilir?",
+      "answer": "Rezervasyon e-posta (reservation@meri-group.de), WhatsApp/telefon (+49 152 064 19253), web sitesi ve Booking partnerleri uzerinden yapilabilir.",
+      "tags": ["reservation", "contact"]
+    },
+    {
+      "id": "res-checkin-checkout",
+      "category": "reservation",
+      "title": "Check-in / Check-out",
+      "question": "Check-in ve check-out saatleri nedir?",
+      "answer": "Check-in 14:00 itibariyla, check-out 12:00'ye kadardir.",
+      "tags": ["checkin", "checkout"]
+    },
+    {
+      "id": "res-early-late",
+      "category": "reservation",
+      "title": "Erken/Geç islem",
+      "question": "Erken check-in veya gec check-out mumkun mu?",
+      "answer": "Musaitlik durumuna bagli olarak mumkun olabilir. Onceden rezervasyon ekibine bilgi verilmelidir.",
+      "tags": ["checkin", "checkout", "availability"]
+    },
+    {
+      "id": "res-cancel",
+      "category": "reservation",
+      "title": "Iptal politikasi",
+      "question": "Iptal politikasi nedir?",
+      "answer": "Standart bilgilendirmeye gore rezervasyon tarihinden 3 gun oncesine kadar ucretsiz iptal mumkundur. Rezervasyon turune gore degisebilir.",
+      "tags": ["cancellation", "policy"]
+    },
+    {
+      "id": "res-baggage",
+      "category": "reservation",
+      "title": "Bagaj",
+      "question": "Bagaj depolama var mi?",
+      "answer": "Evet. Uygunluk durumuna gore check-out sonrasinda bagaj birakma destegi verilebilir.",
+      "tags": ["baggage"]
+    },
+    {
+      "id": "res-invoice",
+      "category": "billing",
+      "title": "Fatura",
+      "question": "Fatura talep edebilir miyim?",
+      "answer": "Evet. Fatura talebi icin reservation@meri-group.de veya +49 152 064 19253 uzerinden rezervasyon ekibine ulasilir.",
+      "tags": ["invoice", "billing"]
+    },
+    {
+      "id": "support-emergency",
+      "category": "support",
+      "title": "Acil durum",
+      "question": "Acil durumda kimi aramaliyim?",
+      "answer": "Acil teknik veya operasyonel durumlarda 7/24 +49 152 064 19253 numarasi uzerinden destek alinabilir.",
+      "tags": ["emergency", "support"]
+    },
+    {
+      "id": "loc-flamingo-overview",
+      "category": "location",
+      "title": "Flamingo ozet",
+      "question": "Stuttgart Flamingo lokasyonu hakkinda ozet bilgi verir misin?",
+      "answer": "Adres: Flamingoweg 70, 70378 Stuttgart. 76 adet 1+0 daire bulunur. Sehir merkezine ulasim kolaydir; doga alanlarina yakindir.",
+      "tags": ["flamingo", "stuttgart"]
+    },
+    {
+      "id": "loc-europaplatz-overview",
+      "category": "location",
+      "title": "Europaplatz ozet",
+      "question": "Stuttgart Europaplatz lokasyonu hakkinda ozet bilgi verir misin?",
+      "answer": "Adres: Europaplatz 20b, 70565 Stuttgart. 65 adet 1+0 ve 2+0 daire bulunur. Havalimanina ve toplu tasimaya yakin konumdadir.",
+      "tags": ["europaplatz", "stuttgart"]
+    },
+    {
+      "id": "loc-hildesheim-overview",
+      "category": "location",
+      "title": "Hildesheim ozet",
+      "question": "Hildesheim lokasyonu hakkinda ozet bilgi verir misin?",
+      "answer": "Hildesheim lokasyonunda farkli binalarda tam donanimli daireler bulunur. Hannover ve bolgesel ulasim noktalarina yakindir.",
+      "tags": ["hildesheim"]
+    },
+    {
+      "id": "contact-core",
+      "category": "contact",
+      "title": "Iletisim",
+      "question": "Meri Boarding'e nasil ulasabilirim?",
+      "answer": "WhatsApp/Telefon: +49 152 064 19253, Rezervasyon e-postasi: reservation@meri-group.de, Genel e-posta: info@meri-group.de, Web: www.meri-boarding.de",
+      "tags": ["contact"]
+    }
+  ]
+}

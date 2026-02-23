@@ -1,10 +1,12 @@
 import BuyNow from "@/components/meri/BuyNow";
+import BookingPartnersSection from "@/components/meri/BookingPartnersSection";
 import Footer from "@/components/meri/Footer";
 import Header from "@/components/meri/Header";
 import type { Locale } from "@/i18n/getLocale";
 import { getLocale } from "@/i18n/getLocale";
 import { localePath } from "@/i18n/localePath";
 import { getMessages } from "@/i18n/messages";
+import { fetchHomeResolvedContent } from "@/lib/homeContentApi";
 import { fetchPublicHotels } from "@/lib/hotelsApi";
 import Link from "next/link";
 
@@ -36,6 +38,7 @@ export default async function HotelsPage({ params }: HotelsPageProps = {}) {
     return { text: "", icon: "fa fa-check" };
   };
   const apiHotels = await fetchPublicHotels(locale);
+  const homeContent = await fetchHomeResolvedContent(locale);
   const hotelCards = apiHotels.map((item) => ({
     slug: item.slug,
     image: withApiHost(item.coverImageUrl || fallbackHotelImage),
@@ -255,6 +258,11 @@ export default async function HotelsPage({ params }: HotelsPageProps = {}) {
             </div>
           </div>
         </section>
+        <BookingPartnersSection
+          partners={homeContent.hero.bookingPartners}
+          title={homeContent.hero.bookingPartnersTitle}
+          description={homeContent.hero.bookingPartnersDescription}
+        />
       </main>
       <Footer locale={locale} />
       <BuyNow />

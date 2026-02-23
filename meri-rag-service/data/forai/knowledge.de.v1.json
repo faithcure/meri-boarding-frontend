@@ -1,0 +1,30 @@
+{
+  "version": "1.0.0",
+  "locale": "de",
+  "updatedAt": "2026-02-23",
+  "source": "HOTEL_AI_MASTER_FORM_v8.docx",
+  "items": [
+    {"id":"gen-what-is-meri","category":"general","title":"Was ist Meri Boarding?","question":"Was ist Meri Boarding?","answer":"Meri Boarding bietet voll moeblierte Serviced Apartments fuer kurze und lange Aufenthalte in Stuttgart und Hildesheim.","tags":["general","company"]},
+    {"id":"gen-locations-count","category":"general","title":"Anzahl der Standorte","question":"Wie viele Standorte gibt es?","answer":"Es gibt aktuell 3 Standorte: Stuttgart Flamingo, Stuttgart Europaplatz und Hildesheim.","tags":["locations"]},
+    {"id":"gen-stay-min-max","category":"reservation","title":"Aufenthaltsdauer","question":"Gibt es eine Mindest- oder Maximalaufenthaltsdauer?","answer":"Es gibt keine feste Mindest- oder Maximaldauer. Sowohl kurze als auch lange Aufenthalte sind moeglich.","tags":["reservation","stay"]},
+    {"id":"gen-anmeldung","category":"policy","title":"Anmeldung","question":"Ist eine Anmeldung (Meldebescheinigung) moeglich?","answer":"Ja. Wir unterstuetzen die Anmeldung fuer passende Aufenthalte.","tags":["anmeldung","documents"]},
+    {"id":"room-furnished","category":"rooms","title":"Moeblierung","question":"Sind die Apartments moebliert?","answer":"Ja. Alle Apartments sind voll moebliert und bezugsfertig.","tags":["rooms","furniture"]},
+    {"id":"room-kitchen","category":"rooms","title":"Kueche","question":"Gibt es eine Kueche im Apartment?","answer":"Ja. Alle Apartments haben eine voll ausgestattete Kueche.","tags":["kitchen"]},
+    {"id":"room-tv","category":"rooms","title":"Smart TV","question":"Gibt es einen Fernseher?","answer":"Ja. In den Apartments gibt es einen Smart TV.","tags":["tv"]},
+    {"id":"room-laundry","category":"amenities","title":"Waesche","question":"Gibt es eine Waschmaschine?","answer":"In Flamingo und Europaplatz gibt es Gemeinschaftswaesche. In Hildesheim sind Waschmaschine und Trockner im Apartment vorhanden.","tags":["laundry"]},
+    {"id":"room-climate","category":"amenities","title":"Klima","question":"Gibt es eine Klimaanlage?","answer":"In der Regel gibt es keine Klimaanlage; Ventilatoren sind vorhanden.","tags":["climate"]},
+    {"id":"room-extra-bed","category":"amenities","title":"Zusaetzliche Betten","question":"Kann ich ein Babybett oder Zusatzbett anfragen?","answer":"Ja, Babybett und Zusatzbett sind auf Anfrage verfuegbar.","tags":["family","extra-bed"]},
+    {"id":"svc-included","category":"services","title":"Inklusive Leistungen","question":"Was ist im Aufenthalt enthalten?","answer":"Internet, Nutzung der Waeschebereiche, Moeblierung und Grundausstattung, Nebenkosten sowie Reinigungsservice sind enthalten.","tags":["services","included"]},
+    {"id":"svc-wifi","category":"services","title":"Wi-Fi","question":"Ist Wi-Fi kostenlos und schnell?","answer":"Ja, Wi-Fi ist kostenlos. Die Verbindung ist stabil, besonders an Standorten mit eigenem Modem pro Einheit.","tags":["wifi","internet"]},
+    {"id":"svc-wifi-troubleshoot","category":"support","title":"Wi-Fi Problem","question":"Was mache ich bei Wi-Fi Problemen?","answer":"Modem kurz vom Strom trennen, einige Minuten warten und erneut verbinden. Falls das Problem bleibt: +49 152 064 19253.","tags":["wifi","support"]},
+    {"id":"svc-breakfast","category":"services","title":"Fruehstueck","question":"Gibt es Fruehstueck?","answer":"Es gibt kein standardmaessiges Fruehstueck im Haus. Auf Anfrage koennen kostenpflichtige Optionen verfuegbar sein.","tags":["breakfast"]},
+    {"id":"svc-pets","category":"policy","title":"Haustiere","question":"Sind Haustiere erlaubt?","answer":"Haustiere werden je nach Apartment und Verfuegbarkeit im Einzelfall geprueft.","tags":["pets","policy"]},
+    {"id":"svc-smoking","category":"policy","title":"Rauchen","question":"Darf man im Apartment rauchen?","answer":"Rauchen in den Apartments ist nicht erlaubt. Ein Apartment mit Balkon kann bei Verfuegbarkeit angefragt werden.","tags":["smoking","policy"]},
+    {"id":"res-how-to-book","category":"reservation","title":"Reservierung","question":"Wie kann ich reservieren?","answer":"Sie koennen reservation@meri-group.de kontaktieren, +49 152 064 19253 anrufen/schreiben, die Website nutzen oder ueber Partner buchen.","tags":["reservation","contact"]},
+    {"id":"res-checkin-checkout","category":"reservation","title":"Check-in und Check-out","question":"Wann sind Check-in und Check-out?","answer":"Check-in ist ab 14:00 Uhr, Check-out bis 12:00 Uhr.","tags":["checkin","checkout"]},
+    {"id":"res-cancel","category":"reservation","title":"Stornierung","question":"Wie ist die Stornierungsregelung?","answer":"Standardmaessig ist eine kostenfreie Stornierung bis 3 Tage vor Anreise moeglich; die finalen Bedingungen haengen von der Buchungsart ab.","tags":["cancellation","policy"]},
+    {"id":"res-invoice","category":"billing","title":"Rechnung","question":"Kann ich eine Rechnung anfordern?","answer":"Ja. Bitte kontaktieren Sie reservation@meri-group.de oder +49 152 064 19253.","tags":["invoice","billing"]},
+    {"id":"support-emergency","category":"support","title":"Notfallkontakt","question":"Wen kontaktiere ich im Notfall?","answer":"Bei dringenden operativen oder technischen Themen kontaktieren Sie bitte +49 152 064 19253.","tags":["emergency","support"]},
+    {"id":"contact-core","category":"contact","title":"Kontaktkanaele","question":"Wie erreiche ich Meri Boarding?","answer":"Telefon/WhatsApp: +49 152 064 19253, Reservierung: reservation@meri-group.de, Allgemein: info@meri-group.de, Web: www.meri-boarding.de.","tags":["contact"]}
+  ]
+}

@@ -9,6 +9,8 @@ import AccordionSummary from '@mui/material/AccordionSummary'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
+import Checkbox from '@mui/material/Checkbox'
+import FormControlLabel from '@mui/material/FormControlLabel'
 import Grid from '@mui/material/Grid'
 import MenuItem from '@mui/material/MenuItem'
 import Typography from '@mui/material/Typography'
@@ -16,6 +18,7 @@ import Typography from '@mui/material/Typography'
 import CustomTextField from '@core/components/mui/TextField'
 
 type Locale = 'en' | 'de' | 'tr'
+type ContactSectionKey = 'details' | 'inquiry' | 'bookingPartners'
 
 type ContactDetailItem = {
   icon: string
@@ -30,6 +33,7 @@ type ContactSocialLink = {
 }
 
 type ContactContent = {
+  sections: Record<ContactSectionKey, { enabled: boolean; order: number }>
   hero: {
     subtitle: string
     title: string
@@ -70,7 +74,6 @@ type ContactErrors = {
   detailsTitle?: string
   detailsDescription?: string
   detailItems?: string
-  socials?: string
   formAction?: string
   formName?: string
   formEmail?: string
@@ -84,14 +87,31 @@ type ContactErrors = {
   formPhonePlaceholder?: string
   formMessagePlaceholder?: string
   detailsByIndex: Record<number, { icon?: string; title?: string; value?: string }>
-  socialsByIndex: Record<number, { icon?: string; label?: string; url?: string }>
 }
 
 const localeOptions: Locale[] = ['en', 'de', 'tr']
+const contactSectionKeys: ContactSectionKey[] = ['details', 'inquiry', 'bookingPartners']
 const maxDetailItems = 12
 const maxSocials = 12
+const detailIconOptions: Array<{ label: string; value: string }> = [
+  { label: 'Location', value: 'icofont-location-pin' },
+  { label: 'Email', value: 'icofont-envelope' },
+  { label: 'Phone', value: 'icofont-phone' },
+  { label: 'WhatsApp', value: 'icofont-brand-whatsapp' },
+  { label: 'Info', value: 'icofont-info-circle' },
+  { label: 'Clock', value: 'icofont-clock-time' },
+  { label: 'Building', value: 'icofont-building-alt' },
+  { label: 'User', value: 'icofont-user' },
+  { label: 'Globe', value: 'icofont-globe' }
+]
+const defaultSections = (): Record<ContactSectionKey, { enabled: boolean; order: number }> => ({
+  details: { enabled: true, order: 1 },
+  inquiry: { enabled: true, order: 2 },
+  bookingPartners: { enabled: true, order: 3 }
+})
 
 const createDefaultContact = (): ContactContent => ({
+  sections: defaultSections(),
   hero: {
     subtitle: '',
     title: '',
@@ -124,6 +144,17 @@ const createDefaultContact = (): ContactContent => ({
 
 const normalizeContact = (input: unknown): ContactContent => {
   const value = (input || {}) as Partial<ContactContent>
+  const fallbackSections = defaultSections()
+  const sections = contactSectionKeys.reduce(
+    (acc, key, index) => {
+      acc[key] = {
+        enabled: Boolean(value?.sections?.[key]?.enabled ?? fallbackSections[key].enabled),
+        order: Number(value?.sections?.[key]?.order) || index + 1
+      }
+      return acc
+    },
+    {} as Record<ContactSectionKey, { enabled: boolean; order: number }>
+  )
 
   const items = Array.isArray(value?.details?.items)
     ? value.details.items
@@ -148,6 +179,7 @@ const normalizeContact = (input: unknown): ContactContent => {
     : []
 
   return {
+    sections,
     hero: {
       subtitle: String(value?.hero?.subtitle || '').trim(),
       title: String(value?.hero?.title || '').trim(),
@@ -181,8 +213,7 @@ const normalizeContact = (input: unknown): ContactContent => {
 
 const validateContact = (value: ContactContent): ContactErrors => {
   const errors: ContactErrors = {
-    detailsByIndex: {},
-    socialsByIndex: {}
+    detailsByIndex: {}
   }
 
   if (!value.hero.subtitle.trim()) errors.heroSubtitle = 'Hero subtitle is required.'
@@ -212,23 +243,6 @@ const validateContact = (value: ContactContent): ContactErrors => {
     if (rowError.icon || rowError.title || rowError.value) errors.detailsByIndex[index] = rowError
   })
 
-  if (!Array.isArray(value.details.socials) || value.details.socials.length < 1) {
-    errors.socials = 'At least 1 social row is required.'
-  }
-
-  if (Array.isArray(value.details.socials) && value.details.socials.length > maxSocials) {
-    errors.socials = `Social row limit is ${maxSocials}.`
-  }
-
-  value.details.socials.forEach((item, index) => {
-    const rowError: { icon?: string; label?: string; url?: string } = {}
-
-    if (!item.icon.trim()) rowError.icon = 'Icon class is required.'
-    if (!item.label.trim()) rowError.label = 'Label is required.'
-    if (!item.url.trim()) rowError.url = 'URL is required.'
-    if (rowError.icon || rowError.label || rowError.url) errors.socialsByIndex[index] = rowError
-  })
-
   if (!value.form.action.trim()) errors.formAction = 'Form action URL is required.'
   if (!value.form.name.trim()) errors.formName = 'Name label is required.'
   if (!value.form.email.trim()) errors.formEmail = 'Email label is required.'
@@ -256,7 +270,6 @@ const hasErrors = (errors: ContactErrors) =>
       errors.detailsTitle ||
       errors.detailsDescription ||
       errors.detailItems ||
-      errors.socials ||
       errors.formAction ||
       errors.formName ||
       errors.formEmail ||
@@ -269,8 +282,7 @@ const hasErrors = (errors: ContactErrors) =>
       errors.formEmailPlaceholder ||
       errors.formPhonePlaceholder ||
       errors.formMessagePlaceholder ||
-      Object.keys(errors.detailsByIndex).length ||
-      Object.keys(errors.socialsByIndex).length
+      Object.keys(errors.detailsByIndex).length
   )
 
 const moveItem = <T,>(items: T[], from: number, to: number) => {
@@ -281,6 +293,30 @@ const moveItem = <T,>(items: T[], from: number, to: number) => {
   next.splice(to, 0, moved)
 
   return next
+}
+
+const moveSection = (
+  sections: Record<ContactSectionKey, { enabled: boolean; order: number }>,
+  from: ContactSectionKey,
+  to: ContactSectionKey
+) => {
+  if (from === to) return sections
+  const ordered = [...contactSectionKeys].sort((a, b) => Number(sections[a]?.order || 0) - Number(sections[b]?.order || 0))
+  const fromIndex = ordered.indexOf(from)
+  const toIndex = ordered.indexOf(to)
+  if (fromIndex < 0 || toIndex < 0) return sections
+  const nextOrdered = moveItem(ordered, fromIndex, toIndex)
+
+  return nextOrdered.reduce(
+    (acc, key, index) => {
+      acc[key] = {
+        ...sections[key],
+        order: index + 1
+      }
+      return acc
+    },
+    {} as Record<ContactSectionKey, { enabled: boolean; order: number }>
+  )
 }
 
 export default function ContactContentPage() {
@@ -294,14 +330,16 @@ export default function ContactContentPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [locale, setLocale] = useState<Locale>('de')
-  const [expanded, setExpanded] = useState<'hero' | 'details' | 'items' | 'socials' | 'form'>('hero')
+  const [expanded, setExpanded] = useState<'sections' | 'hero' | 'details' | 'items' | 'form'>('sections')
 
   const [formErrors, setFormErrors] = useState<ContactErrors>({
-    detailsByIndex: {},
-    socialsByIndex: {}
+    detailsByIndex: {}
   })
 
   const [contact, setContact] = useState<ContactContent>(createDefaultContact())
+  const orderedSectionKeys = [...contactSectionKeys].sort(
+    (a, b) => Number(contact.sections[a]?.order || 0) - Number(contact.sections[b]?.order || 0)
+  )
 
   const loadContact = useCallback(
     async (targetLocale: Locale) => {
@@ -316,7 +354,7 @@ export default function ContactContentPage() {
 
       setError('')
       setSuccess('')
-      setFormErrors({ detailsByIndex: {}, socialsByIndex: {} })
+      setFormErrors({ detailsByIndex: {} })
 
       try {
         const meResponse = await fetch(`${apiBaseUrl}/api/v1/auth/me`, {
@@ -397,8 +435,6 @@ export default function ContactContentPage() {
         setExpanded('details')
       } else if (validationErrors.detailItems || Object.keys(validationErrors.detailsByIndex).length) {
         setExpanded('items')
-      } else if (validationErrors.socials || Object.keys(validationErrors.socialsByIndex).length) {
-        setExpanded('socials')
       } else {
         setExpanded('form')
       }
@@ -472,7 +508,71 @@ export default function ContactContentPage() {
       <Grid size={{ xs: 12 }}>
         <Card>
           <CardContent className='flex flex-col gap-4'>
-            <Accordion expanded={expanded === 'hero'} onChange={(_, open) => setExpanded(open ? 'hero' : 'details')} variant='outlined' disableGutters>
+            <Accordion expanded={expanded === 'sections'} onChange={(_, open) => setExpanded(open ? 'sections' : 'hero')} variant='outlined' disableGutters>
+              <AccordionSummary expandIcon={<i className='bx-chevron-down' />}>
+                <Typography variant='h6'>Section Order & Visibility</Typography>
+              </AccordionSummary>
+              <AccordionDetails className='flex flex-col gap-3'>
+                {orderedSectionKeys.map((key, index) => (
+                  <Card key={key} variant='outlined'>
+                    <CardContent className='flex flex-wrap items-center justify-between gap-3'>
+                      <div className='flex items-center gap-3'>
+                        <Typography variant='body1'>
+                          {index + 1}. {key}
+                        </Typography>
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={Boolean(contact.sections[key]?.enabled)}
+                              onChange={e =>
+                                setContact(prev => ({
+                                  ...prev,
+                                  sections: {
+                                    ...prev.sections,
+                                    [key]: { ...prev.sections[key], enabled: e.target.checked }
+                                  }
+                                }))
+                              }
+                            />
+                          }
+                          label='Enabled'
+                        />
+                      </div>
+                      <div className='flex gap-2'>
+                        <Button
+                          size='small'
+                          variant='outlined'
+                          onClick={() =>
+                            setContact(prev => ({
+                              ...prev,
+                              sections: moveSection(prev.sections, key, orderedSectionKeys[index - 1] as ContactSectionKey)
+                            }))
+                          }
+                          disabled={index === 0}
+                        >
+                          Move Up
+                        </Button>
+                        <Button
+                          size='small'
+                          variant='outlined'
+                          onClick={() =>
+                            setContact(prev => ({
+                              ...prev,
+                              sections: moveSection(prev.sections, key, orderedSectionKeys[index + 1] as ContactSectionKey)
+                            }))
+                          }
+                          disabled={index === orderedSectionKeys.length - 1}
+                        >
+                          Move Down
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </AccordionDetails>
+            </Accordion>
+
+            <Accordion expanded={expanded === 'hero'} onChange={(_, open) => setExpanded(open ? 'hero' : 'sections')} variant='outlined' disableGutters>
               <AccordionSummary expandIcon={<i className='bx-chevron-down' />}>
                 <Typography variant='h6'>Hero & Breadcrumb</Typography>
               </AccordionSummary>
@@ -612,8 +712,21 @@ export default function ContactContentPage() {
                       <Grid container spacing={2}>
                         <Grid size={{ xs: 12, md: 3 }}>
                           <CustomTextField
-                            label='Icon Class'
+                            select
+                            label='Icon'
                             value={item.icon}
+                            SelectProps={{
+                              MenuProps: {
+                                PaperProps: {
+                                  sx: { width: 96 }
+                                }
+                              },
+                              renderValue: selected => (
+                                <span className='flex items-center justify-center'>
+                                  <i className={String(selected || item.icon)} aria-hidden='true' />
+                                </span>
+                              )
+                            }}
                             onChange={e => {
                               setContact(prev => ({
                                 ...prev,
@@ -630,7 +743,22 @@ export default function ContactContentPage() {
                             error={Boolean(formErrors.detailsByIndex[index]?.icon)}
                             helperText={formErrors.detailsByIndex[index]?.icon}
                             fullWidth
-                          />
+                          >
+                            {!detailIconOptions.some(option => option.value === item.icon) && item.icon ? (
+                              <MenuItem value={item.icon}>
+                                <div className='flex items-center justify-center w-full' title='Custom' aria-label='Custom'>
+                                  <i className={item.icon} aria-hidden='true' />
+                                </div>
+                              </MenuItem>
+                            ) : null}
+                            {detailIconOptions.map(option => (
+                              <MenuItem key={option.value} value={option.value}>
+                                <div className='flex items-center justify-center w-full' title={option.label} aria-label={option.label}>
+                                  <i className={option.value} aria-hidden='true' />
+                                </div>
+                              </MenuItem>
+                            ))}
+                          </CustomTextField>
                         </Grid>
                         <Grid size={{ xs: 12, md: 3 }}>
                           <CustomTextField
@@ -752,159 +880,7 @@ export default function ContactContentPage() {
               </AccordionDetails>
             </Accordion>
 
-            <Accordion expanded={expanded === 'socials'} onChange={(_, open) => setExpanded(open ? 'socials' : 'items')} variant='outlined' disableGutters>
-              <AccordionSummary expandIcon={<i className='bx-chevron-down' />}>
-                <Typography variant='h6'>{`Social Links (${contact.details.socials.length})`}</Typography>
-              </AccordionSummary>
-              <AccordionDetails className='flex flex-col gap-3'>
-                {formErrors.socials ? <Alert severity='error'>{formErrors.socials}</Alert> : null}
-
-                {contact.details.socials.map((item, index) => (
-                  <Card key={`contact-social-${index}`} variant='outlined'>
-                    <CardContent className='flex flex-col gap-2'>
-                      <Typography variant='subtitle1'>{`Social ${index + 1}`}</Typography>
-                      <Grid container spacing={2}>
-                        <Grid size={{ xs: 12, md: 3 }}>
-                          <CustomTextField
-                            label='Icon Class'
-                            value={item.icon}
-                            onChange={e => {
-                              setContact(prev => ({
-                                ...prev,
-                                details: {
-                                  ...prev.details,
-                                  socials: prev.details.socials.map((row, i) => (i === index ? { ...row, icon: e.target.value } : row))
-                                }
-                              }))
-                              setFormErrors(prev => ({
-                                ...prev,
-                                socialsByIndex: { ...prev.socialsByIndex, [index]: { ...prev.socialsByIndex[index], icon: undefined } }
-                              }))
-                            }}
-                            error={Boolean(formErrors.socialsByIndex[index]?.icon)}
-                            helperText={formErrors.socialsByIndex[index]?.icon}
-                            fullWidth
-                          />
-                        </Grid>
-                        <Grid size={{ xs: 12, md: 3 }}>
-                          <CustomTextField
-                            label='Label'
-                            value={item.label}
-                            onChange={e => {
-                              setContact(prev => ({
-                                ...prev,
-                                details: {
-                                  ...prev.details,
-                                  socials: prev.details.socials.map((row, i) => (i === index ? { ...row, label: e.target.value } : row))
-                                }
-                              }))
-                              setFormErrors(prev => ({
-                                ...prev,
-                                socialsByIndex: { ...prev.socialsByIndex, [index]: { ...prev.socialsByIndex[index], label: undefined } }
-                              }))
-                            }}
-                            error={Boolean(formErrors.socialsByIndex[index]?.label)}
-                            helperText={formErrors.socialsByIndex[index]?.label}
-                            fullWidth
-                          />
-                        </Grid>
-                        <Grid size={{ xs: 12, md: 6 }}>
-                          <CustomTextField
-                            label='URL'
-                            value={item.url}
-                            onChange={e => {
-                              setContact(prev => ({
-                                ...prev,
-                                details: {
-                                  ...prev.details,
-                                  socials: prev.details.socials.map((row, i) => (i === index ? { ...row, url: e.target.value } : row))
-                                }
-                              }))
-                              setFormErrors(prev => ({
-                                ...prev,
-                                socialsByIndex: { ...prev.socialsByIndex, [index]: { ...prev.socialsByIndex[index], url: undefined } }
-                              }))
-                            }}
-                            error={Boolean(formErrors.socialsByIndex[index]?.url)}
-                            helperText={formErrors.socialsByIndex[index]?.url}
-                            fullWidth
-                          />
-                        </Grid>
-                      </Grid>
-                      <div className='flex flex-wrap gap-2'>
-                        <Button
-                          size='small'
-                          variant='outlined'
-                          onClick={() =>
-                            setContact(prev => ({
-                              ...prev,
-                              details: {
-                                ...prev.details,
-                                socials: moveItem(prev.details.socials, index, index - 1)
-                              }
-                            }))
-                          }
-                          disabled={index === 0}
-                        >
-                          Move Up
-                        </Button>
-                        <Button
-                          size='small'
-                          variant='outlined'
-                          onClick={() =>
-                            setContact(prev => ({
-                              ...prev,
-                              details: {
-                                ...prev.details,
-                                socials: moveItem(prev.details.socials, index, index + 1)
-                              }
-                            }))
-                          }
-                          disabled={index === contact.details.socials.length - 1}
-                        >
-                          Move Down
-                        </Button>
-                        <Button
-                          size='small'
-                          color='error'
-                          variant='outlined'
-                          onClick={() =>
-                            setContact(prev => ({
-                              ...prev,
-                              details: {
-                                ...prev.details,
-                                socials: prev.details.socials.filter((_, i) => i !== index)
-                              }
-                            }))
-                          }
-                          disabled={contact.details.socials.length <= 1}
-                        >
-                          Remove
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-
-                <Button
-                  variant='outlined'
-                  onClick={() =>
-                    setContact(prev => ({
-                      ...prev,
-                      details: {
-                        ...prev.details,
-                        socials: [...prev.details.socials, { icon: 'fa-brands fa-linkedin-in', label: '', url: '' }].slice(0, maxSocials)
-                      }
-                    }))
-                  }
-                  disabled={contact.details.socials.length >= maxSocials}
-                >
-                  Add Social Row
-                </Button>
-              </AccordionDetails>
-            </Accordion>
-
-            <Accordion expanded={expanded === 'form'} onChange={(_, open) => setExpanded(open ? 'form' : 'socials')} variant='outlined' disableGutters>
+            <Accordion expanded={expanded === 'form'} onChange={(_, open) => setExpanded(open ? 'form' : 'items')} variant='outlined' disableGutters>
               <AccordionSummary expandIcon={<i className='bx-chevron-down' />}>
                 <Typography variant='h6'>Contact Form</Typography>
               </AccordionSummary>

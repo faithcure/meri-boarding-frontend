@@ -45,9 +45,24 @@ type SocialLink = {
   order: number
 }
 
+type FormDeliverySettings = {
+  requestFormActionUrl: string
+  contactNotificationEmails: string[]
+}
+
+type SmtpSettings = {
+  host: string
+  port: number
+  user: string
+  pass: string
+  from: string
+}
+
 type GeneralSettingsContent = {
   siteIconUrl: string
   socialLinks: SocialLink[]
+  formDelivery: FormDeliverySettings
+  smtp: SmtpSettings
 }
 
 const platformOptions: Array<{ value: SocialPlatform; label: string; iconClass: string }> = [
@@ -88,7 +103,18 @@ const defaultSettings: GeneralSettingsContent = {
       enabled: true,
       order: 2
     }
-  ]
+  ],
+  formDelivery: {
+    requestFormActionUrl: 'https://meri-boarding.de/boarding-booking.php',
+    contactNotificationEmails: []
+  },
+  smtp: {
+    host: '',
+    port: 465,
+    user: '',
+    pass: '',
+    from: ''
+  }
 }
 
 const previewFallbackIcon = '/images/branding/meri-logo-mark.svg'
@@ -146,6 +172,46 @@ function normalizeSocialLinks(input: unknown): SocialLink[] {
     .map((item, index) => ({ ...item, order: index + 1 }))
 }
 
+function normalizeFormDelivery(input: unknown): FormDeliverySettings {
+  const value = (input || {}) as { requestFormActionUrl?: unknown; contactNotificationEmails?: unknown }
+  const emails = Array.isArray(value?.contactNotificationEmails)
+    ? value.contactNotificationEmails
+        .map(item => String(item || '').trim().toLowerCase())
+        .filter(Boolean)
+        .slice(0, 30)
+    : []
+
+  return {
+    requestFormActionUrl: String(value?.requestFormActionUrl || defaultSettings.formDelivery.requestFormActionUrl).trim(),
+    contactNotificationEmails: emails
+  }
+}
+
+function parseContactEmailList(input: string) {
+  return Array.from(
+    new Set(
+      String(input || '')
+        .split(/[\n,;]+/g)
+        .map(item => item.trim().toLowerCase())
+        .filter(Boolean)
+    )
+  ).slice(0, 30)
+}
+
+function normalizeSmtpSettings(input: unknown): SmtpSettings {
+  const value = (input || {}) as { host?: unknown; port?: unknown; user?: unknown; pass?: unknown; from?: unknown }
+  const portRaw = Number(value?.port ?? defaultSettings.smtp.port)
+  const port = Number.isFinite(portRaw) ? Math.min(65535, Math.max(1, Math.round(portRaw))) : defaultSettings.smtp.port
+
+  return {
+    host: String(value?.host || '').trim(),
+    port,
+    user: String(value?.user || '').trim(),
+    pass: String(value?.pass || '').trim(),
+    from: String(value?.from || '').trim()
+  }
+}
+
 export default function GeneralSettingsPage() {
   const configuredApiBaseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL ?? '').trim()
 
@@ -153,15 +219,17 @@ export default function GeneralSettingsPage() {
     ? ''
     : configuredApiBaseUrl
 
-  const [tab, setTab] = useState<'icon' | 'socials'>('icon')
+  const [tab, setTab] = useState<'icon' | 'socials' | 'forms'>('icon')
   const [allowed, setAllowed] = useState(false)
   const [loading, setLoading] = useState(true)
   const [savingSocials, setSavingSocials] = useState(false)
+  const [savingForms, setSavingForms] = useState(false)
   const [uploadingIcon, setUploadingIcon] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [fieldError, setFieldError] = useState('')
   const [settings, setSettings] = useState<GeneralSettingsContent>(defaultSettings)
+  const [contactEmailText, setContactEmailText] = useState('')
 
   const loadSettings = useCallback(async () => {
     const token = window.localStorage.getItem('admin_token')
@@ -215,8 +283,13 @@ return
 
       setSettings({
         siteIconUrl: String(data?.content?.siteIconUrl || defaultSettings.siteIconUrl).trim(),
-        socialLinks: normalizeSocialLinks(data?.content?.socialLinks)
+        socialLinks: normalizeSocialLinks(data?.content?.socialLinks),
+        formDelivery: normalizeFormDelivery(data?.content?.formDelivery),
+        smtp: normalizeSmtpSettings(data?.content?.smtp)
       })
+      setContactEmailText(
+        normalizeFormDelivery(data?.content?.formDelivery).contactNotificationEmails.join('\n')
+      )
     } catch {
       setError('API connection failed.')
     } finally {
@@ -246,7 +319,9 @@ return
 
     return {
       siteIconUrl: String(data?.content?.siteIconUrl || payload.siteIconUrl).trim(),
-      socialLinks: normalizeSocialLinks(data?.content?.socialLinks)
+      socialLinks: normalizeSocialLinks(data?.content?.socialLinks),
+      formDelivery: normalizeFormDelivery(data?.content?.formDelivery),
+      smtp: normalizeSmtpSettings(data?.content?.smtp)
     }
   }
 
@@ -308,7 +383,9 @@ return
 
       const persisted = await saveGeneralSettings(token, {
         siteIconUrl: uploadedIconUrl,
-        socialLinks: settings.socialLinks
+        socialLinks: settings.socialLinks,
+        formDelivery: settings.formDelivery,
+        smtp: settings.smtp
       })
 
       setSettings(persisted)
@@ -402,7 +479,9 @@ return
     try {
       const persisted = await saveGeneralSettings(token, {
         siteIconUrl: settings.siteIconUrl,
-        socialLinks: settings.socialLinks
+        socialLinks: settings.socialLinks,
+        formDelivery: settings.formDelivery,
+        smtp: settings.smtp
       })
 
       setSettings(persisted)
@@ -411,6 +490,78 @@ return
       setError(String((saveError as Error)?.message || 'General settings could not be saved.'))
     } finally {
       setSavingSocials(false)
+    }
+  }
+
+  const saveFormSettings = async () => {
+    const token = window.localStorage.getItem('admin_token')
+    if (!token) return
+
+    const requestActionUrl = String(settings.formDelivery.requestFormActionUrl || '').trim()
+    if (!/^https?:\/\//i.test(requestActionUrl)) {
+      setFieldError('Request form action URL must start with http(s)://')
+      return
+    }
+
+    const emails = parseContactEmailList(contactEmailText)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    for (const [index, email] of emails.entries()) {
+      if (!emailRegex.test(email)) {
+        setFieldError(`Contact notification email ${index + 1} is invalid.`)
+        return
+      }
+    }
+    const smtpHost = String(settings.smtp.host || '').trim()
+    const smtpFrom = String(settings.smtp.from || '').trim()
+    const smtpPort = Number(settings.smtp.port || 0)
+    const smtpUser = String(settings.smtp.user || '').trim()
+    const smtpPass = String(settings.smtp.pass || '').trim()
+    if (!smtpHost) {
+      setFieldError('SMTP host is required.')
+      return
+    }
+    if (!Number.isFinite(smtpPort) || smtpPort < 1 || smtpPort > 65535) {
+      setFieldError('SMTP port must be between 1 and 65535.')
+      return
+    }
+    const smtpFromEnvelope = smtpFrom.includes('<') ? String((smtpFrom.match(/<([^>]+)>/) || [])[1] || '').trim() : smtpFrom
+    if (!emailRegex.test(smtpFromEnvelope.toLowerCase())) {
+      setFieldError('SMTP from email is invalid.')
+      return
+    }
+    if ((smtpUser && !smtpPass) || (!smtpUser && smtpPass)) {
+      setFieldError('SMTP user and password must be set together.')
+      return
+    }
+
+    setSavingForms(true)
+    setError('')
+    setSuccess('')
+    setFieldError('')
+
+    try {
+      const persisted = await saveGeneralSettings(token, {
+        siteIconUrl: settings.siteIconUrl,
+        socialLinks: settings.socialLinks,
+        formDelivery: {
+          requestFormActionUrl: requestActionUrl,
+          contactNotificationEmails: emails
+        },
+        smtp: {
+          host: smtpHost,
+          port: smtpPort,
+          user: smtpUser,
+          pass: smtpPass,
+          from: smtpFrom
+        }
+      })
+      setSettings(persisted)
+      setContactEmailText(persisted.formDelivery.contactNotificationEmails.join('\n'))
+      setSuccess('Form delivery settings saved.')
+    } catch (saveError) {
+      setError(String((saveError as Error)?.message || 'General settings could not be saved.'))
+    } finally {
+      setSavingForms(false)
     }
   }
 
@@ -436,6 +587,7 @@ return
             <Tabs value={tab} onChange={(_, value) => setTab(value)}>
               <Tab value='icon' label='Site Icon' />
               <Tab value='socials' label='Social Media' />
+              <Tab value='forms' label='Form Settings' />
             </Tabs>
 
             {tab === 'icon' ? (
@@ -483,7 +635,7 @@ return
                   </div>
                 </div>
               </Box>
-            ) : (
+            ) : tab === 'socials' ? (
               <Box className='flex flex-col gap-4'>
                 <div className='flex flex-wrap items-center gap-3'>
                   <Button variant='outlined' onClick={addSocialLink} disabled={settings.socialLinks.length >= 40}>
@@ -573,6 +725,118 @@ return
                     </Grid>
                   </div>
                 ))}
+              </Box>
+            ) : (
+              <Box className='flex flex-col gap-4'>
+                <div className='flex flex-wrap items-center gap-3'>
+                  <Button variant='contained' onClick={saveFormSettings} disabled={savingForms}>
+                    {savingForms ? 'Saving...' : 'Save Form Settings'}
+                  </Button>
+                </div>
+
+                <Grid container spacing={3}>
+                  <Grid size={{ xs: 12 }}>
+                    <Typography variant='h6'>SMTP Settings</Typography>
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <CustomTextField
+                      fullWidth
+                      label='SMTP Host'
+                      placeholder='smtp.example.com'
+                      value={settings.smtp.host}
+                      onChange={event =>
+                        setSettings(prev => ({
+                          ...prev,
+                          smtp: { ...prev.smtp, host: event.target.value }
+                        }))
+                      }
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <CustomTextField
+                      fullWidth
+                      type='number'
+                      label='SMTP Port'
+                      value={String(settings.smtp.port || '')}
+                      onChange={event =>
+                        setSettings(prev => ({
+                          ...prev,
+                          smtp: { ...prev.smtp, port: Number(event.target.value || 0) }
+                        }))
+                      }
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <CustomTextField
+                      fullWidth
+                      label='SMTP User'
+                      placeholder='user@example.com'
+                      value={settings.smtp.user}
+                      onChange={event =>
+                        setSettings(prev => ({
+                          ...prev,
+                          smtp: { ...prev.smtp, user: event.target.value }
+                        }))
+                      }
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <CustomTextField
+                      fullWidth
+                      type='password'
+                      label='SMTP Password'
+                      value={settings.smtp.pass}
+                      onChange={event =>
+                        setSettings(prev => ({
+                          ...prev,
+                          smtp: { ...prev.smtp, pass: event.target.value }
+                        }))
+                      }
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12 }}>
+                    <CustomTextField
+                      fullWidth
+                      label='SMTP From Email'
+                      placeholder='no-reply@example.com'
+                      value={settings.smtp.from}
+                      onChange={event =>
+                        setSettings(prev => ({
+                          ...prev,
+                          smtp: { ...prev.smtp, from: event.target.value }
+                        }))
+                      }
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12 }}>
+                    <CustomTextField
+                      fullWidth
+                      label='Request Form Action URL'
+                      placeholder='https://...'
+                      value={settings.formDelivery.requestFormActionUrl}
+                      onChange={event =>
+                        setSettings(prev => ({
+                          ...prev,
+                          formDelivery: { ...prev.formDelivery, requestFormActionUrl: event.target.value }
+                        }))
+                      }
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12 }}>
+                    <CustomTextField
+                      fullWidth
+                      multiline
+                      minRows={6}
+                      label='Contact Form Notification Emails'
+                      placeholder={'one@email.com\nsecond@email.com'}
+                      value={contactEmailText}
+                      onChange={event => setContactEmailText(event.target.value)}
+                    />
+                    <Typography color='text.secondary' className='mt-2'>
+                      Enter one email per line (or comma separated). These recipients are used for contact form notifications.
+                    </Typography>
+                  </Grid>
+                </Grid>
               </Box>
             )}
           </CardContent>

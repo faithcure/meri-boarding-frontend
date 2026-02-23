@@ -1,0 +1,30 @@
+{
+  "version": "1.0.0",
+  "locale": "en",
+  "updatedAt": "2026-02-23",
+  "source": "HOTEL_AI_MASTER_FORM_v8.docx",
+  "items": [
+    {"id":"gen-what-is-meri","category":"general","title":"What is Meri Boarding?","question":"What is Meri Boarding?","answer":"Meri Boarding provides fully furnished serviced apartments for short and long stays in Stuttgart and Hildesheim.","tags":["general","company"]},
+    {"id":"gen-locations-count","category":"general","title":"Number of locations","question":"How many locations do you have?","answer":"We currently have 3 locations: Stuttgart Flamingo, Stuttgart Europaplatz, and Hildesheim.","tags":["locations"]},
+    {"id":"gen-stay-min-max","category":"reservation","title":"Stay duration","question":"Is there a minimum or maximum stay duration?","answer":"There is no strict minimum or maximum. Both short and long stays are possible.","tags":["reservation","stay"]},
+    {"id":"gen-anmeldung","category":"policy","title":"Registration support","question":"Do you support Anmeldung (residence registration)?","answer":"Yes. We support residence registration (Anmeldung / Meldebescheinigung) for eligible stays.","tags":["anmeldung","documents"]},
+    {"id":"room-furnished","category":"rooms","title":"Furnished apartments","question":"Are the apartments furnished?","answer":"Yes. All apartments are fully furnished and ready for daily living.","tags":["rooms","furniture"]},
+    {"id":"room-kitchen","category":"rooms","title":"Kitchen","question":"Do apartments include a kitchen?","answer":"Yes. All apartments include a fully equipped kitchen.","tags":["kitchen"]},
+    {"id":"room-tv","category":"rooms","title":"Smart TV","question":"Is there a TV in the apartment?","answer":"Yes. Apartments include a Smart TV.","tags":["tv"]},
+    {"id":"room-laundry","category":"amenities","title":"Laundry","question":"Is there a washing machine?","answer":"Flamingo and Europaplatz use shared laundry rooms. Hildesheim apartments include in-unit washer and dryer.","tags":["laundry"]},
+    {"id":"room-climate","category":"amenities","title":"Climate","question":"Do rooms have air conditioning?","answer":"Air conditioning is generally not available; fans are provided.","tags":["climate"]},
+    {"id":"room-extra-bed","category":"amenities","title":"Extra bed","question":"Can I request a baby bed or extra bed?","answer":"Yes, baby beds and extra beds are available on request.","tags":["family","extra-bed"]},
+    {"id":"svc-included","category":"services","title":"Included services","question":"What is included in the stay?","answer":"Internet, laundry access, furniture and essentials, utilities, and cleaning service are included.","tags":["services","included"]},
+    {"id":"svc-wifi","category":"services","title":"Wi-Fi","question":"Is Wi-Fi free and fast?","answer":"Yes, Wi-Fi is free. Connection quality is strong, especially where each room has its own modem.","tags":["wifi","internet"]},
+    {"id":"svc-wifi-troubleshoot","category":"support","title":"Wi-Fi troubleshooting","question":"What should I do if Wi-Fi is not working?","answer":"Restart the modem by unplugging it for a few minutes, then reconnect. If the issue continues, contact +49 152 064 19253.","tags":["wifi","support"]},
+    {"id":"svc-breakfast","category":"services","title":"Breakfast","question":"Do you provide breakfast?","answer":"There is no standard in-house breakfast service. Paid breakfast options may be available on request.","tags":["breakfast"]},
+    {"id":"svc-pets","category":"policy","title":"Pet policy","question":"Are pets allowed?","answer":"Pet requests are reviewed case by case depending on apartment and availability.","tags":["pets","policy"]},
+    {"id":"svc-smoking","category":"policy","title":"Smoking policy","question":"Can I smoke in the apartment?","answer":"Smoking inside apartments is not allowed. You can request a unit with balcony if available.","tags":["smoking","policy"]},
+    {"id":"res-how-to-book","category":"reservation","title":"How to book","question":"How can I make a reservation?","answer":"You can contact reservation@meri-group.de, call or message +49 152 064 19253, use the website, or book via partners.","tags":["reservation","contact"]},
+    {"id":"res-checkin-checkout","category":"reservation","title":"Check-in and check-out","question":"What are check-in and check-out times?","answer":"Check-in starts at 14:00 and check-out is until 12:00.","tags":["checkin","checkout"]},
+    {"id":"res-cancel","category":"reservation","title":"Cancellation policy","question":"What is your cancellation policy?","answer":"Standard rule states free cancellation up to 3 days before arrival; final terms depend on booking type.","tags":["cancellation","policy"]},
+    {"id":"res-invoice","category":"billing","title":"Invoice","question":"Can I request an invoice?","answer":"Yes. Please contact reservation@meri-group.de or +49 152 064 19253 for invoice requests.","tags":["invoice","billing"]},
+    {"id":"support-emergency","category":"support","title":"Emergency support","question":"Who should I contact in an emergency?","answer":"For urgent operational or technical support, contact +49 152 064 19253.","tags":["emergency","support"]},
+    {"id":"contact-core","category":"contact","title":"Contact channels","question":"How can I reach Meri Boarding?","answer":"Phone/WhatsApp: +49 152 064 19253, Reservation email: reservation@meri-group.de, General email: info@meri-group.de, Web: www.meri-boarding.de.","tags":["contact"]}
+  ]
+}

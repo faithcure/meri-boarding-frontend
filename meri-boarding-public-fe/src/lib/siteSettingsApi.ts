@@ -28,6 +28,9 @@ type CmsGeneralSettingsContent = {
     enabled?: boolean
     order?: number
   }>
+  formDelivery?: {
+    requestFormActionUrl?: string
+  }
 }
 
 export type PublicSocialLink = {
@@ -41,6 +44,9 @@ export type PublicSocialLink = {
 export type PublicGeneralSettings = {
   siteIconUrl: string
   socialLinks: PublicSocialLink[]
+  formDelivery: {
+    requestFormActionUrl: string
+  }
 }
 
 const apiBaseUrl = getServerApiBaseUrl()
@@ -49,6 +55,7 @@ const fallbackSocialLinks: PublicSocialLink[] = [
   { id: 'instagram', platform: 'instagram', label: 'Instagram', url: 'https://www.instagram.com/', iconClass: 'fa-brands fa-instagram' },
   { id: 'linkedin', platform: 'linkedin', label: 'LinkedIn', url: 'https://www.linkedin.com/', iconClass: 'fa-brands fa-linkedin-in' }
 ]
+const fallbackRequestFormActionUrl = 'https://meri-boarding.de/boarding-booking.php'
 const socialIconMap: Record<SocialPlatform, string> = {
   instagram: 'fa-brands fa-instagram',
   facebook: 'fa-brands fa-facebook-f',
@@ -109,6 +116,11 @@ function resolveSocialLinks(cms?: CmsGeneralSettingsContent): PublicSocialLink[]
   return sorted.length > 0 ? sorted : fallbackSocialLinks
 }
 
+function resolveRequestFormActionUrl(cms?: CmsGeneralSettingsContent): string {
+  const value = String(cms?.formDelivery?.requestFormActionUrl || '').trim()
+  return /^https?:\/\//i.test(value) ? value : fallbackRequestFormActionUrl
+}
+
 export async function fetchGeneralSettings(): Promise<PublicGeneralSettings> {
   try {
     const response = await fetch(`${apiBaseUrl}/api/v1/public/settings/general`, {
@@ -122,13 +134,19 @@ export async function fetchGeneralSettings(): Promise<PublicGeneralSettings> {
     const content = data?.content || {}
     return {
       siteIconUrl: resolveSiteIconUrl(content),
-      socialLinks: resolveSocialLinks(content)
+      socialLinks: resolveSocialLinks(content),
+      formDelivery: {
+        requestFormActionUrl: resolveRequestFormActionUrl(content)
+      }
     }
   } catch (error) {
     console.error('[public-fe] falling back to default general settings', error)
     return {
       siteIconUrl: fallbackIconUrl,
-      socialLinks: fallbackSocialLinks
+      socialLinks: fallbackSocialLinks,
+      formDelivery: {
+        requestFormActionUrl: fallbackRequestFormActionUrl
+      }
     }
   }
 }
@@ -141,4 +159,9 @@ export async function fetchSiteIconUrl(): Promise<string> {
 export async function fetchGeneralSocialLinks(): Promise<PublicSocialLink[]> {
   const settings = await fetchGeneralSettings()
   return settings.socialLinks
+}
+
+export async function fetchRequestFormActionUrl(): Promise<string> {
+  const settings = await fetchGeneralSettings()
+  return settings.formDelivery.requestFormActionUrl
 }
