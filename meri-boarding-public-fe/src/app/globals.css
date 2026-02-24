@@ -2349,6 +2349,132 @@ header .menu_side_area {
   cursor: wait;
 }
 
+.chat-guest-picker {
+  align-self: stretch;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(26, 22, 19, 0.14);
+  border-radius: 14px;
+  box-shadow: 0 8px 18px rgba(24, 20, 17, 0.09);
+  padding: 12px;
+  display: grid;
+  gap: 8px;
+}
+
+.chat-guest-picker-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(26, 22, 19, 0.9);
+}
+
+.chat-guest-picker label {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(26, 22, 19, 0.76);
+}
+
+.chat-guest-picker select {
+  border: 1px solid rgba(26, 22, 19, 0.16);
+  border-radius: 10px;
+  padding: 8px 10px;
+  background: #f9fafb;
+  min-height: 38px;
+}
+
+.chat-guest-picker select:focus {
+  outline: none;
+  border-color: rgba(178, 129, 61, 0.64);
+  box-shadow: 0 0 0 3px rgba(178, 129, 61, 0.18);
+}
+
+.chat-guest-picker-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(26, 22, 19, 0.12);
+  border-radius: 10px;
+  padding: 8px 10px;
+  background: #f9fafb;
+}
+
+.chat-guest-picker-checkbox input {
+  margin: 0;
+  width: 15px;
+  height: 15px;
+}
+
+.chat-guest-picker-submit {
+  border: 0;
+  background: linear-gradient(135deg, var(--chat-accent), var(--chat-accent-strong));
+  color: #ffffff;
+  border-radius: 999px;
+  padding: 9px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.chat-guest-picker-submit:hover,
+.chat-guest-picker-submit:focus-visible {
+  transform: translateY(-1px);
+}
+
+.chat-guest-picker-submit:disabled {
+  opacity: 0.72;
+  cursor: wait;
+}
+
+.chat-phone-card {
+  margin-top: 4px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(26, 22, 19, 0.11);
+  border-radius: 16px;
+  padding: 12px;
+  display: grid;
+  gap: 8px;
+}
+
+.chat-phone-card label {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(26, 22, 19, 0.76);
+}
+
+.chat-phone-card input {
+  border: 1px solid rgba(26, 22, 19, 0.16);
+  border-radius: 10px;
+  padding: 8px 10px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.chat-phone-card input:focus {
+  outline: none;
+  border-color: rgba(178, 129, 61, 0.64);
+  box-shadow: 0 0 0 3px rgba(178, 129, 61, 0.18);
+}
+
+.chat-phone-card-submit {
+  margin-top: 4px;
+  border: 0;
+  background: linear-gradient(135deg, var(--chat-accent), var(--chat-accent-strong));
+  color: #ffffff;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.chat-phone-card-submit:hover,
+.chat-phone-card-submit:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(29, 29, 31, 0.2);
+}
+
+.chat-phone-card-submit:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .chat-typing {
   display: inline-flex;
   align-items: center;

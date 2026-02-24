@@ -35,6 +35,9 @@ type ReservationDraft = {
   checkin: string;
   checkout: string;
   guests: string;
+  children: string;
+  accessible: boolean;
+  phone: string;
 };
 
 const fallbackReservationHotels: PublicHotel[] = [
@@ -126,10 +129,20 @@ function getUiLabels(locale: Locale) {
       reservationCardTitle: "Hizli Rezervasyon Akisi",
       checkinAsk: "Lutfen giris tarihini YYYY-MM-DD formatinda yazin.",
       checkoutAsk: "Lutfen cikis tarihini YYYY-MM-DD formatinda yazin.",
-      guestsAsk: "Lutfen misafir sayisini yazin (1-20).",
+      guestsAsk: "Lutfen misafir bilgilerini asagidan secin.",
+      phoneAsk: "Son adim olarak telefon numaranizi paylasin.",
       badDate: "Tarih formati gecersiz. Ornekler: 2026-03-15, 15.03.2026, yarin",
       badCheckout: "Cikis tarihi, giris tarihinden once olamaz.",
       badGuests: "Misafir sayisi 1 ile 20 arasinda olmalidir.",
+      badPhone: "Lutfen gecerli bir telefon numarasi girin.",
+      guestPickerTitle: "Misafir secimi",
+      adultGuestsLabel: "Yetiskin misafir",
+      childGuestsLabel: "Cocuk misafir",
+      accessibleGuestLabel: "Engelli vatandas / erisilebilir ihtiyaci",
+      guestPickerContinue: "Misafir bilgileriyle devam et",
+      phoneInputLabel: "Telefon numarasi",
+      phoneInputPlaceholder: "Ornek: +49 152 064 19253",
+      phoneContinue: "Telefonla devam et",
       complete: (link: string) => `Harika, bilgileri tamamladik. Buradan devam edebilirsiniz: ${link}`,
       handoff: "Musteri temsilcisine baglan: +49 152 064 19253 | reservation@meri-group.de",
       priceRedirect: "Fiyat bilgisi icin sizi yetkili ekibe yonlendireyim.",
@@ -166,10 +179,20 @@ function getUiLabels(locale: Locale) {
       reservationCardTitle: "Schneller Reservierungsablauf",
       checkinAsk: "Bitte geben Sie das Check-in Datum im Format YYYY-MM-DD ein.",
       checkoutAsk: "Bitte geben Sie das Check-out Datum im Format YYYY-MM-DD ein.",
-      guestsAsk: "Bitte geben Sie die Gaestezahl ein (1-20).",
+      guestsAsk: "Bitte waehlen Sie die Gaestedaten unten aus.",
+      phoneAsk: "Als letzten Schritt teilen Sie bitte Ihre Telefonnummer mit.",
       badDate: "Ungueltiges Datumsformat. Beispiele: 2026-03-15, 15.03.2026, morgen",
       badCheckout: "Check-out darf nicht vor Check-in liegen.",
       badGuests: "Die Gaestezahl muss zwischen 1 und 20 liegen.",
+      badPhone: "Bitte geben Sie eine gueltige Telefonnummer ein.",
+      guestPickerTitle: "Gaesteauswahl",
+      adultGuestsLabel: "Erwachsene",
+      childGuestsLabel: "Kindergaeste",
+      accessibleGuestLabel: "Barrierefrei / Gast mit Behinderung",
+      guestPickerContinue: "Mit Gaestedaten fortfahren",
+      phoneInputLabel: "Telefonnummer",
+      phoneInputPlaceholder: "Beispiel: +49 152 064 19253",
+      phoneContinue: "Mit Telefon fortfahren",
       complete: (link: string) => `Perfekt, wir haben alles. Hier koennen Sie fortfahren: ${link}`,
       handoff: "Direkter Kontakt: +49 152 064 19253 | reservation@meri-group.de",
       priceRedirect: "Fuer Preisangaben leite ich Sie direkt an unser Team weiter.",
@@ -205,10 +228,20 @@ function getUiLabels(locale: Locale) {
     reservationCardTitle: "Quick Reservation Flow",
     checkinAsk: "Please enter check-in date in YYYY-MM-DD format.",
     checkoutAsk: "Please enter check-out date in YYYY-MM-DD format.",
-    guestsAsk: "Please enter number of guests (1-20).",
+    guestsAsk: "Please select guest details below.",
+    phoneAsk: "As a final step, please share your phone number.",
     badDate: "Invalid date format. Examples: 2026-03-15, 15/03/2026, tomorrow",
     badCheckout: "Check-out cannot be before check-in.",
     badGuests: "Guest count must be between 1 and 20.",
+    badPhone: "Please enter a valid phone number.",
+    guestPickerTitle: "Guest selection",
+    adultGuestsLabel: "Adult guests",
+    childGuestsLabel: "Child guests",
+    accessibleGuestLabel: "Disabled guest / accessibility need",
+    guestPickerContinue: "Continue with guest details",
+    phoneInputLabel: "Phone number",
+    phoneInputPlaceholder: "Example: +49 152 064 19253",
+    phoneContinue: "Continue with phone",
     complete: (link: string) => `Great, we captured the details. Continue here: ${link}`,
     handoff: "Contact reservation team: +49 152 064 19253 | reservation@meri-group.de",
     priceRedirect: "For pricing details, I will connect you with our authorized team.",
@@ -483,6 +516,18 @@ function parseGuestCount(input: string) {
   return total > 0 ? total : NaN;
 }
 
+function normalizePhoneInput(input: string) {
+  return String(input || "").replace(/\s+/g, " ").trim();
+}
+
+function isValidPhoneNumber(input: string) {
+  const value = normalizePhoneInput(input);
+  if (!value) return false;
+  if (!/^[+\d\s()\-/.]+$/.test(value)) return false;
+  const digits = value.replace(/\D/g, "");
+  return digits.length >= 8 && digits.length <= 15;
+}
+
 function toLocalIsoDate(date: Date) {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -507,7 +552,7 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
   const [messages, setMessages] = useState<Message[]>(() => initialMessages(t));
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const [reservationStep, setReservationStep] = useState<"idle" | "hotel" | "checkin" | "checkout" | "guests">("idle");
+  const [reservationStep, setReservationStep] = useState<"idle" | "hotel" | "checkin" | "checkout" | "guests" | "phone">("idle");
   const [avgResponseMs, setAvgResponseMs] = useState<number>(0);
   const [chatSessionId, setChatSessionId] = useState("");
   const [hotels, setHotels] = useState<PublicHotel[]>([]);
@@ -524,11 +569,20 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
   const [checkinPickerValue, setCheckinPickerValue] = useState("");
   const [checkoutPickerValue, setCheckoutPickerValue] = useState("");
   const [datePickerError, setDatePickerError] = useState("");
+  const [adultGuestsValue, setAdultGuestsValue] = useState("1");
+  const [childGuestsValue, setChildGuestsValue] = useState("0");
+  const [accessibleGuestValue, setAccessibleGuestValue] = useState(false);
+  const [guestPickerError, setGuestPickerError] = useState("");
+  const [phoneValue, setPhoneValue] = useState("");
+  const [phoneError, setPhoneError] = useState("");
   const [reservationDraft, setReservationDraft] = useState<ReservationDraft>({
     hotelSlugs: [],
     checkin: "",
     checkout: "",
     guests: "",
+    children: "0",
+    accessible: false,
+    phone: "",
   });
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
@@ -624,7 +678,13 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
     setCheckinPickerValue("");
     setCheckoutPickerValue("");
     setDatePickerError("");
-    setReservationDraft({ hotelSlugs: [], checkin: "", checkout: "", guests: "" });
+    setAdultGuestsValue("1");
+    setChildGuestsValue("0");
+    setAccessibleGuestValue(false);
+    setGuestPickerError("");
+    setPhoneValue("");
+    setPhoneError("");
+    setReservationDraft({ hotelSlugs: [], checkin: "", checkout: "", guests: "", children: "0", accessible: false, phone: "" });
     setChatSessionId("");
     loggedMessageCountRef.current = 0;
     if (feedbackTimerRef.current) {
@@ -731,8 +791,33 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
       setDatePickerError("");
       return;
     }
+    if (reservationStep === "guests") {
+      const nextAdults = Math.min(20, Math.max(1, Number.parseInt(String(reservationDraft.guests || "1"), 10) || 1));
+      const maxChildren = Math.max(0, 20 - nextAdults);
+      const nextChildren = Math.min(maxChildren, Math.max(0, Number.parseInt(String(reservationDraft.children || "0"), 10) || 0));
+      setAdultGuestsValue(String(nextAdults));
+      setChildGuestsValue(String(nextChildren));
+      setAccessibleGuestValue(Boolean(reservationDraft.accessible));
+      setGuestPickerError("");
+      return;
+    }
+    if (reservationStep === "phone") {
+      setPhoneValue(reservationDraft.phone || "");
+      setPhoneError("");
+      return;
+    }
     setDatePickerError("");
-  }, [reservationStep, reservationDraft.checkin, reservationDraft.checkout]);
+    setGuestPickerError("");
+    setPhoneError("");
+  }, [
+    reservationStep,
+    reservationDraft.checkin,
+    reservationDraft.checkout,
+    reservationDraft.guests,
+    reservationDraft.children,
+    reservationDraft.accessible,
+    reservationDraft.phone,
+  ]);
 
   const handleFeedbackChoice = (choice: FeedbackChoice) => {
     setFeedbackChoice(choice);
@@ -785,6 +870,9 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
     if (draft.checkin) query.set("checkin", draft.checkin);
     if (draft.checkout) query.set("checkout", draft.checkout);
     if (draft.guests) query.set("guests", draft.guests);
+    if (draft.children) query.set("children", draft.children);
+    if (draft.accessible) query.set("accessible", "1");
+    if (draft.phone) query.set("phone", draft.phone);
     const path = `${reservationPath}${query.toString() ? `?${query.toString()}` : ""}`;
     return typeof window !== "undefined" ? `${window.location.origin}${path}` : path;
   };
@@ -870,6 +958,45 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
       await pushAssistantMessagesWithDelay({ role: "assistant", text: labels.guestsAsk, variant: "action" });
       trackEvent("reservation_step", { intent: "checkout_set_picker" });
     }
+  };
+
+  const handleGuestPickerContinue = async () => {
+    if (isTyping || reservationStep !== "guests") return;
+    const adults = Number.parseInt(adultGuestsValue, 10);
+    const children = Number.parseInt(childGuestsValue, 10);
+    const total = adults + children;
+    if (!Number.isFinite(adults) || !Number.isFinite(children) || adults < 1 || children < 0 || total < 1 || total > 20) {
+      setGuestPickerError(labels.badGuests);
+      return;
+    }
+
+    setGuestPickerError("");
+    const draft = {
+      ...reservationDraft,
+      guests: String(adults),
+      children: String(children),
+      accessible: accessibleGuestValue,
+    };
+    setReservationDraft(draft);
+    setReservationStep("phone");
+    await pushAssistantMessagesWithDelay({ role: "assistant", text: labels.phoneAsk, variant: "action" });
+    trackEvent("reservation_step", { intent: "guests_set_picker" });
+  };
+
+  const handlePhoneContinue = async () => {
+    if (isTyping || reservationStep !== "phone") return;
+    const normalizedPhone = normalizePhoneInput(phoneValue);
+    if (!isValidPhoneNumber(normalizedPhone)) {
+      setPhoneError(labels.badPhone);
+      return;
+    }
+
+    setPhoneError("");
+    const draft = { ...reservationDraft, phone: normalizedPhone };
+    setReservationDraft(draft);
+    setReservationStep("idle");
+    await pushAssistantMessagesWithDelay({ role: "assistant", text: labels.complete(createReservationLink(draft)), variant: "action" });
+    trackEvent("reservation_flow_complete", { intent: "reservation_prefill_ready" });
   };
 
   const processUserMessage = async (trimmed: string, options?: { appendUserMessage?: boolean }) => {
@@ -992,8 +1119,26 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
         await pushAssistantMessagesWithDelay({ role: "assistant", text: labels.badGuests, variant: "warn" });
         return;
       }
-      const draft = { ...reservationDraft, guests: String(guests) };
+      const draft = { ...reservationDraft, guests: String(guests), children: "0", accessible: false };
       setReservationDraft(draft);
+      setAdultGuestsValue(String(guests));
+      setChildGuestsValue("0");
+      setAccessibleGuestValue(false);
+      setReservationStep("phone");
+      await pushAssistantMessagesWithDelay({ role: "assistant", text: labels.phoneAsk, variant: "action" });
+      trackEvent("reservation_step", { intent: "guests_set" });
+      return;
+    }
+
+    if (activeReservationStep === "phone") {
+      const normalizedPhone = normalizePhoneInput(trimmed);
+      if (!isValidPhoneNumber(normalizedPhone)) {
+        await pushAssistantMessagesWithDelay({ role: "assistant", text: labels.badPhone, variant: "warn" });
+        return;
+      }
+      const draft = { ...reservationDraft, phone: normalizedPhone };
+      setReservationDraft(draft);
+      setPhoneValue(normalizedPhone);
       setReservationStep("idle");
       await pushAssistantMessagesWithDelay({ role: "assistant", text: labels.complete(createReservationLink(draft)), variant: "action" });
       trackEvent("reservation_flow_complete", { intent: "reservation_prefill_ready" });
@@ -1389,6 +1534,91 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
               {datePickerError ? <div className="chat-contact-error">{datePickerError}</div> : null}
               <button type="button" className="chat-date-picker-submit" onClick={() => void handleDatePickerContinue()} disabled={isTyping}>
                 {labels.datePickerContinue}
+              </button>
+            </div>
+          ) : null}
+          {reservationStep === "guests" ? (
+            <div className="chat-guest-picker" aria-label={labels.guestPickerTitle}>
+              <div className="chat-guest-picker-title">{labels.guestPickerTitle}</div>
+              <label htmlFor="chat-guest-adults">{labels.adultGuestsLabel}</label>
+              <select
+                id="chat-guest-adults"
+                value={adultGuestsValue}
+                onChange={(event) => {
+                  const nextAdults = Math.min(20, Math.max(1, Number.parseInt(event.target.value, 10) || 1));
+                  const maxChildren = Math.max(0, 20 - nextAdults);
+                  setAdultGuestsValue(String(nextAdults));
+                  setChildGuestsValue((prev) => {
+                    const current = Number.parseInt(prev, 10);
+                    return String(Math.max(0, Math.min(Number.isFinite(current) ? current : 0, maxChildren)));
+                  });
+                  if (guestPickerError) setGuestPickerError("");
+                }}
+                disabled={isTyping}
+              >
+                {Array.from({ length: 20 }, (_, index) => index + 1).map((value) => (
+                  <option key={value} value={value}>
+                    {value}
+                  </option>
+                ))}
+              </select>
+              <label htmlFor="chat-guest-children">{labels.childGuestsLabel}</label>
+              <select
+                id="chat-guest-children"
+                value={childGuestsValue}
+                onChange={(event) => {
+                  setChildGuestsValue(event.target.value);
+                  if (guestPickerError) setGuestPickerError("");
+                }}
+                disabled={isTyping}
+              >
+                {Array.from({ length: Math.max(0, 21 - (Number.parseInt(adultGuestsValue, 10) || 1)) }, (_, index) => index).map((value) => (
+                  <option key={value} value={value}>
+                    {value}
+                  </option>
+                ))}
+              </select>
+              <label className="chat-guest-picker-checkbox">
+                <input
+                  type="checkbox"
+                  checked={accessibleGuestValue}
+                  onChange={(event) => {
+                    setAccessibleGuestValue(event.target.checked);
+                    if (guestPickerError) setGuestPickerError("");
+                  }}
+                  disabled={isTyping}
+                />
+                <span>{labels.accessibleGuestLabel}</span>
+              </label>
+              {guestPickerError ? <div className="chat-contact-error">{guestPickerError}</div> : null}
+              <button type="button" className="chat-guest-picker-submit" onClick={() => void handleGuestPickerContinue()} disabled={isTyping}>
+                {labels.guestPickerContinue}
+              </button>
+            </div>
+          ) : null}
+          {reservationStep === "phone" ? (
+            <div className="chat-phone-card" aria-label={labels.phoneAsk}>
+              <label htmlFor="chat-phone-input">{labels.phoneInputLabel}</label>
+              <input
+                id="chat-phone-input"
+                type="tel"
+                value={phoneValue}
+                placeholder={labels.phoneInputPlaceholder}
+                onChange={(event) => {
+                  setPhoneValue(event.target.value);
+                  if (phoneError) setPhoneError("");
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    event.preventDefault();
+                    void handlePhoneContinue();
+                  }
+                }}
+                disabled={isTyping}
+              />
+              {phoneError ? <div className="chat-contact-error">{phoneError}</div> : null}
+              <button type="button" className="chat-phone-card-submit" onClick={() => void handlePhoneContinue()} disabled={isTyping}>
+                {labels.phoneContinue}
               </button>
             </div>
           ) : null}
