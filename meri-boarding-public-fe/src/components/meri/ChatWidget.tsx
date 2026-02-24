@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Locale } from "@/i18n/getLocale";
 import { localePath } from "@/i18n/localePath";
@@ -546,6 +547,15 @@ function splitFullName(value: string) {
   return { firstName: parts[0], lastName: parts.slice(1).join(" ") };
 }
 
+function isChatActivePath(pathname: string) {
+  const normalized = String(pathname || "/")
+    .toLowerCase()
+    .replace(/\/+$/, "") || "/";
+  const parts = normalized.split("/").filter(Boolean);
+  const localized = parts.length >= 2 && ["tr", "de", "en"].includes(parts[0]) ? parts[1] : parts[0] || "";
+  return localized === "hotels" || localized === "contact";
+}
+
 function playInviteSound(context: AudioContext) {
   const now = context.currentTime;
   const master = context.createGain();
@@ -593,6 +603,8 @@ const getAssistantDelayMs = (next: Message | Message[]) => {
 };
 
 export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
+  const pathname = usePathname();
+  const isChatActivePage = useMemo(() => isChatActivePath(pathname || "/"), [pathname]);
   const activeLocale = useLocale();
   const locale = activeLocale ?? localeProp ?? "de";
   const t = getMessages(locale).chatWidget;
@@ -884,6 +896,7 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+    if (!isChatActivePage) return;
     if (isOpen || hasAutoInviteShownRef.current || hasManualChatInteractionRef.current) return;
     const alreadyShown = window.sessionStorage.getItem(autoInviteSessionKey) === "1";
     if (alreadyShown) {
@@ -919,7 +932,13 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
         autoInviteTimerRef.current = null;
       }
     };
-  }, [isOpen, labels.autoInvite]);
+  }, [isOpen, labels.autoInvite, isChatActivePage]);
+
+  useEffect(() => {
+    if (isChatActivePage) return;
+    setIsOpen(false);
+    setIsExpanded(false);
+  }, [isChatActivePage]);
 
   useEffect(() => {
     const today = getTodayIsoDate();
@@ -1544,6 +1563,8 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
     trackEvent("quick_action", { intent: "handoff" });
     void pushAssistantMessagesWithDelay({ role: "assistant", text: labels.handoff, variant: "action" });
   };
+
+  if (!isChatActivePage) return null;
 
   return (
     <div className={`chat-widget ${isOpen ? "is-open" : ""} ${isExpanded ? "is-expanded" : ""}`}>
