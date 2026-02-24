@@ -1705,7 +1705,7 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
             </div>
           ) : null}
           {feedbackChoice ? <div className="chat-feedback-saved">{t.feedbackSaved}</div> : null}
-          {isTyping && (
+          {isTyping && reservationStep === "idle" && !needsContactInfo && (
             <div className="chat-typing" aria-live="polite">
               <span className="typing-dots">
                 <span></span>
