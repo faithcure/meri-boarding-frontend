@@ -990,7 +990,6 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
     setMessages((prev) => [...prev, { role: "user", text: labels.hotelPickerSelected(selectedHotelNames) }]);
     setReservationDraft((prev) => ({ ...prev, hotelSlugs: availableHotels.map((item) => item.slug) }));
     setReservationStep("checkin");
-    await pushAssistantMessagesWithDelay({ role: "assistant", text: labels.checkinAsk, variant: "action" });
     trackEvent("reservation_step", { intent: availableHotels.length > 1 ? "hotels_selected_multi" : "hotel_selected" });
   };
 
@@ -1131,7 +1130,6 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
       }
       setReservationDraft((prev) => ({ ...prev, hotelSlugs: availableHotels.map((item) => item.slug) }));
       setReservationStep("checkin");
-      await pushAssistantMessagesWithDelay({ role: "assistant", text: labels.checkinAsk, variant: "action" });
       trackEvent("reservation_step", { intent: availableHotels.length > 1 ? "hotels_selected_multi" : "hotel_selected" });
       return;
     }
@@ -1260,7 +1258,6 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
             text: flowText.available(hotelLabel, createReservationLink({ ...reservationDraft, hotelSlugs: nextHotelSlugs })),
             variant: "action",
           },
-          { role: "assistant", text: labels.checkinAsk, variant: "action" },
         ]);
         return;
       }
