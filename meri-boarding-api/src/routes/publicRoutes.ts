@@ -63,7 +63,7 @@ function renderBrandedMailHtml(options: {
           <table role="presentation" width="680" cellspacing="0" cellpadding="0" style="max-width:680px;width:100%;background:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e5e7eb;">
             <tr>
               <td style="padding:22px 24px;background:#CAA05C;text-align:center;">
-                <img src="cid:meri-logo" alt="Meri Boarding" width="146" style="display:block;margin:0 auto 10px;max-width:146px;height:auto;" />
+                <img src="cid:meri-logo" alt="Meri Boarding" width="292" style="display:block;margin:0 auto 10px;max-width:292px;height:auto;" />
                 <div style="color:#ffffff;font-family:Arial,sans-serif;font-size:12px;margin-top:4px;">${escapeHtml(options.subtitle || 'Form Notification')}</div>
               </td>
             </tr>
@@ -98,6 +98,48 @@ function renderBrandedMailHtml(options: {
 </html>`;
 }
 
+type MailAttachment = {
+  filename: string;
+  content: Buffer;
+  cid?: string;
+  contentType?: string;
+};
+
+let cachedLogoAttachment: MailAttachment | null | undefined;
+
+async function getMailLogoAttachment(): Promise<MailAttachment | null> {
+  if (cachedLogoAttachment !== undefined) {
+    return cachedLogoAttachment;
+  }
+
+  const candidates = [
+    'http://public-fe:3000/images/meri/meri-logo-black.png',
+    'http://public-fe:3000/images/meri/meri-logo-mark-white.svg',
+  ];
+
+  for (const url of candidates) {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) continue;
+      const content = Buffer.from(await response.arrayBuffer());
+      if (content.length < 64) continue;
+      const contentType = String(response.headers.get('content-type') || '').trim();
+      cachedLogoAttachment = {
+        filename: url.endsWith('.svg') ? 'meri-logo.svg' : 'meri-logo.png',
+        content,
+        cid: 'meri-logo',
+        contentType: contentType || (url.endsWith('.svg') ? 'image/svg+xml' : 'image/png'),
+      };
+      return cachedLogoAttachment;
+    } catch {
+      continue;
+    }
+  }
+
+  cachedLogoAttachment = null;
+  return null;
+}
+
 function getAutoReplyCopy(locale: string, type: 'contact' | 'request', boarding?: string) {
   if (type === 'request') {
     return {
@@ -114,11 +156,19 @@ function getAutoReplyCopy(locale: string, type: 'contact' | 'request', boarding?
 }
 
 async function sendAutoReplyEmail(options: {
-  sendSmtpMail: (options: { to: string[]; subject: string; text: string; html?: string; replyTo?: string }) => Promise<{ sent: boolean; error?: string }>;
+  sendSmtpMail: (options: {
+    to: string[];
+    subject: string;
+    text: string;
+    html?: string;
+    replyTo?: string;
+    attachments?: MailAttachment[];
+  }) => Promise<{ sent: boolean; error?: string }>;
   locale: string;
   to: string;
   type: 'contact' | 'request';
   boarding?: string;
+  logoAttachment?: MailAttachment | null;
 }) {
   const copy = getAutoReplyCopy(options.locale, options.type, options.boarding);
   await options.sendSmtpMail({
@@ -132,6 +182,7 @@ async function sendAutoReplyEmail(options: {
       locale: options.locale,
       generatedAt: new Date(),
     }),
+    attachments: options.logoAttachment ? [options.logoAttachment] : undefined,
   });
 }
 
@@ -150,7 +201,7 @@ export async function registerPublicRoutes(ctx: RouteContext) {
     ragServiceUrl,
     getContactSubmissionsCollection,
     resolveContactNotificationRecipients,
-    sendSmtpMail,
+  sendSmtpMail,
     getDb,
     normalizeHotelLocaleContent,
     escapeRegex,
@@ -167,8 +218,69 @@ export async function registerPublicRoutes(ctx: RouteContext) {
   } = ctx;
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const collapseWhitespace = (value: string) => String(value || '').replace(/\s+/g, ' ').trim();
+const maxChatHistoryItems = 12;
+const maxChatHistoryTextLen = 600;
+const isMeaningfulMessage = (value: string) => {
+  const normalized = collapseWhitespace(value);
+  if (normalized.length < 10) return false;
+  return normalized.split(' ').filter(Boolean).length >= 2;
+};
+const chatRateLimitStore = new Map<string, { count: number; resetAt: number }>();
+
+function isChatRateLimited(key: string, max: number, windowMs: number) {
+  const now = Date.now();
+  const existing = chatRateLimitStore.get(key);
+  if (!existing || existing.resetAt <= now) {
+    chatRateLimitStore.set(key, { count: 1, resetAt: now + windowMs });
+    return false;
+  }
+  if (existing.count >= max) return true;
+  existing.count += 1;
+  chatRateLimitStore.set(key, existing);
+  return false;
+}
+
+function enforceChatRateLimit(options: {
+  scope: string;
+  request: FastifyRequest;
+  reply: FastifyReply;
+  max: number;
+  windowMs: number;
+}) {
+  const forwardedFor = String(options.request.headers['x-forwarded-for'] || '').split(',')[0].trim();
+  const ip = (forwardedFor || options.request.ip || 'unknown').slice(0, 120);
+  const key = `${options.scope}:${ip}`;
+  const limited = isChatRateLimited(key, options.max, options.windowMs);
+  if (!limited) return false;
+  options.reply.code(429).send({ error: 'Too many requests. Please slow down.' });
+  return true;
+}
 
 const toObjectId = (value: string) => (ObjectId.isValid(value) ? new ObjectId(value) : null);
+
+function normalizeChatHistoryText(value: string) {
+  return String(value || '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, maxChatHistoryTextLen);
+}
+
+function buildRetrievalQuestion(question: string, history: Array<{ role: 'user' | 'assistant'; content: string }>) {
+  const current = normalizeChatHistoryText(question);
+  if (!current) return '';
+  const previousUserTurns = history
+    .filter((item) => item.role === 'user')
+    .map((item) => normalizeChatHistoryText(item.content))
+    .filter(Boolean)
+    .slice(-2);
+  const turns = [...previousUserTurns, current];
+  const dedupedTurns: string[] = [];
+  turns.forEach((turn) => {
+    if (dedupedTurns[dedupedTurns.length - 1] !== turn) dedupedTurns.push(turn);
+  });
+  return dedupedTurns.join('\n');
+}
 
 async function appendChatMessage(options: {
   sessionId: string;
@@ -276,6 +388,8 @@ server.get('/api/v1/public/content/contact', async (request, reply) => {
 });
 
 server.post('/api/v1/chat', async (request, reply) => {
+  if (enforceChatRateLimit({ scope: 'chat:ask', request, reply, max: 45, windowMs: 60_000 })) return;
+
   const body = request.body as
     | {
         question?: string;
@@ -293,18 +407,48 @@ server.post('/api/v1/chat', async (request, reply) => {
   if (!question || question.length < 3) {
     return reply.code(400).send({ error: 'Question must be at least 3 characters.' });
   }
-
-  void sessionId;
+  if (question.length > 2000) {
+    return reply.code(400).send({ error: 'Question is too long.' });
+  }
 
   const timeout = Number.isFinite(ragRequestTimeoutMs) && ragRequestTimeoutMs > 0 ? ragRequestTimeoutMs : 10000;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeout);
 
   try {
+    const sessionObjectId = toObjectId(sessionId);
+    let history: Array<{ role: 'user' | 'assistant'; content: string }> = [];
+    if (sessionObjectId) {
+      const db = await getDb();
+      const messages = db.collection('chat_messages');
+      const rows = await messages
+        .find({ sessionId: sessionObjectId, role: { $in: ['user', 'assistant'] } })
+        .project({ _id: 0, role: 1, text: 1 })
+        .sort({ createdAt: -1 })
+        .limit(maxChatHistoryItems)
+        .toArray();
+      history = rows
+        .reverse()
+        .map((row: { role?: string; text?: string }) => {
+          const role = String(row?.role || '').trim().toLowerCase() === 'assistant' ? 'assistant' : 'user';
+          const content = normalizeChatHistoryText(row?.text || '');
+          return { role, content };
+        })
+        .filter((row) => Boolean(row.content));
+    }
+    const retrievalQuestion = buildRetrievalQuestion(question, history);
+
     const ragResponse = await fetch(`${ragServiceUrl}/query`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ question, locale, topK }),
+      body: JSON.stringify({
+        question,
+        locale,
+        topK,
+        sessionId: sessionId || undefined,
+        history,
+        retrievalQuestion: retrievalQuestion || question,
+      }),
       signal: controller.signal,
     });
 
@@ -325,6 +469,8 @@ server.post('/api/v1/chat', async (request, reply) => {
 });
 
 server.post('/api/v1/chat/sessions', async (request, reply) => {
+  if (enforceChatRateLimit({ scope: 'chat:session', request, reply, max: 12, windowMs: 60_000 })) return;
+
   const body = request.body as
     | {
         name?: string;
@@ -334,17 +480,14 @@ server.post('/api/v1/chat/sessions', async (request, reply) => {
       }
     | undefined;
 
-  const name = String(body?.name || '').trim().slice(0, 160);
-  const email = String(body?.email || '').trim().toLowerCase().slice(0, 200);
+  const nameInput = String(body?.name || '').trim();
+  const emailInput = String(body?.email || '').trim().toLowerCase();
   const locale = parseLocale(body?.locale);
   const sourcePage = String(body?.sourcePage || '/').trim().slice(0, 160) || '/';
-
-  if (!name || name.length < 2) {
-    return reply.code(400).send({ error: 'Name must be at least 2 characters.' });
-  }
-  if (!emailRegex.test(email)) {
-    return reply.code(400).send({ error: 'Valid email is required.' });
-  }
+  const name = nameInput.length >= 2 ? nameInput.slice(0, 160) : 'Guest';
+  const email = emailRegex.test(emailInput)
+    ? emailInput.slice(0, 200)
+    : `guest.${Date.now()}.${Math.floor(Math.random() * 100000)}@chat.local`;
 
   const now = new Date();
   const forwardedFor = String(request.headers['x-forwarded-for'] || '').split(',')[0].trim();
@@ -353,9 +496,6 @@ server.post('/api/v1/chat/sessions', async (request, reply) => {
 
   const db = await getDb();
   const sessions = db.collection('chat_sessions');
-  await sessions.createIndex({ createdAt: -1 });
-  await sessions.createIndex({ email: 1, createdAt: -1 });
-  await sessions.createIndex({ locale: 1, createdAt: -1 });
 
   const sessionId = new ObjectId();
   await sessions.insertOne({
@@ -366,6 +506,7 @@ server.post('/api/v1/chat/sessions', async (request, reply) => {
     sourcePage,
     messageCount: 0,
     status: 'open',
+    isAnonymous: !emailRegex.test(emailInput),
     ip,
     userAgent,
     createdAt: now,
@@ -379,6 +520,8 @@ server.post('/api/v1/chat/sessions', async (request, reply) => {
 });
 
 server.post('/api/v1/chat/sessions/:sessionId/messages', async (request, reply) => {
+  if (enforceChatRateLimit({ scope: 'chat:message', request, reply, max: 120, windowMs: 60_000 })) return;
+
   const params = request.params as { sessionId?: string } | undefined;
   const sessionId = String(params?.sessionId || '').trim();
   const body = request.body as
@@ -422,6 +565,8 @@ server.post('/api/v1/chat/sessions/:sessionId/messages', async (request, reply) 
 });
 
 server.post('/api/v1/chat/events', async (request, reply) => {
+  if (enforceChatRateLimit({ scope: 'chat:event', request, reply, max: 240, windowMs: 60_000 })) return;
+
   const body = request.body as
     | {
         event?: string;
@@ -488,7 +633,7 @@ server.post('/api/v1/public/forms/contact', async (request, reply) => {
   const phone = String(body?.phone || '').trim();
   const country = String(body?.country || '').trim();
   const subject = String(body?.subject || '').trim();
-  const message = String(body?.message || '').trim();
+  const message = collapseWhitespace(body?.message || '');
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   if (!name || name.length < 2) {
@@ -506,8 +651,8 @@ server.post('/api/v1/public/forms/contact', async (request, reply) => {
   if (!subject || subject.length < 2) {
     return reply.code(400).send({ error: 'Subject is required.' });
   }
-  if (!message || message.length < 5) {
-    return reply.code(400).send({ error: 'Message must be at least 5 characters.' });
+  if (!isMeaningfulMessage(message)) {
+    return reply.code(400).send({ error: 'Message must include at least 10 characters and 2 words.' });
   }
   if (message.length > 5000) {
     return reply.code(400).send({ error: 'Message is too long.' });
@@ -540,6 +685,7 @@ server.post('/api/v1/public/forms/contact', async (request, reply) => {
 
   try {
     const recipients = await resolveContactNotificationRecipients(locale);
+    const logoAttachment = await getMailLogoAttachment();
     const mailResult = await sendSmtpMail({
       to: recipients,
       subject: String(submission.subject || 'Inquiry').trim(),
@@ -576,6 +722,7 @@ server.post('/api/v1/public/forms/contact', async (request, reply) => {
         generatedAt: submission.createdAt,
       }),
       replyTo: submission.email,
+      attachments: logoAttachment ? [logoAttachment] : undefined,
     });
 
     if (mailResult.sent) {
@@ -584,6 +731,7 @@ server.post('/api/v1/public/forms/contact', async (request, reply) => {
         locale,
         to: submission.email,
         type: 'contact',
+        logoAttachment,
       }).catch(() => undefined);
       await submissions.updateOne(
         { _id: submission._id },
@@ -691,6 +839,7 @@ server.post('/api/v1/public/forms/request', async (request, reply) => {
 
   try {
     const recipients = await resolveContactNotificationRecipients(locale);
+    const logoAttachment = await getMailLogoAttachment();
     const mailResult = await sendSmtpMail({
       to: recipients,
       subject: `Request Quote: ${boarding}`,
@@ -741,6 +890,7 @@ server.post('/api/v1/public/forms/request', async (request, reply) => {
         generatedAt: submittedAt,
       }),
       replyTo: email,
+      attachments: logoAttachment ? [logoAttachment] : undefined,
     });
 
     if (mailResult.sent) {
@@ -750,6 +900,7 @@ server.post('/api/v1/public/forms/request', async (request, reply) => {
         to: email,
         type: 'request',
         boarding,
+        logoAttachment,
       }).catch(() => undefined);
       return reply.code(201).send({ ok: true, mailSent: true });
     }

@@ -1,30 +1,2071 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "locale": "en",
-  "updatedAt": "2026-02-23",
+  "updatedAt": "2026-02-24",
   "source": "HOTEL_AI_MASTER_FORM_v8.docx",
   "items": [
-    {"id":"gen-what-is-meri","category":"general","title":"What is Meri Boarding?","question":"What is Meri Boarding?","answer":"Meri Boarding provides fully furnished serviced apartments for short and long stays in Stuttgart and Hildesheim.","tags":["general","company"]},
-    {"id":"gen-locations-count","category":"general","title":"Number of locations","question":"How many locations do you have?","answer":"We currently have 3 locations: Stuttgart Flamingo, Stuttgart Europaplatz, and Hildesheim.","tags":["locations"]},
-    {"id":"gen-stay-min-max","category":"reservation","title":"Stay duration","question":"Is there a minimum or maximum stay duration?","answer":"There is no strict minimum or maximum. Both short and long stays are possible.","tags":["reservation","stay"]},
-    {"id":"gen-anmeldung","category":"policy","title":"Registration support","question":"Do you support Anmeldung (residence registration)?","answer":"Yes. We support residence registration (Anmeldung / Meldebescheinigung) for eligible stays.","tags":["anmeldung","documents"]},
-    {"id":"room-furnished","category":"rooms","title":"Furnished apartments","question":"Are the apartments furnished?","answer":"Yes. All apartments are fully furnished and ready for daily living.","tags":["rooms","furniture"]},
-    {"id":"room-kitchen","category":"rooms","title":"Kitchen","question":"Do apartments include a kitchen?","answer":"Yes. All apartments include a fully equipped kitchen.","tags":["kitchen"]},
-    {"id":"room-tv","category":"rooms","title":"Smart TV","question":"Is there a TV in the apartment?","answer":"Yes. Apartments include a Smart TV.","tags":["tv"]},
-    {"id":"room-laundry","category":"amenities","title":"Laundry","question":"Is there a washing machine?","answer":"Flamingo and Europaplatz use shared laundry rooms. Hildesheim apartments include in-unit washer and dryer.","tags":["laundry"]},
-    {"id":"room-climate","category":"amenities","title":"Climate","question":"Do rooms have air conditioning?","answer":"Air conditioning is generally not available; fans are provided.","tags":["climate"]},
-    {"id":"room-extra-bed","category":"amenities","title":"Extra bed","question":"Can I request a baby bed or extra bed?","answer":"Yes, baby beds and extra beds are available on request.","tags":["family","extra-bed"]},
-    {"id":"svc-included","category":"services","title":"Included services","question":"What is included in the stay?","answer":"Internet, laundry access, furniture and essentials, utilities, and cleaning service are included.","tags":["services","included"]},
-    {"id":"svc-wifi","category":"services","title":"Wi-Fi","question":"Is Wi-Fi free and fast?","answer":"Yes, Wi-Fi is free. Connection quality is strong, especially where each room has its own modem.","tags":["wifi","internet"]},
-    {"id":"svc-wifi-troubleshoot","category":"support","title":"Wi-Fi troubleshooting","question":"What should I do if Wi-Fi is not working?","answer":"Restart the modem by unplugging it for a few minutes, then reconnect. If the issue continues, contact +49 152 064 19253.","tags":["wifi","support"]},
-    {"id":"svc-breakfast","category":"services","title":"Breakfast","question":"Do you provide breakfast?","answer":"There is no standard in-house breakfast service. Paid breakfast options may be available on request.","tags":["breakfast"]},
-    {"id":"svc-pets","category":"policy","title":"Pet policy","question":"Are pets allowed?","answer":"Pet requests are reviewed case by case depending on apartment and availability.","tags":["pets","policy"]},
-    {"id":"svc-smoking","category":"policy","title":"Smoking policy","question":"Can I smoke in the apartment?","answer":"Smoking inside apartments is not allowed. You can request a unit with balcony if available.","tags":["smoking","policy"]},
-    {"id":"res-how-to-book","category":"reservation","title":"How to book","question":"How can I make a reservation?","answer":"You can contact reservation@meri-group.de, call or message +49 152 064 19253, use the website, or book via partners.","tags":["reservation","contact"]},
-    {"id":"res-checkin-checkout","category":"reservation","title":"Check-in and check-out","question":"What are check-in and check-out times?","answer":"Check-in starts at 14:00 and check-out is until 12:00.","tags":["checkin","checkout"]},
-    {"id":"res-cancel","category":"reservation","title":"Cancellation policy","question":"What is your cancellation policy?","answer":"Standard rule states free cancellation up to 3 days before arrival; final terms depend on booking type.","tags":["cancellation","policy"]},
-    {"id":"res-invoice","category":"billing","title":"Invoice","question":"Can I request an invoice?","answer":"Yes. Please contact reservation@meri-group.de or +49 152 064 19253 for invoice requests.","tags":["invoice","billing"]},
-    {"id":"support-emergency","category":"support","title":"Emergency support","question":"Who should I contact in an emergency?","answer":"For urgent operational or technical support, contact +49 152 064 19253.","tags":["emergency","support"]},
-    {"id":"contact-core","category":"contact","title":"Contact channels","question":"How can I reach Meri Boarding?","answer":"Phone/WhatsApp: +49 152 064 19253, Reservation email: reservation@meri-group.de, General email: info@meri-group.de, Web: www.meri-boarding.de.","tags":["contact"]}
+    {
+      "id": "gen-what-is-meri",
+      "category": "general",
+      "tags": [
+        "general",
+        "company"
+      ],
+      "title": "What is Meri Boarding?",
+      "question": "What is Meri Boarding?",
+      "answer": "Meri Boarding offers fully furnished and equipped serviced apartment services for short and long-term stays in the Stuttgart and Hildesheim areas."
+    },
+    {
+      "id": "gen-locations-count",
+      "category": "general",
+      "tags": [
+        "locations"
+      ],
+      "title": "Number of Locations",
+      "question": "How many locations are there?",
+      "answer": "There are a total of 3 locations: Stuttgart Flamingo, Stuttgart Europaplatz, and Hildesheim."
+    },
+    {
+      "id": "gen-stay-min-max",
+      "category": "reservation",
+      "tags": [
+        "reservation",
+        "stay"
+      ],
+      "title": "Stay Duration",
+      "question": "Is there a minimum and maximum stay duration?",
+      "answer": "There is no minimum or maximum stay limit; stays of 1 night or longer are possible."
+    },
+    {
+      "id": "gen-anmeldung",
+      "category": "policy",
+      "tags": [
+        "anmeldung",
+        "documents"
+      ],
+      "title": "Anmeldung Support",
+      "question": "Can Anmeldung (residence registration) be done?",
+      "answer": "Yes. Meri Boarding provides support for residence registration (Anmeldung/Meldebescheinigung) for guests."
+    },
+    {
+      "id": "room-furnished",
+      "category": "rooms",
+      "tags": [
+        "rooms",
+        "furniture"
+      ],
+      "title": "Apartment Furnishing",
+      "question": "Are the apartments furnished?",
+      "answer": "Yes. All apartments are fully furnished and equipped with basic living necessities."
+    },
+    {
+      "id": "room-kitchen",
+      "category": "rooms",
+      "tags": [
+        "kitchen"
+      ],
+      "title": "Kitchen",
+      "question": "Are there kitchens in the rooms?",
+      "answer": "Yes. All apartments have a fully equipped kitchen."
+    },
+    {
+      "id": "room-tv",
+      "category": "rooms",
+      "tags": [
+        "tv"
+      ],
+      "title": "Smart TV",
+      "question": "Is there a TV?",
+      "answer": "Yes. The apartments have Smart TV."
+    },
+    {
+      "id": "room-laundry",
+      "category": "amenities",
+      "tags": [
+        "laundry"
+      ],
+      "title": "Laundry",
+      "question": "Are there washing machines in the rooms?",
+      "answer": "There is a shared laundry room at the Flamingo and Europaplatz locations. The Hildesheim location has a washing machine and dryer in the apartment."
+    },
+    {
+      "id": "room-climate",
+      "category": "amenities",
+      "tags": [
+        "climate"
+      ],
+      "title": "Air Conditioning",
+      "question": "Is there air conditioning?",
+      "answer": "There is no air conditioning, but fans are available in the rooms."
+    },
+    {
+      "id": "room-extra-bed",
+      "category": "amenities",
+      "tags": [
+        "family",
+        "extra-bed"
+      ],
+      "title": "Extra Bed",
+      "question": "Is a baby bed or extra bed available?",
+      "answer": "Yes. Baby/extra beds are provided upon request."
+    },
+    {
+      "id": "svc-included",
+      "category": "services",
+      "tags": [
+        "services",
+        "included"
+      ],
+      "title": "Included Services",
+      "question": "What is included in the accommodation?",
+      "answer": "Free internet, laundry usage, furniture/equipment, utilities, and cleaning service are included."
+    },
+    {
+      "id": "svc-wifi",
+      "category": "services",
+      "tags": [
+        "wifi",
+        "internet"
+      ],
+      "title": "Wi-Fi",
+      "question": "Is Wi-Fi free and what is the speed?",
+      "answer": "Wi-Fi is free. Especially at Europaplatz, each room has its own modem, so the connection is fast and stable."
+    },
+    {
+      "id": "svc-wifi-troubleshoot",
+      "category": "support",
+      "tags": [
+        "wifi",
+        "support"
+      ],
+      "title": "Wi-Fi Issue",
+      "question": "What should I do if Wi-Fi is not working?",
+      "answer": "Unplug the modem's cable, wait a few minutes, and then plug it back in. If the issue persists, contact +49 152 064 19253."
+    },
+    {
+      "id": "svc-breakfast",
+      "category": "services",
+      "tags": [
+        "breakfast"
+      ],
+      "title": "Breakfast",
+      "question": "Is breakfast available?",
+      "answer": "There is no standard breakfast service within the facility. An optional paid coupon can be considered upon request."
+    },
+    {
+      "id": "svc-cleaning-frequency",
+      "category": "services",
+      "tags": [
+        "housekeeping"
+      ],
+      "title": "Cleaning Frequency",
+      "question": "How often is room cleaning done?",
+      "answer": "For short-term stays, cleaning is done more frequently, while for long-term stays, a weekly plan is applied. The exact plan is determined by the reservation agreement."
+    },
+    {
+      "id": "svc-pets",
+      "category": "policy",
+      "tags": [
+        "pets",
+        "policy"
+      ],
+      "title": "Pets",
+      "question": "Are pets allowed?",
+      "answer": "Pet requests are evaluated based on the apartment and availability. Prior approval is required."
+    },
+    {
+      "id": "svc-smoking",
+      "category": "policy",
+      "tags": [
+        "smoking",
+        "policy"
+      ],
+      "title": "Smoking Policy",
+      "question": "Can I smoke in the room?",
+      "answer": "Smoking is prohibited inside the rooms. For balcony apartment requests, please contact the reservation team."
+    },
+    {
+      "id": "svc-accessibility",
+      "category": "services",
+      "tags": [
+        "accessibility"
+      ],
+      "title": "Accessibility",
+      "question": "Is there infrastructure for disabled guests?",
+      "answer": "Some locations have disabled parking and WC infrastructure. Prior notice is required for special needs."
+    },
+    {
+      "id": "res-how-to-book",
+      "category": "reservation",
+      "tags": [
+        "reservation",
+        "contact"
+      ],
+      "title": "Booking Channels",
+      "question": "How can I make a reservation?",
+      "answer": "Reservations can be made via email (reservation@meri-group.de), WhatsApp/phone (+49 152 064 19253), website, and Booking partners."
+    },
+    {
+      "id": "res-checkin-checkout",
+      "category": "reservation",
+      "tags": [
+        "checkin",
+        "checkout"
+      ],
+      "title": "Check-in / Check-out",
+      "question": "What are the check-in and check-out times?",
+      "answer": "Check-in is from 14:00, and check-out is until 12:00."
+    },
+    {
+      "id": "res-early-late",
+      "category": "reservation",
+      "tags": [
+        "checkin",
+        "checkout",
+        "availability"
+      ],
+      "title": "Early/Late Check",
+      "question": "Is early check-in or late check-out possible?",
+      "answer": "It may be possible depending on availability. The reservation team should be informed in advance."
+    },
+    {
+      "id": "res-cancel",
+      "category": "reservation",
+      "tags": [
+        "cancellation",
+        "policy"
+      ],
+      "title": "Cancellation Policy",
+      "question": "What is the cancellation policy?",
+      "answer": "According to standard information, free cancellation is possible up to 3 days before the reservation date. It may vary depending on the reservation type."
+    },
+    {
+      "id": "res-baggage",
+      "category": "reservation",
+      "tags": [
+        "baggage"
+      ],
+      "title": "Baggage",
+      "question": "Is there baggage storage?",
+      "answer": "Yes. Baggage storage support may be provided after check-out, depending on availability."
+    },
+    {
+      "id": "res-invoice",
+      "category": "billing",
+      "tags": [
+        "invoice",
+        "billing"
+      ],
+      "title": "Invoice",
+      "question": "Can I request an invoice?",
+      "answer": "Yes. For invoice requests, contact the reservation team at reservation@meri-group.de or +49 152 064 19253."
+    },
+    {
+      "id": "support-emergency",
+      "category": "support",
+      "tags": [
+        "emergency",
+        "support"
+      ],
+      "title": "Emergency",
+      "question": "Who should I contact in case of an emergency?",
+      "answer": "In case of technical or operational emergencies, support is available 24/7 at +49 152 064 19253."
+    },
+    {
+      "id": "loc-flamingo-overview",
+      "category": "location",
+      "tags": [
+        "flamingo",
+        "stuttgart"
+      ],
+      "title": "Flamingo Overview",
+      "question": "Can you provide an overview of the Stuttgart Flamingo location?",
+      "answer": "Address: Flamingoweg 70, 70378 Stuttgart. There are 76 1+0 apartments. The city center is easily accessible, and it is close to nature areas."
+    },
+    {
+      "id": "loc-europaplatz-overview",
+      "category": "location",
+      "tags": [
+        "europaplatz",
+        "stuttgart"
+      ],
+      "title": "Europaplatz Overview",
+      "question": "Can you provide an overview of the Stuttgart Europaplatz location?",
+      "answer": "Address: Europaplatz 20b, 70565 Stuttgart. There are 65 1+0 and 2+0 apartments. It is close to the airport and public transportation."
+    },
+    {
+      "id": "loc-hildesheim-overview",
+      "category": "location",
+      "tags": [
+        "hildesheim"
+      ],
+      "title": "Hildesheim Overview",
+      "question": "Can you provide an overview of the Hildesheim location?",
+      "answer": "The Hildesheim location has fully furnished apartments in different buildings. It is close to Hanover and regional transportation hubs."
+    },
+    {
+      "id": "contact-core",
+      "category": "contact",
+      "tags": [
+        "contact"
+      ],
+      "title": "Contact",
+      "question": "How can I contact Meri Boarding?",
+      "answer": "WhatsApp/Phone: +49 152 064 19253, Reservation email: reservation@meri-group.de, General email: info@meri-group.de, Web: www.meri-boarding.de"
+    },
+    {
+      "id": "master-q-003",
+      "category": "general",
+      "tags": [
+        "general"
+      ],
+      "title": "Total number of apartments?",
+      "question": "What is the total number of apartments?",
+      "answer": "256 fully furnished and ready-to-live apartments. (Flamingo: 76 1+0, Europaplatz: 65 1+0 and 2+0)"
+    },
+    {
+      "id": "master-q-004",
+      "category": "general",
+      "tags": [
+        "general"
+      ],
+      "title": "Customer portfolio",
+      "question": "What is the customer portfolio?",
+      "answer": "Accommodation is provided to employees of global companies such as Bosch, Mercedes, Daimler Truck, Infosys, Deutsche Bahn (German Railways), Strabag, and many more. Details: www.meri-boarding.de"
+    },
+    {
+      "id": "master-q-005",
+      "category": "general",
+      "tags": [
+        "general"
+      ],
+      "title": "Minimum stay",
+      "question": "What is the minimum stay?",
+      "answer": "There is no minimum stay requirement. Stays of 1 night or longer are possible."
+    },
+    {
+      "id": "master-q-006",
+      "category": "general",
+      "tags": [
+        "general"
+      ],
+      "title": "Maximum stay",
+      "question": "What is the maximum stay?",
+      "answer": "There is no maximum stay requirement. Long-term stays are preferred."
+    },
+    {
+      "id": "master-q-007",
+      "category": "general",
+      "tags": [
+        "general"
+      ],
+      "title": "Number of people per room",
+      "question": "How many people can stay in one room?",
+      "answer": "Room capacity varies depending on the apartment type. For more information, you will be directed to our customer representative: +49 152 064 19253"
+    },
+    {
+      "id": "master-q-008",
+      "category": "general",
+      "tags": [
+        "general"
+      ],
+      "title": "Private visitor policy",
+      "question": "Are private visitors allowed?",
+      "answer": "Yes, private visitors are allowed. An additional fee applies for overnight stays."
+    },
+    {
+      "id": "master-q-009",
+      "category": "general",
+      "tags": [
+        "general"
+      ],
+      "title": "International guests",
+      "question": "Are international guests accepted?",
+      "answer": "Yes, international guests are accepted."
+    },
+    {
+      "id": "master-q-010",
+      "category": "general",
+      "tags": [
+        "general"
+      ],
+      "title": "Home comfort",
+      "question": "Is the accommodation like home?",
+      "answer": "Yes, all apartments are designed to provide home comfort."
+    },
+    {
+      "id": "master-q-011",
+      "category": "general",
+      "tags": [
+        "general"
+      ],
+      "title": "Anmeldung (registration)",
+      "question": "Can Anmeldung (registration) be done?",
+      "answer": "Yes, Meri Boarding provides support for Germany registration (Anmeldung / Meldebescheinigung) for its guests."
+    },
+    {
+      "id": "master-q-012",
+      "category": "general",
+      "tags": [
+        "general"
+      ],
+      "title": "Corporate accommodation",
+      "question": "Is corporate accommodation possible?",
+      "answer": "Yes, group accommodation solutions are available for company employees."
+    },
+    {
+      "id": "master-q-016",
+      "category": "rooms",
+      "tags": [
+        "rooms"
+      ],
+      "title": "Are the beds orthopedic?",
+      "question": "Are the beds orthopedic?",
+      "answer": "Yes, the most comfortable and healthy furniture is preferred."
+    },
+    {
+      "id": "master-q-017",
+      "category": "rooms",
+      "tags": [
+        "rooms"
+      ],
+      "title": "Is there a balcony or terrace?",
+      "question": "Is there a balcony or terrace?",
+      "answer": "Some apartments have a balcony or terrace. Those who want to smoke can request a room with a balcony."
+    },
+    {
+      "id": "master-q-019",
+      "category": "rooms",
+      "tags": [
+        "rooms"
+      ],
+      "title": "Is there an iron?",
+      "question": "Is there an iron?",
+      "answer": "Yes, there is an iron in the closet of each room."
+    },
+    {
+      "id": "master-q-021",
+      "category": "rooms",
+      "tags": [
+        "rooms"
+      ],
+      "title": "Is there a baby bed?",
+      "question": "Is there a baby bed?",
+      "answer": "Yes, it is provided upon request."
+    },
+    {
+      "id": "master-q-022",
+      "category": "rooms",
+      "tags": [
+        "rooms"
+      ],
+      "title": "Is there an extra bed?",
+      "question": "Is there an extra bed?",
+      "answer": "Yes, it is provided upon request."
+    },
+    {
+      "id": "master-q-023",
+      "category": "rooms",
+      "tags": [
+        "rooms"
+      ],
+      "title": "Is there a phone connection?",
+      "question": "Is there a phone connection?",
+      "answer": "The landline phone has been removed; mobile devices are considered sufficient."
+    },
+    {
+      "id": "master-q-024",
+      "category": "rooms",
+      "tags": [
+        "rooms"
+      ],
+      "title": "Is it suitable for home office?",
+      "question": "Is it suitable for home office?",
+      "answer": "Yes, it is suitable for home office due to high-speed internet and fully equipped living spaces."
+    },
+    {
+      "id": "master-q-026",
+      "category": "services",
+      "tags": [
+        "services"
+      ],
+      "title": "What are the extra paid services?",
+      "question": "What are the extra paid services?",
+      "answer": "Parking fee is charged extra."
+    },
+    {
+      "id": "master-q-027",
+      "category": "services",
+      "tags": [
+        "services"
+      ],
+      "title": "Is Wi-Fi free?",
+      "question": "Is Wi-Fi free?",
+      "answer": "Yes, Wi-Fi is completely free."
+    },
+    {
+      "id": "master-q-028",
+      "category": "services",
+      "tags": [
+        "services"
+      ],
+      "title": "What is the Wi-Fi speed?",
+      "question": "What is the Wi-Fi speed?",
+      "answer": "There is a separate modem in each room; therefore, the internet speed is very high."
+    },
+    {
+      "id": "master-q-029",
+      "category": "services",
+      "tags": [
+        "services"
+      ],
+      "title": "Where is the Wi-Fi password?",
+      "question": "Where is the Wi-Fi password?",
+      "answer": "It is specified in the room."
+    },
+    {
+      "id": "master-q-030",
+      "category": "services",
+      "tags": [
+        "services"
+      ],
+      "title": "What to do if Wi-Fi is not working?",
+      "question": "What to do if Wi-Fi is not working?",
+      "answer": "Unplug the modem cable, wait for a few minutes, and then plug it back in. If the problem persists: +49 152 064 19253"
+    },
+    {
+      "id": "master-q-032",
+      "category": "services",
+      "tags": [
+        "services"
+      ],
+      "title": "Is room cleaning done?",
+      "question": "Is room cleaning done?",
+      "answer": "Yes. Daily for short-term stays; 1 or 2 times a week for long-term stays (depending on the agreement)."
+    },
+    {
+      "id": "master-q-033",
+      "category": "services",
+      "tags": [
+        "services"
+      ],
+      "title": "How is towel change done?",
+      "question": "How is towel change done?",
+      "answer": "Towels on the bathroom floor are changed on cleaning days."
+    },
+    {
+      "id": "master-q-034",
+      "category": "services",
+      "tags": [
+        "services"
+      ],
+      "title": "Sheet change frequency",
+      "question": "What is the frequency of sheet change?",
+      "answer": "Twice a week for short-term stays."
+    },
+    {
+      "id": "master-q-035",
+      "category": "services",
+      "tags": [
+        "services"
+      ],
+      "title": "Laundry service",
+      "question": "Is there a laundry service?",
+      "answer": "There is a shared laundry room on each floor; usage instructions are indicated on the machines."
+    },
+    {
+      "id": "master-q-036",
+      "category": "services",
+      "tags": [
+        "services"
+      ],
+      "title": "Requesting cleaning",
+      "question": "What should I do to request cleaning?",
+      "answer": "Contact the customer representative: +49 152 064 19253 or reservation@meri-group.de"
+    },
+    {
+      "id": "master-q-037",
+      "category": "services",
+      "tags": [
+        "services"
+      ],
+      "title": "Extra towel",
+      "question": "Can I get an extra towel?",
+      "answer": "Yes, the towel will be replaced when you leave it on the bathroom floor; contact us for extra requests."
+    },
+    {
+      "id": "master-q-038",
+      "category": "services",
+      "tags": [
+        "services"
+      ],
+      "title": "Extra pillow",
+      "question": "Can I get an extra pillow?",
+      "answer": "Yes, it will be provided upon request."
+    },
+    {
+      "id": "master-q-040",
+      "category": "services",
+      "tags": [
+        "services"
+      ],
+      "title": "Smoking policy",
+      "question": "Is smoking allowed?",
+      "answer": "Smoking is strictly prohibited in the rooms. Contact us for balcony room requests."
+    },
+    {
+      "id": "master-q-041",
+      "category": "services",
+      "tags": [
+        "services"
+      ],
+      "title": "Deposit",
+      "question": "Is a deposit required?",
+      "answer": "A deposit is only required for long-term stays."
+    },
+    {
+      "id": "master-q-042",
+      "category": "services",
+      "tags": [
+        "services"
+      ],
+      "title": "Infrastructure for people with disabilities",
+      "question": "Is there infrastructure for people with disabilities?",
+      "answer": "There is parking and toilet infrastructure for people with disabilities. Please contact the customer representative for special needs: +49 152 064 19253"
+    },
+    {
+      "id": "master-q-044",
+      "category": "reservation",
+      "tags": [
+        "reservation"
+      ],
+      "title": "Direct reservation advantage",
+      "question": "Is there an advantage to making a direct reservation?",
+      "answer": "Yes, discounted offers may be available for direct reservations."
+    },
+    {
+      "id": "master-q-045",
+      "category": "reservation",
+      "tags": [
+        "reservation"
+      ],
+      "title": "What is the WhatsApp number?",
+      "question": "What is the WhatsApp number?",
+      "answer": "+49 152 064 19253"
+    },
+    {
+      "id": "master-q-046",
+      "category": "reservation",
+      "tags": [
+        "reservation"
+      ],
+      "title": "What is the email address?",
+      "question": "What is the email address?",
+      "answer": "reservation@meri-group.de"
+    },
+    {
+      "id": "master-q-047",
+      "category": "reservation",
+      "tags": [
+        "reservation"
+      ],
+      "title": "What is the website?",
+      "question": "What is the website?",
+      "answer": "www.meri-boarding.de"
+    },
+    {
+      "id": "master-q-048",
+      "category": "reservation",
+      "tags": [
+        "reservation"
+      ],
+      "title": "What is the check-in time?",
+      "question": "What is the check-in time?",
+      "answer": "From 14:00"
+    },
+    {
+      "id": "master-q-049",
+      "category": "reservation",
+      "tags": [
+        "reservation"
+      ],
+      "title": "What is the check-out time?",
+      "question": "What is the check-out time?",
+      "answer": "Until 12:00"
+    },
+    {
+      "id": "master-q-050",
+      "category": "reservation",
+      "tags": [
+        "reservation"
+      ],
+      "title": "Is early check-in possible?",
+      "question": "Is early check-in possible?",
+      "answer": "May be possible depending on availability. Please inquire in advance: +49 152 064 19253"
+    },
+    {
+      "id": "master-q-051",
+      "category": "reservation",
+      "tags": [
+        "reservation"
+      ],
+      "title": "Is late check-out possible?",
+      "question": "Is late check-out possible?",
+      "answer": "May be possible depending on availability. Please inquire in advance: +49 152 064 19253"
+    },
+    {
+      "id": "master-q-053",
+      "category": "reservation",
+      "tags": [
+        "reservation"
+      ],
+      "title": "Is luggage storage available?",
+      "question": "Is luggage storage available?",
+      "answer": "Yes, luggage can be left even after check-out"
+    },
+    {
+      "id": "master-q-054",
+      "category": "reservation",
+      "tags": [
+        "reservation"
+      ],
+      "title": "Can the reservation be extended?",
+      "question": "Can the reservation be extended?",
+      "answer": "Yes, depending on availability. Contact: +49 152 064 19253"
+    },
+    {
+      "id": "master-q-055",
+      "category": "reservation",
+      "tags": [
+        "reservation"
+      ],
+      "title": "Is it possible to change rooms?",
+      "question": "Is it possible to change rooms?",
+      "answer": "Depending on availability. Contact: +49 152 064 19253"
+    },
+    {
+      "id": "master-q-056",
+      "category": "reservation",
+      "tags": [
+        "reservation"
+      ],
+      "title": "How do I check out of the hotel?",
+      "question": "How do I check out of the hotel?",
+      "answer": "Just inform the customer representative."
+    },
+    {
+      "id": "master-q-058",
+      "category": "support",
+      "tags": [
+        "support"
+      ],
+      "title": "Who should I contact in an emergency?",
+      "question": "Who should I contact in an emergency?",
+      "answer": "+49 152 064 19253 (24/7)"
+    },
+    {
+      "id": "master-q-059",
+      "category": "support",
+      "tags": [
+        "support"
+      ],
+      "title": "What should I do if there is a technical issue?",
+      "question": "What should I do if there is a technical issue?",
+      "answer": "Contact: +49 152 064 19253"
+    },
+    {
+      "id": "master-q-060",
+      "category": "support",
+      "tags": [
+        "support"
+      ],
+      "title": "What should I do in case of a power outage?",
+      "question": "What should I do in case of a power outage?",
+      "answer": "Contact: +49 152 064 19253"
+    },
+    {
+      "id": "master-q-061",
+      "category": "support",
+      "tags": [
+        "support"
+      ],
+      "title": "What should I do if there is no hot water?",
+      "question": "What should I do if there is no hot water?",
+      "answer": "Contact: +49 152 064 19253"
+    },
+    {
+      "id": "master-q-062",
+      "category": "support",
+      "tags": [
+        "support"
+      ],
+      "title": "What should I do if I lose my room key?",
+      "question": "What should I do if I lose my room key?",
+      "answer": "Contact: +49 152 064 19253"
+    },
+    {
+      "id": "master-q-063",
+      "category": "support",
+      "tags": [
+        "support"
+      ],
+      "title": "How do I make a noise complaint?",
+      "question": "How do I make a noise complaint?",
+      "answer": "Contact: +49 152 064 19253"
+    },
+    {
+      "id": "master-q-064",
+      "category": "support",
+      "tags": [
+        "support"
+      ],
+      "title": "How do I contact the reception?",
+      "question": "How do I contact the reception?",
+      "answer": "WhatsApp / Phone: +49 152 064 19253 or Email: reservation@meri-group.de"
+    },
+    {
+      "id": "master-q-065",
+      "category": "amenities",
+      "tags": [
+        "amenities",
+        "flamingo"
+      ],
+      "title": "Where is the Flamingo?",
+      "question": "Where is the Flamingo?",
+      "answer": "Located in the north-east of Stuttgart, close to the city center, in a lush natural setting."
+    },
+    {
+      "id": "master-q-066",
+      "category": "amenities",
+      "tags": [
+        "amenities",
+        "flamingo"
+      ],
+      "title": "Is the area safe?",
+      "question": "Is the area safe?",
+      "answer": "Yes, it is a quiet and green neighborhood."
+    },
+    {
+      "id": "master-q-067",
+      "category": "amenities",
+      "tags": [
+        "amenities",
+        "europaplatz"
+      ],
+      "title": "Where is Europaplatz?",
+      "question": "Where is Europaplatz?",
+      "answer": "In the southwest of Stuttgart, 9 minutes from the airport."
+    },
+    {
+      "id": "master-q-069",
+      "category": "amenities",
+      "tags": [
+        "amenities",
+        "hildesheim"
+      ],
+      "title": "Where is Hildesheim?",
+      "question": "Where is Hildesheim?",
+      "answer": "In the state of Lower Saxony, 15 km from Hanover, 15 km from Salzgitter, 30 km from Braunschweig. Close to the A7 highway, at the intersection of 4 federal highways."
+    },
+    {
+      "id": "master-f-001",
+      "category": "amenities",
+      "tags": [
+        "amenities"
+      ],
+      "title": "Bed & Bedroom",
+      "question": "What is Bed & Bedroom?",
+      "answer": "Large double bed, high-quality mattress, bed linen included and regular change. Built-in wardrobe. Extra/child/baby bed available upon request."
+    },
+    {
+      "id": "master-f-002",
+      "category": "amenities",
+      "tags": [
+        "amenities"
+      ],
+      "title": "Living Room",
+      "question": "What is Living Room?",
+      "answer": "High-quality furniture. Smart TV (satellite: international channels). Sofa bed."
+    },
+    {
+      "id": "master-f-003",
+      "category": "amenities",
+      "tags": [
+        "amenities"
+      ],
+      "title": "Kitchen (all locations)",
+      "question": "What is Kitchen (all locations)?",
+      "answer": "Dishwasher, coffee machine, microwave, rice cooker, Indian chapati board, complete cutlery/plate/glass set, shopping cart."
+    },
+    {
+      "id": "master-f-004",
+      "category": "amenities",
+      "tags": [
+        "amenities"
+      ],
+      "title": "Balcony / Terrace",
+      "question": "What is Balcony / Terrace?",
+      "answer": "Furnished balcony or terrace in all apartments."
+    },
+    {
+      "id": "master-f-005",
+      "category": "amenities",
+      "tags": [
+        "amenities"
+      ],
+      "title": "Curtains",
+      "question": "What are Curtains?",
+      "answer": "Heat-resistant blackout curtains."
+    },
+    {
+      "id": "master-f-006",
+      "category": "amenities",
+      "tags": [
+        "amenities"
+      ],
+      "title": "Wi-Fi & Internet",
+      "question": "What is Wi-Fi & Internet?",
+      "answer": "Free Wi-Fi + DSL connection. (Europaplatz: separate modem in each room)"
+    },
+    {
+      "id": "master-f-007",
+      "category": "amenities",
+      "tags": [
+        "amenities"
+      ],
+      "title": "Phone",
+      "question": "What is Phone?",
+      "answer": "Private line with unlimited free calls to the German landline."
+    },
+    {
+      "id": "master-f-008",
+      "category": "amenities",
+      "tags": [
+        "amenities"
+      ],
+      "title": "Laundry",
+      "question": "What is laundry?",
+      "answer": "Flamingo & Europaplatz: shared laundry room (free). Hildesheim: washing machine + dryer in the apartment."
+    },
+    {
+      "id": "master-f-009",
+      "category": "amenities",
+      "tags": [
+        "amenities"
+      ],
+      "title": "Iron",
+      "question": "What is iron?",
+      "answer": "Each apartment has an iron and ironing board."
+    },
+    {
+      "id": "master-f-010",
+      "category": "amenities",
+      "tags": [
+        "amenities"
+      ],
+      "title": "Registration",
+      "question": "What is registration?",
+      "answer": "Residence registration (Meldebestätigung / Wohnungsbescheinigung) is provided at all locations."
+    },
+    {
+      "id": "master-f-011",
+      "category": "amenities",
+      "tags": [
+        "amenities"
+      ],
+      "title": "Name plate",
+      "question": "What is name plate?",
+      "answer": "A name plate is placed on the door on the day of move-in."
+    },
+    {
+      "id": "master-f-012",
+      "category": "amenities",
+      "tags": [
+        "amenities"
+      ],
+      "title": "Bicycle (Europaplatz)",
+      "question": "What is bicycle (Europaplatz)?",
+      "answer": "Covered bicycle parking."
+    },
+    {
+      "id": "master-f-013",
+      "category": "amenities",
+      "tags": [
+        "amenities"
+      ],
+      "title": "Guest fee",
+      "question": "What is guest fee?",
+      "answer": "Monthly guest acceptance with an additional fee of only 10 €/person."
+    },
+    {
+      "id": "master-f-014",
+      "category": "amenities",
+      "tags": [
+        "amenities"
+      ],
+      "title": "Pet",
+      "question": "What is pet?",
+      "answer": "Possible upon request and approval: +49 152 064 19253"
+    },
+    {
+      "id": "master-f-015",
+      "category": "amenities",
+      "tags": [
+        "amenities"
+      ],
+      "title": "Parking",
+      "question": "What is parking?",
+      "answer": "Open parking or closed garage available at all locations upon request."
+    },
+    {
+      "id": "master-f-016",
+      "category": "location",
+      "tags": [
+        "flamingo"
+      ],
+      "title": "Address",
+      "question": "What is the address for Flamingo?",
+      "answer": "Flamingoweg 70, D-70378 Stuttgart"
+    },
+    {
+      "id": "master-f-017",
+      "category": "location",
+      "tags": [
+        "flamingo"
+      ],
+      "title": "Apartment type and number",
+      "question": "What is the apartment type and number for Flamingo?",
+      "answer": "76 fully equipped 1-room (1+0) apartments."
+    },
+    {
+      "id": "master-f-018",
+      "category": "location",
+      "tags": [
+        "flamingo"
+      ],
+      "title": "Nature and Environment",
+      "question": "What is the nature and environment like for Flamingo?",
+      "answer": "Near the Neckar river and Max-Eyth-See recreation area; barbecue, walking, and paddle boat fun possible on large lawns."
+    },
+    {
+      "id": "master-f-019",
+      "category": "location",
+      "tags": [
+        "flamingo"
+      ],
+      "title": "Public Transportation",
+      "question": "What is the public transportation like for Flamingo?",
+      "answer": "Easy access to the city center and surroundings with U-Bahn and bus connections."
+    },
+    {
+      "id": "master-f-020",
+      "category": "location",
+      "tags": [
+        "flamingo"
+      ],
+      "title": "Access by Car",
+      "question": "What is the access like by car for Flamingo?",
+      "answer": "Easy access to the north and east of Stuttgart by car."
+    },
+    {
+      "id": "master-f-021",
+      "category": "location",
+      "tags": [
+        "flamingo"
+      ],
+      "title": "Airport Transfer",
+      "question": "What is the airport transfer like for Flamingo?",
+      "answer": "Transfer service available: +49 152 064 19253"
+    },
+    {
+      "id": "master-f-022",
+      "category": "location",
+      "tags": [
+        "flamingo"
+      ],
+      "title": "Taxi Service",
+      "question": "What is the taxi service like for Flamingo?",
+      "answer": "Reservation can be made upon request: +49 152 064 19253"
+    },
+    {
+      "id": "master-f-023",
+      "category": "location",
+      "tags": [
+        "flamingo"
+      ],
+      "title": "Furniture",
+      "question": "What is the furniture like for Flamingo?",
+      "answer": "Fully equipped with high-quality furniture; ready for move-in."
+    },
+    {
+      "id": "master-f-024",
+      "category": "location",
+      "tags": [
+        "flamingo"
+      ],
+      "title": "Kitchen",
+      "question": "What is the kitchen like for Flamingo?",
+      "answer": "Fully equipped kitchen: dishwasher, coffee machine, rice cooker, Indian chapati board, microwave, and shopping cart."
+    },
+    {
+      "id": "master-f-025",
+      "category": "location",
+      "tags": [
+        "flamingo"
+      ],
+      "title": "Living Room",
+      "question": "What is the living room like for Flamingo?",
+      "answer": "Modern Smart TV (with international channels via satellite system). Sofa can be converted into a bed."
+    },
+    {
+      "id": "master-f-026",
+      "category": "location",
+      "tags": [
+        "flamingo"
+      ],
+      "title": "Bedroom",
+      "question": "What is the bedroom like for Flamingo?",
+      "answer": "Large double bed, high-quality mattress. Built-in wardrobe. Extra bed available upon request."
+    },
+    {
+      "id": "master-f-027",
+      "category": "location",
+      "tags": [
+        "flamingo"
+      ],
+      "title": "Bedding",
+      "question": "What is the bedding like for Flamingo?",
+      "answer": "Sheets included, regular change available upon request."
+    },
+    {
+      "id": "master-f-028",
+      "category": "location",
+      "tags": [
+        "flamingo"
+      ],
+      "title": "Balcony / Terrace",
+      "question": "What is the balcony / terrace for Flamingo?",
+      "answer": "All apartments have a furnished balcony or terrace."
+    },
+    {
+      "id": "master-f-029",
+      "category": "location",
+      "tags": [
+        "flamingo"
+      ],
+      "title": "Curtains",
+      "question": "What are the curtains for Flamingo?",
+      "answer": "Heat-resistant blackout curtains."
+    },
+    {
+      "id": "master-f-030",
+      "category": "location",
+      "tags": [
+        "flamingo"
+      ],
+      "title": "Wi-Fi & Internet",
+      "question": "What is Wi-Fi & internet for Flamingo?",
+      "answer": "Free Wi-Fi and DSL connection."
+    },
+    {
+      "id": "master-f-031",
+      "category": "location",
+      "tags": [
+        "flamingo"
+      ],
+      "title": "Phone",
+      "question": "What is the phone for Flamingo?",
+      "answer": "Private line including unlimited free calls to German landlines."
+    },
+    {
+      "id": "master-f-032",
+      "category": "location",
+      "tags": [
+        "flamingo"
+      ],
+      "title": "Laundry",
+      "question": "What is the laundry for Flamingo?",
+      "answer": "Free use of washing machine and dryer in the shared laundry room."
+    },
+    {
+      "id": "master-f-033",
+      "category": "location",
+      "tags": [
+        "flamingo"
+      ],
+      "title": "Child-friendly",
+      "question": "What is child-friendly for Flamingo?",
+      "answer": "Playground in front of the door, baby/child bed can be added at any time."
+    },
+    {
+      "id": "master-f-034",
+      "category": "location",
+      "tags": [
+        "flamingo"
+      ],
+      "title": "Pets",
+      "question": "What are pets for Flamingo?",
+      "answer": "Possible on request: +49 152 064 19253"
+    },
+    {
+      "id": "master-f-035",
+      "category": "location",
+      "tags": [
+        "flamingo"
+      ],
+      "title": "Guest visit",
+      "question": "What is guest visit for Flamingo?",
+      "answer": "Guests can be accepted for a monthly fee of only 10 €/person."
+    },
+    {
+      "id": "master-f-036",
+      "category": "location",
+      "tags": [
+        "flamingo"
+      ],
+      "title": "Cleaning & maintenance service",
+      "question": "What is cleaning & maintenance service for Flamingo?",
+      "answer": "Optional: Facility service, cleaning service or service-free living options."
+    },
+    {
+      "id": "master-f-037",
+      "category": "location",
+      "tags": [
+        "flamingo"
+      ],
+      "title": "24-hour maintenance",
+      "question": "What is 24-hour maintenance for Flamingo?",
+      "answer": "Yes, 24-hour site staff service is available."
+    },
+    {
+      "id": "master-f-038",
+      "category": "location",
+      "tags": [
+        "flamingo"
+      ],
+      "title": "Registration",
+      "question": "What is registration for Flamingo?",
+      "answer": "Yes, registration support (Meldebestätigung / Wohnungsbescheinigung) is provided."
+    },
+    {
+      "id": "master-f-039",
+      "category": "location",
+      "tags": [
+        "flamingo"
+      ],
+      "title": "Name Plate",
+      "question": "What is the name plate for Flamingo?",
+      "answer": "The name plate is ready at the door from the moving day."
+    },
+    {
+      "id": "master-f-040",
+      "category": "location",
+      "tags": [
+        "flamingo"
+      ],
+      "title": "Multiculturalism",
+      "question": "What is multiculturalism for Flamingo?",
+      "answer": "A multicultural guest structure and its special atmosphere."
+    },
+    {
+      "id": "master-f-041",
+      "category": "location",
+      "tags": [
+        "flamingo"
+      ],
+      "title": "Parking",
+      "question": "What is parking for Flamingo?",
+      "answer": "Open parking or closed garage possibility upon request: +49 152 064 19253"
+    },
+    {
+      "id": "master-f-042",
+      "category": "location",
+      "tags": [
+        "europaplatz"
+      ],
+      "title": "Address",
+      "question": "What is the address for Europaplatz?",
+      "answer": "Europaplatz 20b, 70565 Stuttgart"
+    },
+    {
+      "id": "master-f-043",
+      "category": "location",
+      "tags": [
+        "europaplatz"
+      ],
+      "title": "Apartment Type and Number",
+      "question": "What is the apartment type and number for Europaplatz?",
+      "answer": "65 fully equipped 1+0 and 2+0 apartments."
+    },
+    {
+      "id": "master-f-044",
+      "category": "location",
+      "tags": [
+        "europaplatz"
+      ],
+      "title": "Highway Connection",
+      "question": "What is the highway connection for Europaplatz?",
+      "answer": "Less than 1 km to the A8 highway Stuttgart Airport/Fair exit; excellent connection to southern Stuttgart."
+    },
+    {
+      "id": "master-f-045",
+      "category": "location",
+      "tags": [
+        "europaplatz"
+      ],
+      "title": "Distance to Airport",
+      "question": "What is the distance to the airport for Europaplatz?",
+      "answer": "Approximately 15 minutes to Stuttgart Airport by direct U-Bahn, 9 minutes by car."
+    },
+    {
+      "id": "master-f-046",
+      "category": "location",
+      "tags": [
+        "europaplatz"
+      ],
+      "title": "Metro Station",
+      "question": "What is the metro station for Europaplatz?",
+      "answer": "Europaplatz U-Bahn station — right next to the building, 3-minute walk."
+    },
+    {
+      "id": "master-f-047",
+      "category": "location",
+      "tags": [
+        "europaplatz"
+      ],
+      "title": "Bus",
+      "question": "What is the bus for Europaplatz?",
+      "answer": "7 different bus lines connect Europaplatz to various points in the city."
+    },
+    {
+      "id": "master-f-048",
+      "category": "location",
+      "tags": [
+        "europaplatz"
+      ],
+      "title": "Public Transportation to City Center",
+      "question": "What is the public transportation to the city center for Europaplatz?",
+      "answer": "Directly to Stuttgart city center by U-Bahn."
+    },
+    {
+      "id": "master-f-049",
+      "category": "location",
+      "tags": [
+        "europaplatz"
+      ],
+      "title": "Airport Transfer",
+      "question": "What is the airport transfer for Europaplatz?",
+      "answer": "Transfer service available: +49 152 064 19253"
+    },
+    {
+      "id": "master-f-050",
+      "category": "location",
+      "tags": [
+        "europaplatz"
+      ],
+      "title": "Taxi",
+      "question": "What is the taxi for Europaplatz?",
+      "answer": "Booking on request: +49 152 064 19253"
+    },
+    {
+      "id": "master-f-051",
+      "category": "location",
+      "tags": [
+        "europaplatz"
+      ],
+      "title": "Furniture",
+      "question": "What is the furniture for Europaplatz?",
+      "answer": "Fully equipped with high-quality furniture; ready for occupancy."
+    },
+    {
+      "id": "master-f-052",
+      "category": "location",
+      "tags": [
+        "europaplatz"
+      ],
+      "title": "Kitchen",
+      "question": "What is the kitchen for Europaplatz?",
+      "answer": "Fully equipped kitchen: dishwasher, coffee machine, rice cooker, Indian chapati board, microwave and shopping cart."
+    },
+    {
+      "id": "master-f-053",
+      "category": "location",
+      "tags": [
+        "europaplatz"
+      ],
+      "title": "Living Room",
+      "question": "What is the living room for Europaplatz?",
+      "answer": "Modern Smart TV (with international channels via satellite system). Sofa can be converted into a bed."
+    },
+    {
+      "id": "master-f-054",
+      "category": "location",
+      "tags": [
+        "europaplatz"
+      ],
+      "title": "Bedroom",
+      "question": "What is the bedroom for Europaplatz?",
+      "answer": "Large double bed, high-quality mattress. Built-in wardrobe. Extra bed available on request."
+    },
+    {
+      "id": "master-f-055",
+      "category": "location",
+      "tags": [
+        "europaplatz"
+      ],
+      "title": "Bed Linen",
+      "question": "What is the bed linen for Europaplatz?",
+      "answer": "Sheets included, regular change on request."
+    },
+    {
+      "id": "master-f-056",
+      "category": "location",
+      "tags": [
+        "europaplatz"
+      ],
+      "title": "Balcony / Terrace",
+      "question": "What is the balcony / terrace for Europaplatz?",
+      "answer": "All apartments have a furnished balcony or terrace."
+    },
+    {
+      "id": "master-f-057",
+      "category": "location",
+      "tags": [
+        "europaplatz"
+      ],
+      "title": "Curtains",
+      "question": "What are the curtains for Europaplatz?",
+      "answer": "Heat-resistant blackout curtains."
+    },
+    {
+      "id": "master-f-058",
+      "category": "location",
+      "tags": [
+        "europaplatz"
+      ],
+      "title": "Wi-Fi & Internet",
+      "question": "What is the Wi-Fi and internet like at Europaplatz?",
+      "answer": "Free Wi-Fi and DSL connection. Each room has its own modem."
+    },
+    {
+      "id": "master-f-059",
+      "category": "location",
+      "tags": [
+        "europaplatz"
+      ],
+      "title": "Phone",
+      "question": "What is the phone like at Europaplatz?",
+      "answer": "Private line with unlimited free calls to German landlines."
+    },
+    {
+      "id": "master-f-060",
+      "category": "location",
+      "tags": [
+        "europaplatz"
+      ],
+      "title": "Laundry",
+      "question": "What is the laundry like at Europaplatz?",
+      "answer": "Free use of washing machine and dryer in the shared laundry room."
+    },
+    {
+      "id": "master-f-061",
+      "category": "location",
+      "tags": [
+        "europaplatz"
+      ],
+      "title": "Bicycle",
+      "question": "What is the bicycle parking like at Europaplatz?",
+      "answer": "There is a covered bicycle parking area."
+    },
+    {
+      "id": "master-f-062",
+      "category": "location",
+      "tags": [
+        "europaplatz"
+      ],
+      "title": "Child Friendly",
+      "question": "Is Europaplatz child friendly?",
+      "answer": "There is a playground in front of the door, and a baby/child bed can be added upon request."
+    },
+    {
+      "id": "master-f-063",
+      "category": "location",
+      "tags": [
+        "europaplatz"
+      ],
+      "title": "Pets",
+      "question": "Are pets allowed at Europaplatz?",
+      "answer": "Possible upon request: +49 152 064 19253"
+    },
+    {
+      "id": "master-f-064",
+      "category": "location",
+      "tags": [
+        "europaplatz"
+      ],
+      "title": "Market (Ground Floor)",
+      "question": "What is the market like on the ground floor at Europaplatz?",
+      "answer": "There is a direct market on the ground floor of the building."
+    },
+    {
+      "id": "master-f-065",
+      "category": "location",
+      "tags": [
+        "europaplatz"
+      ],
+      "title": "Market Hours",
+      "question": "What are the market hours at Europaplatz?",
+      "answer": "Open until ~21:00 on weekdays and Saturdays. Closed on Sundays. The nearby bakery is open until 17:00 on Sundays."
+    },
+    {
+      "id": "master-f-066",
+      "category": "location",
+      "tags": [
+        "europaplatz"
+      ],
+      "title": "24 Hour Market",
+      "question": "Is there a 24 hour market at Europaplatz?",
+      "answer": "Not available."
+    },
+    {
+      "id": "master-f-067",
+      "category": "location",
+      "tags": [
+        "europaplatz"
+      ],
+      "title": "ATM",
+      "question": "Is there an ATM at Europaplatz?",
+      "answer": "Located directly under the building."
+    },
+    {
+      "id": "master-f-068",
+      "category": "location",
+      "tags": [
+        "europaplatz"
+      ],
+      "title": "Bank",
+      "question": "What is the bank for Europaplatz?",
+      "answer": "The nearest bank is approximately 1.5 km."
+    },
+    {
+      "id": "master-f-069",
+      "category": "location",
+      "tags": [
+        "europaplatz"
+      ],
+      "title": "Pharmacy / Health",
+      "question": "What is the pharmacy / health for Europaplatz?",
+      "answer": "Müller store is in the building; basic health products are available."
+    },
+    {
+      "id": "master-f-070",
+      "category": "location",
+      "tags": [
+        "europaplatz"
+      ],
+      "title": "Hospital",
+      "question": "What is the hospital for Europaplatz?",
+      "answer": "Robert Bosch City Hospital — approximately 8.6 km."
+    },
+    {
+      "id": "master-f-071",
+      "category": "location",
+      "tags": [
+        "europaplatz"
+      ],
+      "title": "Shopping Center",
+      "question": "What is the shopping center for Europaplatz?",
+      "answer": "SI-Centrum — 1.6 km. Breuningerland — 14 km. Metzingen Outlet — outside the city."
+    },
+    {
+      "id": "master-f-072",
+      "category": "location",
+      "tags": [
+        "europaplatz"
+      ],
+      "title": "Children's Play Area",
+      "question": "What is the children's play area for Europaplatz?",
+      "answer": "There is a special area for children at this location. Photos: www.meri-boarding.de"
+    },
+    {
+      "id": "master-f-073",
+      "category": "location",
+      "tags": [
+        "europaplatz"
+      ],
+      "title": "Guest Visit",
+      "question": "What is the guest visit for Europaplatz?",
+      "answer": "Guests can be accepted with an additional fee of 10 €/person per month."
+    },
+    {
+      "id": "master-f-074",
+      "category": "location",
+      "tags": [
+        "europaplatz"
+      ],
+      "title": "Cleaning & Maintenance Service",
+      "question": "What is the cleaning & maintenance service for Europaplatz?",
+      "answer": "Optional: Facility service, cleaning service, or service-free living options."
+    },
+    {
+      "id": "master-f-075",
+      "category": "location",
+      "tags": [
+        "europaplatz"
+      ],
+      "title": "24 Hour Maintenance",
+      "question": "What is the 24 hour maintenance for Europaplatz?",
+      "answer": "Yes, there is a 24-hour site staff service."
+    },
+    {
+      "id": "master-f-076",
+      "category": "location",
+      "tags": [
+        "europaplatz"
+      ],
+      "title": "Registration",
+      "question": "What is the registration for Europaplatz?",
+      "answer": "Yes, registration of residence (Meldebestätigung / Wohnungsbescheinigung) support is provided."
+    },
+    {
+      "id": "master-f-077",
+      "category": "location",
+      "tags": [
+        "europaplatz"
+      ],
+      "title": "Name Plate",
+      "question": "What is the name plate for Europaplatz?",
+      "answer": "The name plate is ready at the door from the moving day."
+    },
+    {
+      "id": "master-f-078",
+      "category": "location",
+      "tags": [
+        "europaplatz"
+      ],
+      "title": "Multiculturalism",
+      "question": "What is multiculturalism for Europaplatz?",
+      "answer": "A multicultural guest structure and its special atmosphere."
+    },
+    {
+      "id": "master-f-079",
+      "category": "location",
+      "tags": [
+        "europaplatz"
+      ],
+      "title": "For People with Disabilities",
+      "question": "What is available for people with disabilities at Europaplatz?",
+      "answer": "There is a parking lot and toilet infrastructure for people with disabilities. For special needs: +49 152 064 19253"
+    },
+    {
+      "id": "master-f-080",
+      "category": "location",
+      "tags": [
+        "europaplatz"
+      ],
+      "title": "Parking",
+      "question": "What is the parking situation like at Europaplatz?",
+      "answer": "Open parking or closed garage available upon request: +49 152 064 19253"
+    },
+    {
+      "id": "master-f-081",
+      "category": "location",
+      "tags": [
+        "europaplatz"
+      ],
+      "title": "Electric Vehicle Charging",
+      "question": "Is electric vehicle charging available at Europaplatz?",
+      "answer": "Available. For details: +49 152 064 19253"
+    },
+    {
+      "id": "master-f-082",
+      "category": "location",
+      "tags": [
+        "hildesheim"
+      ],
+      "title": "Tourist Attraction",
+      "question": "What is the tourist attraction of Hildesheim?",
+      "answer": "The historic market square is the center of the city. St. Michaelis Church and Mariendom are on the UNESCO World Heritage list."
+    },
+    {
+      "id": "master-f-083",
+      "category": "location",
+      "tags": [
+        "hildesheim"
+      ],
+      "title": "Apartment Type",
+      "question": "What type of apartments are available in Hildesheim?",
+      "answer": "Various fully equipped apartments in different small buildings."
+    },
+    {
+      "id": "master-f-084",
+      "category": "location",
+      "tags": [
+        "hildesheim"
+      ],
+      "title": "Highway",
+      "question": "How close is Hildesheim to the highway?",
+      "answer": "Close to the A7 highway; easy access to the area by car."
+    },
+    {
+      "id": "master-f-085",
+      "category": "location",
+      "tags": [
+        "hildesheim"
+      ],
+      "title": "Public Transportation",
+      "question": "What public transportation options are available in Hildesheim?",
+      "answer": "Close to U-Bahn and bus lines. For details: +49 152 064 19253"
+    },
+    {
+      "id": "master-f-086",
+      "category": "location",
+      "tags": [
+        "hildesheim"
+      ],
+      "title": "Distance to Hannover",
+      "question": "How far is Hildesheim from Hannover?",
+      "answer": "Approximately 15 km to the north."
+    },
+    {
+      "id": "master-f-087",
+      "category": "location",
+      "tags": [
+        "hildesheim"
+      ],
+      "title": "Distance to Braunschweig",
+      "question": "How far is Hildesheim from Braunschweig?",
+      "answer": "Approximately 30 km."
+    },
+    {
+      "id": "master-f-088",
+      "category": "location",
+      "tags": [
+        "hildesheim"
+      ],
+      "title": "Airport Transfer",
+      "question": "What is the airport transfer for Hildesheim?",
+      "answer": "Transfer service is available: +49 152 064 19253"
+    },
+    {
+      "id": "master-f-089",
+      "category": "location",
+      "tags": [
+        "hildesheim"
+      ],
+      "title": "Furniture",
+      "question": "What is the furniture for Hildesheim?",
+      "answer": "Fully equipped with high-quality furniture; ready for move-in."
+    },
+    {
+      "id": "master-f-090",
+      "category": "location",
+      "tags": [
+        "hildesheim"
+      ],
+      "title": "Kitchen",
+      "question": "What is the kitchen for Hildesheim?",
+      "answer": "Fully equipped kitchen: dishwasher, coffee machine, rice cooker, Indian chapati board, microwave."
+    },
+    {
+      "id": "master-f-091",
+      "category": "location",
+      "tags": [
+        "hildesheim"
+      ],
+      "title": "Living Room",
+      "question": "What is the living room for Hildesheim?",
+      "answer": "Modern Smart TV (with international channels via satellite system). Sofa can be converted into a bed."
+    },
+    {
+      "id": "master-f-092",
+      "category": "location",
+      "tags": [
+        "hildesheim"
+      ],
+      "title": "Bedroom",
+      "question": "What is the bedroom for Hildesheim?",
+      "answer": "Large double bed, high-quality mattress. Built-in wardrobe. Additional bed available upon request."
+    },
+    {
+      "id": "master-f-093",
+      "category": "location",
+      "tags": [
+        "hildesheim"
+      ],
+      "title": "Balcony / Terrace",
+      "question": "What is the balcony / terrace for Hildesheim?",
+      "answer": "Furnished balcony or terrace is available."
+    },
+    {
+      "id": "master-f-094",
+      "category": "location",
+      "tags": [
+        "hildesheim"
+      ],
+      "title": "Wi-Fi & Internet",
+      "question": "What is the Wi-Fi & internet for Hildesheim?",
+      "answer": "Free Wi-Fi and DSL connection."
+    },
+    {
+      "id": "master-f-095",
+      "category": "location",
+      "tags": [
+        "hildesheim"
+      ],
+      "title": "Phone",
+      "question": "What is the phone for Hildesheim?",
+      "answer": "Private line with unlimited free calls to German landline."
+    },
+    {
+      "id": "master-f-096",
+      "category": "location",
+      "tags": [
+        "hildesheim"
+      ],
+      "title": "Laundry",
+      "question": "What is the laundry for Hildesheim?",
+      "answer": "Washing machine and dryer in the apartment."
+    },
+    {
+      "id": "master-f-097",
+      "category": "location",
+      "tags": [
+        "hildesheim"
+      ],
+      "title": "Child-Friendly",
+      "question": "What is the child-friendly feature for Hildesheim?",
+      "answer": "Playground in front of the door, baby/child bed can be added upon request."
+    },
+    {
+      "id": "master-f-098",
+      "category": "location",
+      "tags": [
+        "hildesheim"
+      ],
+      "title": "Pets",
+      "question": "What are the pet policies for Hildesheim?",
+      "answer": "Possible on request: +49 152 064 19253"
+    },
+    {
+      "id": "master-f-099",
+      "category": "location",
+      "tags": [
+        "hildesheim"
+      ],
+      "title": "Guest visit",
+      "question": "What are the guest visit policies for Hildesheim?",
+      "answer": "Guests can be accepted with an additional fee of 10 €/person per month."
+    },
+    {
+      "id": "master-f-100",
+      "category": "location",
+      "tags": [
+        "hildesheim"
+      ],
+      "title": "Cleaning & maintenance service",
+      "question": "What are the cleaning and maintenance services for Hildesheim?",
+      "answer": "Optional: Facility service, cleaning service, or service-free living options."
+    },
+    {
+      "id": "master-f-101",
+      "category": "location",
+      "tags": [
+        "hildesheim"
+      ],
+      "title": "Registration",
+      "question": "What is the registration process for Hildesheim?",
+      "answer": "Yes, support for registration (Meldebestätigung / Wohnungsbescheinigung) is provided."
+    },
+    {
+      "id": "master-f-102",
+      "category": "location",
+      "tags": [
+        "hildesheim"
+      ],
+      "title": "Name plate",
+      "question": "What is the name plate policy for Hildesheim?",
+      "answer": "Name plate is ready at the door from the move-in day."
+    },
+    {
+      "id": "master-f-103",
+      "category": "location",
+      "tags": [
+        "hildesheim"
+      ],
+      "title": "Multiculturalism",
+      "question": "What is the multicultural environment like for Hildesheim?",
+      "answer": "Multicultural guest structure and its special atmosphere."
+    },
+    {
+      "id": "master-f-104",
+      "category": "location",
+      "tags": [
+        "hildesheim"
+      ],
+      "title": "Parking",
+      "question": "What are the parking options for Hildesheim?",
+      "answer": "Open parking or closed garage available on request: +49 152 064 19253"
+    },
+    {
+      "id": "master-c-105",
+      "category": "contact",
+      "tags": [
+        "contact"
+      ],
+      "title": "Switchboard",
+      "question": "What is the switchboard number?",
+      "answer": "+49 (0) 711 54 89 84-0"
+    },
+    {
+      "id": "master-c-107",
+      "category": "contact",
+      "tags": [
+        "contact"
+      ],
+      "title": "Reservation",
+      "question": "What is the reservation email address?",
+      "answer": "reservation@meri-group.de"
+    },
+    {
+      "id": "master-c-108",
+      "category": "contact",
+      "tags": [
+        "contact"
+      ],
+      "title": "General",
+      "question": "What is the general email address?",
+      "answer": "info@meri-group.de"
+    },
+    {
+      "id": "master-c-110",
+      "category": "contact",
+      "tags": [
+        "contact"
+      ],
+      "title": "Office Hours",
+      "question": "What are the office hours?",
+      "answer": "Mon–Fri: 08:00–12:00 / 13:00–17:00 | Sat–Sun: By appointment"
+    },
+    {
+      "id": "master-c-111",
+      "category": "contact",
+      "tags": [
+        "contact"
+      ],
+      "title": "Flamingo (Head Office)",
+      "question": "What is the address of Flamingo?",
+      "answer": "Flamingoweg 70, D-70378 Stuttgart"
+    },
+    {
+      "id": "master-c-112",
+      "category": "contact",
+      "tags": [
+        "contact"
+      ],
+      "title": "Europaplatz",
+      "question": "What is the address of Europaplatz?",
+      "answer": "Europaplatz 20b, 70565 Stuttgart"
+    },
+    {
+      "id": "master-c-113",
+      "category": "contact",
+      "tags": [
+        "contact"
+      ],
+      "title": "Hildesheim",
+      "question": "What is the contact detail of Hildesheim?",
+      "answer": "Hildesheim — for details call"
+    },
+    {
+      "id": "master-q-002",
+      "category": "general",
+      "tags": [
+        "general"
+      ],
+      "title": "How many locations are there?",
+      "question": "How many locations are there?",
+      "answer": "There are 3 locations: Stuttgart Flamingo, Stuttgart Europaplatz, and Hildesheim."
+    },
+    {
+      "id": "master-q-013",
+      "category": "rooms",
+      "tags": [
+        "rooms"
+      ],
+      "title": "Are the apartments furnished?",
+      "question": "Are the apartments furnished?",
+      "answer": "Yes, all apartments are fully furnished with all the basic necessities for living."
+    },
+    {
+      "id": "master-q-014",
+      "category": "rooms",
+      "tags": [
+        "rooms"
+      ],
+      "title": "Do the rooms have a kitchen?",
+      "question": "Do the rooms have a kitchen?",
+      "answer": "Yes, all apartments have a fully equipped kitchen."
+    },
+    {
+      "id": "master-q-015",
+      "category": "rooms",
+      "tags": [
+        "rooms"
+      ],
+      "title": "Is there a TV?",
+      "question": "Is there a TV?",
+      "answer": "Yes, there is a Smart TV in the apartments."
+    },
+    {
+      "id": "master-q-018",
+      "category": "rooms",
+      "tags": [
+        "rooms"
+      ],
+      "title": "Is there a washing machine in the rooms?",
+      "question": "Is there a washing machine in the rooms?",
+      "answer": "There is no washing machine in the rooms. Shared laundry facilities are available on each floor."
+    },
+    {
+      "id": "master-q-020",
+      "category": "rooms",
+      "tags": [
+        "rooms"
+      ],
+      "title": "Is there air conditioning?",
+      "question": "Is there air conditioning?",
+      "answer": "There is no air conditioning. Fans are available in all rooms."
+    },
+    {
+      "id": "master-q-031",
+      "category": "services",
+      "tags": [
+        "services"
+      ],
+      "title": "Is breakfast available?",
+      "question": "Is breakfast available?",
+      "answer": "There is no breakfast service in the hotel. A breakfast voucher can be provided upon request for an extra fee."
+    },
+    {
+      "id": "master-q-043",
+      "category": "reservation",
+      "tags": [
+        "reservation"
+      ],
+      "title": "How do I make a reservation?",
+      "question": "How do I make a reservation?",
+      "answer": "1) Email: reservation@meri-group.de  2) WhatsApp: +49 152 064 19253  3) Web: www.meri-boarding.de  4) Through Booking.com partners"
+    },
+    {
+      "id": "master-q-052",
+      "category": "reservation",
+      "tags": [
+        "reservation"
+      ],
+      "title": "What is the cancellation policy?",
+      "question": "What is the cancellation policy?",
+      "answer": "Cancellation can be made free of charge up to 3 days before the reservation date."
+    }
   ]
 }

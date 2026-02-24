@@ -56,6 +56,28 @@ type SessionDetail = {
   messages: ChatMessage[]
 }
 
+type ChatQuality = {
+  periodDays: number
+  locale: LocaleFilter
+  totals: {
+    sessions: number
+    handoffSessions: number
+    assistantAnsweredSessions: number
+    autoResolvedSessions: number
+    handoffRate: number
+    autoResolveRate: number
+  }
+  feedback: {
+    correct: number
+    incorrect: number
+    incorrectRate: number
+  }
+  topQuestions: Array<{
+    text: string
+    count: number
+  }>
+}
+
 export default function ChatSessionsPage() {
   const configuredApiBaseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL ?? '').trim()
   const apiBaseUrl = configuredApiBaseUrl.startsWith('http://localhost') || configuredApiBaseUrl.startsWith('https://localhost')
@@ -77,6 +99,7 @@ export default function ChatSessionsPage() {
   const [page, setPage] = useState(1)
   const [limit] = useState(25)
   const [total, setTotal] = useState(0)
+  const [quality, setQuality] = useState<ChatQuality | null>(null)
 
   const totalPages = useMemo(() => Math.max(1, Math.ceil(total / limit)), [limit, total])
 
@@ -124,9 +147,14 @@ export default function ChatSessionsPage() {
 
       if (querySearch.trim()) params.set('search', querySearch.trim())
 
-      const response = await fetch(`${apiBaseUrl}/api/v1/admin/chat-sessions?${params.toString()}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
+      const [response, qualityResponse] = await Promise.all([
+        fetch(`${apiBaseUrl}/api/v1/admin/chat-sessions?${params.toString()}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+        fetch(`${apiBaseUrl}/api/v1/admin/chat-quality?locale=${localeFilter}&days=30`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+      ])
 
       const data = await response.json()
 
@@ -135,6 +163,13 @@ export default function ChatSessionsPage() {
         setLoading(false)
 
         return
+      }
+
+      if (qualityResponse.ok) {
+        const qualityData = await qualityResponse.json()
+        setQuality(qualityData)
+      } else {
+        setQuality(null)
       }
 
       const list = Array.isArray(data?.items) ? data.items : []
@@ -256,6 +291,57 @@ export default function ChatSessionsPage() {
         {error ? <Alert severity='error'>{error}</Alert> : null}
         {success ? <Alert severity='success'>{success}</Alert> : null}
       </Grid>
+
+      {quality ? (
+        <Grid size={{ xs: 12 }}>
+          <Card>
+            <CardContent className='flex flex-col gap-3'>
+              <Typography variant='h6'>Quality Snapshot ({quality.periodDays} days)</Typography>
+              <Grid container spacing={2}>
+                <Grid size={{ xs: 12, md: 3 }}>
+                  <Chip color='primary' label={`Auto-resolve rate: ${quality.totals.autoResolveRate}%`} />
+                </Grid>
+                <Grid size={{ xs: 12, md: 3 }}>
+                  <Chip color='warning' label={`Handoff rate: ${quality.totals.handoffRate}%`} />
+                </Grid>
+                <Grid size={{ xs: 12, md: 3 }}>
+                  <Chip color='error' label={`Wrong-answer reports: ${quality.feedback.incorrect}`} />
+                </Grid>
+                <Grid size={{ xs: 12, md: 3 }}>
+                  <Chip label={`Wrong-answer rate: ${quality.feedback.incorrectRate}%`} />
+                </Grid>
+              </Grid>
+              <Typography variant='body2' color='text.secondary'>
+                Top asked questions (normalized from user messages)
+              </Typography>
+              {quality.topQuestions.length < 1 ? (
+                <Typography color='text.secondary'>No question trend data for selected period.</Typography>
+              ) : (
+                <TableContainer>
+                  <Table size='small'>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Question</TableCell>
+                        <TableCell align='right'>Count</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {quality.topQuestions.map((row, index) => (
+                        <TableRow key={`${row.text}-${index}`}>
+                          <TableCell sx={{ maxWidth: 800 }}>
+                            <Typography variant='body2'>{row.text}</Typography>
+                          </TableCell>
+                          <TableCell align='right'>{row.count}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              )}
+            </CardContent>
+          </Card>
+        </Grid>
+      ) : null}
 
       <Grid size={{ xs: 12 }}>
         <Card>

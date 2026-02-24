@@ -594,7 +594,7 @@
     "toggle": "Mit Meri sprechen",
     "panelTitle": "Mit Meri sprechen",
     "badge": "Online",
-    "intro": "Hallo! Ich bin Meris. Teilen Sie Ihren Namen und Ihre E‑Mail, um zu starten.",
+    "intro": "Hallo! Ich bin Meri. Fragen Sie mich zu Verfügbarkeit und Reservierung.",
     "fullName": "Vollständiger Name",
     "email": "E-Mail",
     "continue": "Weiter",
@@ -609,7 +609,14 @@
     "greeting": "Danke, {{name}}! Wie kann ich Ihnen heute helfen?",
     "fallbackName": "dort",
     "namePlaceholder": "Max Mustermann",
-    "emailPlaceholder": "max@beispiel.de"
+    "emailPlaceholder": "max@beispiel.de",
+    "dataNotice": "Dieser Chat wird zur Qualitätsverbesserung gespeichert.",
+    "dataNoticeLink": "Datenschutz",
+    "retentionLabel": "Aufbewahrung: 180 Tage",
+    "feedbackPrompt": "War diese Antwort hilfreich?",
+    "feedbackHelpful": "Hilfreich",
+    "feedbackWrong": "Nicht korrekt",
+    "feedbackSaved": "Gespeichert"
   },
   "amenitiesHero": {
     "subtitle": "Meri Boarding",

@@ -22,7 +22,8 @@ function buildSystemPrompt(answerLocale, preferredLocale) {
     'Never provide any price, tariff, fee amount, discount, or currency value.',
     'For price-related questions, always hand off to reservation team: +49 152 064 19253, reservation@meri-group.de.',
     'Do not invent prices, availability, addresses, or policy details.',
-    'Keep the answer concise and practical (ideally 2-4 short sentences).'
+    'Keep the answer concise and practical (ideally 2-4 short sentences).',
+    'Use conversation history only to resolve references like "that", "there", "same hotel".'
   ].join(' ');
 }
 
@@ -36,8 +37,23 @@ function buildContext(chunks) {
     .join('\n\n');
 }
 
-export async function generateRagAnswer({ question, answerLocale, preferredLocale, hits }) {
+function buildHistory(history) {
+  if (!Array.isArray(history) || history.length < 1) return '';
+  return history
+    .slice(-12)
+    .map((item, idx) => {
+      const role = String(item?.role || '').trim().toLowerCase() === 'assistant' ? 'Assistant' : 'User';
+      const content = String(item?.content || '').replace(/\s+/g, ' ').trim().slice(0, 600);
+      if (!content) return '';
+      return `[H${idx + 1}] ${role}: ${content}`;
+    })
+    .filter(Boolean)
+    .join('\n');
+}
+
+export async function generateRagAnswer({ question, answerLocale, preferredLocale, hits, history = [] }) {
   const context = buildContext(hits);
+  const historyText = buildHistory(history);
 
   if (!config.groqApiKey) {
     return {
@@ -46,35 +62,46 @@ export async function generateRagAnswer({ question, answerLocale, preferredLocal
     };
   }
 
-  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-      authorization: `Bearer ${config.groqApiKey}`
-    },
-    body: JSON.stringify({
-      model: config.groqModel,
-      temperature: 0.2,
-      messages: [
-        { role: 'system', content: buildSystemPrompt(answerLocale, preferredLocale) },
-        {
-          role: 'user',
-          content: `Question:\n${question}\n\nContext:\n${context}`
-        }
-      ]
-    })
-  });
+  const preferredModel = String(config.groqModel || '').trim() || 'llama-3.3-70b-versatile';
+  const fallbackModel = 'llama-3.1-8b-instant';
+  const modelOrder = preferredModel === fallbackModel ? [preferredModel] : [preferredModel, fallbackModel];
+  let lastError = null;
 
-  if (!response.ok) {
-    const body = await response.text();
-    throw new Error(`Groq chat failed (${response.status}): ${body}`);
+  for (const modelName of modelOrder) {
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        authorization: `Bearer ${config.groqApiKey}`
+      },
+      body: JSON.stringify({
+        model: modelName,
+        temperature: 0.2,
+        messages: [
+          { role: 'system', content: buildSystemPrompt(answerLocale, preferredLocale) },
+          {
+            role: 'user',
+            content: `Question:\n${question}\n\nConversation history:\n${historyText || 'none'}\n\nContext:\n${context}`
+          }
+        ]
+      })
+    });
+
+    if (!response.ok) {
+      const body = await response.text();
+      lastError = new Error(`Groq chat failed (${response.status}) [${modelName}]: ${body}`);
+      // Retry on quota/transient issues with next model, fail fast on other classes.
+      if (response.status === 429 || response.status >= 500) continue;
+      throw lastError;
+    }
+
+    const data = await response.json();
+    const answer = String(data?.choices?.[0]?.message?.content || '').trim();
+    return {
+      answer: answer || 'Yeterli baglam bulamadim.',
+      model: modelName
+    };
   }
 
-  const data = await response.json();
-  const answer = String(data?.choices?.[0]?.message?.content || '').trim();
-
-  return {
-    answer: answer || 'Yeterli baglam bulamadim.',
-    model: config.groqModel
-  };
+  throw lastError || new Error('Groq chat failed without response');
 }

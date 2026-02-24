@@ -94,8 +94,10 @@ function buildLocationCountMessage(locale) {
 function isCheckinCheckoutQuery(question) {
   const q = String(question || '').toLowerCase();
   if (!q) return false;
+  const hasCheckKeyword = /\b(check[\s-]?in|check[\s-]?out)\b/.test(q);
+  const hasTimeKeyword = /\b(time|times|hour|hours|clock|uhr|saat|zaman)\b/.test(q);
   return (
-    /\b(check[\s-]?in|check[\s-]?out)\b/.test(q) ||
+    (hasCheckKeyword && hasTimeKeyword) ||
     /\b(giris|çıkış|cikis).*(saat|zaman)\b/i.test(q) ||
     /\b(wann).*(check[\s-]?in|check[\s-]?out|uhr)\b/.test(q)
   );
@@ -121,6 +123,41 @@ function buildPetPolicyMessage(locale) {
     return 'Evcil hayvan talepleri daire ve musaitlik durumuna gore degerlendirilir. Lutfen rezervasyon oncesi ekibimizle iletisime gecin: +49 152 064 19253 veya reservation@meri-group.de.';
   }
   return 'Pet requests are reviewed case by case depending on apartment and availability. Please contact our reservation team before booking: +49 152 064 19253 or reservation@meri-group.de.';
+}
+
+function isAccessibilityQuery(question) {
+  const q = String(question || '').toLowerCase();
+  if (!q) return false;
+  return /\b(accessible|accessibility|disabled|wheelchair|barrier|barrierefrei|engelli|erisilebilir|erişilebilir)\b/.test(q);
+}
+
+function buildAccessibilityMessage(locale) {
+  if (locale === 'de') {
+    return 'Einige Standorte bieten barrierefreie Parkplaetze und WC-Infrastruktur. Bitte geben Sie besondere Anforderungen vorab an, damit wir passend unterstuetzen koennen.';
+  }
+  if (locale === 'tr') {
+    return 'Bazi lokasyonlarda engelli otopark ve WC altyapisi bulunur. Ozel ihtiyaclarinizi onceden paylasirsaniz size uygun sekilde destek olabiliriz.';
+  }
+  return 'Some locations offer disabled parking and WC infrastructure. Please share special accessibility needs in advance so we can support you appropriately.';
+}
+
+function normalizeHistoryText(value) {
+  return String(value || '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 600);
+}
+
+function normalizeHistoryItems(input) {
+  if (!Array.isArray(input)) return [];
+  const rows = [];
+  for (const item of input) {
+    const role = String(item?.role || '').trim().toLowerCase() === 'assistant' ? 'assistant' : 'user';
+    const content = normalizeHistoryText(item?.content || item?.text || '');
+    if (!content) continue;
+    rows.push({ role, content });
+  }
+  return rows.slice(-12);
 }
 
 function dedupeHits(hits) {
@@ -175,6 +212,8 @@ server.post('/query', async (request, reply) => {
   const body = request.body || {};
   const question = String(body.question || '').trim();
   const locale = String(body.locale || '').trim().toLowerCase();
+  const history = normalizeHistoryItems(body.history);
+  const retrievalQuestion = normalizeHistoryText(body.retrievalQuestion || question);
   const answerLocale = resolveAnswerLocale(question, locale);
   const topK = Math.max(1, Math.min(12, Number(body.topK || config.ragTopK)));
 
@@ -234,7 +273,18 @@ server.post('/query', async (request, reply) => {
     });
   }
 
-  const vector = await embedText(question);
+  if (isAccessibilityQuery(question)) {
+    return reply.send({
+      ok: true,
+      model: 'policy_fact_shortcut',
+      answerLocale,
+      preferredLocale: locale ? languageToText(locale) : 'none',
+      answer: buildAccessibilityMessage(answerLocale),
+      sources: []
+    });
+  }
+
+  const vector = await embedText(retrievalQuestion || question);
   await ensureCollection(vector.length);
 
   const localeScopes = [];
@@ -274,7 +324,8 @@ server.post('/query', async (request, reply) => {
       question,
       answerLocale,
       preferredLocale: locale,
-      hits
+      hits,
+      history
     });
     answer = generated.answer;
     model = generated.model;

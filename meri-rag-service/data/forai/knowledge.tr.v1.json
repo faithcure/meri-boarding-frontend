@@ -1,7 +1,7 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "locale": "tr",
-  "updatedAt": "2026-02-23",
+  "updatedAt": "2026-02-24",
   "source": "HOTEL_AI_MASTER_FORM_v8.docx",
   "items": [
     {
@@ -10,7 +10,10 @@
       "title": "Meri Boarding nedir?",
       "question": "Meri Boarding nedir?",
       "answer": "Meri Boarding, Stuttgart ve Hildesheim bolgelerinde kisa ve uzun sureli konaklama icin tamamen mobilyali ve donanimli serviced apartment hizmeti sunar.",
-      "tags": ["general", "company"]
+      "tags": [
+        "general",
+        "company"
+      ]
     },
     {
       "id": "gen-locations-count",
@@ -18,7 +21,9 @@
       "title": "Lokasyon sayisi",
       "question": "Kac lokasyon mevcut?",
       "answer": "Toplam 3 lokasyon vardir: Stuttgart Flamingo, Stuttgart Europaplatz ve Hildesheim.",
-      "tags": ["locations"]
+      "tags": [
+        "locations"
+      ]
     },
     {
       "id": "gen-stay-min-max",
@@ -26,7 +31,10 @@
       "title": "Konaklama suresi",
       "question": "Minimum ve maksimum konaklama suresi var mi?",
       "answer": "Minimum ve maksimum sure kisiti yoktur; 1 gece veya daha uzun konaklamalar mumkundur.",
-      "tags": ["reservation", "stay"]
+      "tags": [
+        "reservation",
+        "stay"
+      ]
     },
     {
       "id": "gen-anmeldung",
@@ -34,7 +42,10 @@
       "title": "Anmeldung destegi",
       "question": "Anmeldung (ikamet kaydi) yapilabilir mi?",
       "answer": "Evet. Meri Boarding, misafirler icin ikamet kaydi (Anmeldung/Meldebescheinigung) destegi saglar.",
-      "tags": ["anmeldung", "documents"]
+      "tags": [
+        "anmeldung",
+        "documents"
+      ]
     },
     {
       "id": "room-furnished",
@@ -42,7 +53,10 @@
       "title": "Daire donanimi",
       "question": "Daireler mobilyali mi?",
       "answer": "Evet. Tum daireler tamamen mobilyali ve temel yasam ihtiyaclari icin donanimlidir.",
-      "tags": ["rooms", "furniture"]
+      "tags": [
+        "rooms",
+        "furniture"
+      ]
     },
     {
       "id": "room-kitchen",
@@ -50,7 +64,9 @@
       "title": "Mutfak",
       "question": "Odalarda mutfak var mi?",
       "answer": "Evet. Tum dairelerde tam donanimli mutfak bulunur.",
-      "tags": ["kitchen"]
+      "tags": [
+        "kitchen"
+      ]
     },
     {
       "id": "room-tv",
@@ -58,7 +74,9 @@
       "title": "Smart TV",
       "question": "TV var mi?",
       "answer": "Evet. Dairelerde Smart TV bulunur.",
-      "tags": ["tv"]
+      "tags": [
+        "tv"
+      ]
     },
     {
       "id": "room-laundry",
@@ -66,7 +84,9 @@
       "title": "Camasir",
       "question": "Odalarda camasir makinesi var mi?",
       "answer": "Flamingo ve Europaplatz lokasyonlarinda ortak camasirhane vardir. Hildesheim lokasyonunda daire icinde camasir makinesi ve kurutucu bulunur.",
-      "tags": ["laundry"]
+      "tags": [
+        "laundry"
+      ]
     },
     {
       "id": "room-climate",
@@ -74,7 +94,9 @@
       "title": "Klima",
       "question": "Klima var mi?",
       "answer": "Klima bulunmaz, odalarda vantilator mevcuttur.",
-      "tags": ["climate"]
+      "tags": [
+        "climate"
+      ]
     },
     {
       "id": "room-extra-bed",
@@ -82,7 +104,10 @@
       "title": "Ek yatak",
       "question": "Bebek yatagi veya ek yatak var mi?",
       "answer": "Evet. Talep uzerine bebek/ek yatak temin edilir.",
-      "tags": ["family", "extra-bed"]
+      "tags": [
+        "family",
+        "extra-bed"
+      ]
     },
     {
       "id": "svc-included",
@@ -90,7 +115,10 @@
       "title": "Dahil hizmetler",
       "question": "Konaklamaya neler dahil?",
       "answer": "Ucretsiz internet, camasirhane kullanimi, mobilya/equipman, yan giderler ve temizlik hizmeti dahildir.",
-      "tags": ["services", "included"]
+      "tags": [
+        "services",
+        "included"
+      ]
     },
     {
       "id": "svc-wifi",
@@ -98,7 +126,10 @@
       "title": "Wi-Fi",
       "question": "Wi-Fi ucretsiz mi ve hizi nasil?",
       "answer": "Wi-Fi ucretsizdir. Ozellikle Europaplatz'da her odada ayri modem oldugu icin baglanti hizli ve stabil olur.",
-      "tags": ["wifi", "internet"]
+      "tags": [
+        "wifi",
+        "internet"
+      ]
     },
     {
       "id": "svc-wifi-troubleshoot",
@@ -106,7 +137,10 @@
       "title": "Wi-Fi sorunu",
       "question": "Wi-Fi calismiyorsa ne yapmaliyim?",
       "answer": "Modemin kablosunu cikarip birkac dakika bekleyin, sonra tekrar takin. Sorun surerse +49 152 064 19253 numarasina ulasin.",
-      "tags": ["wifi", "support"]
+      "tags": [
+        "wifi",
+        "support"
+      ]
     },
     {
       "id": "svc-breakfast",
@@ -114,7 +148,9 @@
       "title": "Kahvalti",
       "question": "Kahvalti var mi?",
       "answer": "Tesis icinde standart kahvalti servisi yoktur. Talebe gore ek ucretli kupon secenegi degerlendirilebilir.",
-      "tags": ["breakfast"]
+      "tags": [
+        "breakfast"
+      ]
     },
     {
       "id": "svc-cleaning-frequency",
@@ -122,7 +158,9 @@
       "title": "Temizlik sikligi",
       "question": "Oda temizligi ne siklikta yapiliyor?",
       "answer": "Kisa sureli konaklamalarda daha sik, uzun sureli konaklamalarda haftalik plan uygulanir. Net plan rezervasyon anlasmasina gore belirlenir.",
-      "tags": ["housekeeping"]
+      "tags": [
+        "housekeeping"
+      ]
     },
     {
       "id": "svc-pets",
@@ -130,7 +168,10 @@
       "title": "Evcil hayvan",
       "question": "Evcil hayvan kabul ediliyor mu?",
       "answer": "Evcil hayvan talepleri daire ve musaitlik durumuna gore degerlendirilir. On onay gerekir.",
-      "tags": ["pets", "policy"]
+      "tags": [
+        "pets",
+        "policy"
+      ]
     },
     {
       "id": "svc-smoking",
@@ -138,7 +179,10 @@
       "title": "Sigara politikasi",
       "question": "Odada sigara icilebilir mi?",
       "answer": "Odalarin icinde sigara icmek yasaktir. Balkonlu daire talebi icin rezervasyon ekibine iletisim saglanir.",
-      "tags": ["smoking", "policy"]
+      "tags": [
+        "smoking",
+        "policy"
+      ]
     },
     {
       "id": "svc-accessibility",
@@ -146,7 +190,9 @@
       "title": "Engelli altyapisi",
       "question": "Engelli misafirler icin altyapi var mi?",
       "answer": "Bazi lokasyonlarda engelli otopark ve WC altyapisi mevcuttur. Ozel ihtiyaclar icin onceden bilgi verilmelidir.",
-      "tags": ["accessibility"]
+      "tags": [
+        "accessibility"
+      ]
     },
     {
       "id": "res-how-to-book",
@@ -154,7 +200,10 @@
       "title": "Rezervasyon kanallari",
       "question": "Rezervasyon nasil yapilir?",
       "answer": "Rezervasyon e-posta (reservation@meri-group.de), WhatsApp/telefon (+49 152 064 19253), web sitesi ve Booking partnerleri uzerinden yapilabilir.",
-      "tags": ["reservation", "contact"]
+      "tags": [
+        "reservation",
+        "contact"
+      ]
     },
     {
       "id": "res-checkin-checkout",
@@ -162,7 +211,10 @@
       "title": "Check-in / Check-out",
       "question": "Check-in ve check-out saatleri nedir?",
       "answer": "Check-in 14:00 itibariyla, check-out 12:00'ye kadardir.",
-      "tags": ["checkin", "checkout"]
+      "tags": [
+        "checkin",
+        "checkout"
+      ]
     },
     {
       "id": "res-early-late",
@@ -170,7 +222,11 @@
       "title": "Erken/Geç islem",
       "question": "Erken check-in veya gec check-out mumkun mu?",
       "answer": "Musaitlik durumuna bagli olarak mumkun olabilir. Onceden rezervasyon ekibine bilgi verilmelidir.",
-      "tags": ["checkin", "checkout", "availability"]
+      "tags": [
+        "checkin",
+        "checkout",
+        "availability"
+      ]
     },
     {
       "id": "res-cancel",
@@ -178,7 +234,10 @@
       "title": "Iptal politikasi",
       "question": "Iptal politikasi nedir?",
       "answer": "Standart bilgilendirmeye gore rezervasyon tarihinden 3 gun oncesine kadar ucretsiz iptal mumkundur. Rezervasyon turune gore degisebilir.",
-      "tags": ["cancellation", "policy"]
+      "tags": [
+        "cancellation",
+        "policy"
+      ]
     },
     {
       "id": "res-baggage",
@@ -186,7 +245,9 @@
       "title": "Bagaj",
       "question": "Bagaj depolama var mi?",
       "answer": "Evet. Uygunluk durumuna gore check-out sonrasinda bagaj birakma destegi verilebilir.",
-      "tags": ["baggage"]
+      "tags": [
+        "baggage"
+      ]
     },
     {
       "id": "res-invoice",
@@ -194,7 +255,10 @@
       "title": "Fatura",
       "question": "Fatura talep edebilir miyim?",
       "answer": "Evet. Fatura talebi icin reservation@meri-group.de veya +49 152 064 19253 uzerinden rezervasyon ekibine ulasilir.",
-      "tags": ["invoice", "billing"]
+      "tags": [
+        "invoice",
+        "billing"
+      ]
     },
     {
       "id": "support-emergency",
@@ -202,7 +266,10 @@
       "title": "Acil durum",
       "question": "Acil durumda kimi aramaliyim?",
       "answer": "Acil teknik veya operasyonel durumlarda 7/24 +49 152 064 19253 numarasi uzerinden destek alinabilir.",
-      "tags": ["emergency", "support"]
+      "tags": [
+        "emergency",
+        "support"
+      ]
     },
     {
       "id": "loc-flamingo-overview",
@@ -210,7 +277,10 @@
       "title": "Flamingo ozet",
       "question": "Stuttgart Flamingo lokasyonu hakkinda ozet bilgi verir misin?",
       "answer": "Adres: Flamingoweg 70, 70378 Stuttgart. 76 adet 1+0 daire bulunur. Sehir merkezine ulasim kolaydir; doga alanlarina yakindir.",
-      "tags": ["flamingo", "stuttgart"]
+      "tags": [
+        "flamingo",
+        "stuttgart"
+      ]
     },
     {
       "id": "loc-europaplatz-overview",
@@ -218,7 +288,10 @@
       "title": "Europaplatz ozet",
       "question": "Stuttgart Europaplatz lokasyonu hakkinda ozet bilgi verir misin?",
       "answer": "Adres: Europaplatz 20b, 70565 Stuttgart. 65 adet 1+0 ve 2+0 daire bulunur. Havalimanina ve toplu tasimaya yakin konumdadir.",
-      "tags": ["europaplatz", "stuttgart"]
+      "tags": [
+        "europaplatz",
+        "stuttgart"
+      ]
     },
     {
       "id": "loc-hildesheim-overview",
@@ -226,7 +299,9 @@
       "title": "Hildesheim ozet",
       "question": "Hildesheim lokasyonu hakkinda ozet bilgi verir misin?",
       "answer": "Hildesheim lokasyonunda farkli binalarda tam donanimli daireler bulunur. Hannover ve bolgesel ulasim noktalarina yakindir.",
-      "tags": ["hildesheim"]
+      "tags": [
+        "hildesheim"
+      ]
     },
     {
       "id": "contact-core",
@@ -234,7 +309,3184 @@
       "title": "Iletisim",
       "question": "Meri Boarding'e nasil ulasabilirim?",
       "answer": "WhatsApp/Telefon: +49 152 064 19253, Rezervasyon e-postasi: reservation@meri-group.de, Genel e-posta: info@meri-group.de, Web: www.meri-boarding.de",
-      "tags": ["contact"]
+      "tags": [
+        "contact"
+      ]
+    },
+    {
+      "id": "master-q-002",
+      "category": "general",
+      "title": "Kaç lokasyon mevcut?",
+      "question": "Kaç lokasyon mevcut?",
+      "answer": "Toplamda 3 lokasyon: Stuttgart Flamingo, Stuttgart Europaplatz ve Hildesheim.",
+      "tags": [
+        "general"
+      ]
+    },
+    {
+      "id": "master-q-003",
+      "category": "general",
+      "title": "Toplam daire sayısı?",
+      "question": "Toplam daire sayısı?",
+      "answer": "256 adet tamamen mobilyalı ve yaşama hazır daire. (Flamingo: 76 adet 1+0, Europaplatz: 65 adet 1+0 ve 2+0)",
+      "tags": [
+        "general"
+      ]
+    },
+    {
+      "id": "master-q-003-ascii",
+      "category": "general",
+      "title": "Toplam daire sayısı? (ASCII)",
+      "question": "Toplam daire sayisi?",
+      "answer": "256 adet tamamen mobilyalı ve yaşama hazır daire. (Flamingo: 76 adet 1+0, Europaplatz: 65 adet 1+0 ve 2+0)",
+      "tags": [
+        "general"
+      ]
+    },
+    {
+      "id": "master-q-004",
+      "category": "general",
+      "title": "Müşteri portföyü nedir?",
+      "question": "Müşteri portföyü nedir?",
+      "answer": "Bosch, Mercedes, Daimler Truck, Infosys, Deutsche Bahn (Alman Demiryolları), Strabag ve daha birçok global şirket çalışanına anlaşmalı konaklama sağlanmaktadır. Detaylar: www.meri-boarding.de",
+      "tags": [
+        "general"
+      ]
+    },
+    {
+      "id": "master-q-004-ascii",
+      "category": "general",
+      "title": "Müşteri portföyü nedir? (ASCII)",
+      "question": "Musteri portfoyu nedir?",
+      "answer": "Bosch, Mercedes, Daimler Truck, Infosys, Deutsche Bahn (Alman Demiryolları), Strabag ve daha birçok global şirket çalışanına anlaşmalı konaklama sağlanmaktadır. Detaylar: www.meri-boarding.de",
+      "tags": [
+        "general"
+      ]
+    },
+    {
+      "id": "master-q-005",
+      "category": "general",
+      "title": "Minimum konaklama süresi?",
+      "question": "Minimum konaklama süresi?",
+      "answer": "Minimum süre kısıtı yoktur. 1 gece veya daha uzun süreli konaklama mümkündür.",
+      "tags": [
+        "general"
+      ]
+    },
+    {
+      "id": "master-q-005-ascii",
+      "category": "general",
+      "title": "Minimum konaklama süresi? (ASCII)",
+      "question": "Minimum konaklama suresi?",
+      "answer": "Minimum süre kısıtı yoktur. 1 gece veya daha uzun süreli konaklama mümkündür.",
+      "tags": [
+        "general"
+      ]
+    },
+    {
+      "id": "master-q-006",
+      "category": "general",
+      "title": "Maksimum konaklama süresi?",
+      "question": "Maksimum konaklama süresi?",
+      "answer": "Maksimum süre kısıtı yoktur. Uzun vadeli konaklamalar tercih edilmektedir.",
+      "tags": [
+        "general"
+      ]
+    },
+    {
+      "id": "master-q-006-ascii",
+      "category": "general",
+      "title": "Maksimum konaklama süresi? (ASCII)",
+      "question": "Maksimum konaklama suresi?",
+      "answer": "Maksimum süre kısıtı yoktur. Uzun vadeli konaklamalar tercih edilmektedir.",
+      "tags": [
+        "general"
+      ]
+    },
+    {
+      "id": "master-q-007",
+      "category": "general",
+      "title": "Bir odada kaç kişi kalabilir?",
+      "question": "Bir odada kaç kişi kalabilir?",
+      "answer": "Oda kapasitesi, seçilen daire tipine göre değişmektedir. Detaylı bilgi için müşteri temsilcimize yönlendirilirsiniz: +49 152 064 19253",
+      "tags": [
+        "general"
+      ]
+    },
+    {
+      "id": "master-q-007-ascii",
+      "category": "general",
+      "title": "Bir odada kaç kişi kalabilir? (ASCII)",
+      "question": "Bir odada kac kisi kalabilir?",
+      "answer": "Oda kapasitesi, seçilen daire tipine göre değişmektedir. Detaylı bilgi için müşteri temsilcimize yönlendirilirsiniz: +49 152 064 19253",
+      "tags": [
+        "general"
+      ]
+    },
+    {
+      "id": "master-q-008",
+      "category": "general",
+      "title": "Özel ziyaretçi kabul edilir mi?",
+      "question": "Özel ziyaretçi kabul edilir mi?",
+      "answer": "Evet, oteller ev konforundadır. Gece kalma durumunda ek ücret uygulanır.",
+      "tags": [
+        "general"
+      ]
+    },
+    {
+      "id": "master-q-008-ascii",
+      "category": "general",
+      "title": "Özel ziyaretçi kabul edilir mi? (ASCII)",
+      "question": "Ozel ziyaretci kabul edilir mi?",
+      "answer": "Evet, oteller ev konforundadır. Gece kalma durumunda ek ücret uygulanır.",
+      "tags": [
+        "general"
+      ]
+    },
+    {
+      "id": "master-q-009",
+      "category": "general",
+      "title": "Uluslararası misafir kabul ediliyor mu?",
+      "question": "Uluslararası misafir kabul ediliyor mu?",
+      "answer": "Evet, uluslararası misafirlere hizmet verilmektedir.",
+      "tags": [
+        "general"
+      ]
+    },
+    {
+      "id": "master-q-009-ascii",
+      "category": "general",
+      "title": "Uluslararası misafir kabul ediliyor mu? (ASCII)",
+      "question": "Uluslararasi misafir kabul ediliyor mu?",
+      "answer": "Evet, uluslararası misafirlere hizmet verilmektedir.",
+      "tags": [
+        "general"
+      ]
+    },
+    {
+      "id": "master-q-010",
+      "category": "general",
+      "title": "Konaklama ev konforunda mı?",
+      "question": "Konaklama ev konforunda mı?",
+      "answer": "Evet, tüm daireler ev konforu sağlayacak şekilde tasarlanmıştır.",
+      "tags": [
+        "general"
+      ]
+    },
+    {
+      "id": "master-q-010-ascii",
+      "category": "general",
+      "title": "Konaklama ev konforunda mı? (ASCII)",
+      "question": "Konaklama ev konforunda mi?",
+      "answer": "Evet, tüm daireler ev konforu sağlayacak şekilde tasarlanmıştır.",
+      "tags": [
+        "general"
+      ]
+    },
+    {
+      "id": "master-q-011",
+      "category": "general",
+      "title": "Anmeldung (ikamet kaydı) yapılabilir mi?",
+      "question": "Anmeldung (ikamet kaydı) yapılabilir mi?",
+      "answer": "Evet, Meri Boarding misafirler için Almanya ikamet kaydı (Anmeldung / Meldebescheinigung) desteği sağlamaktadır.",
+      "tags": [
+        "general"
+      ]
+    },
+    {
+      "id": "master-q-012",
+      "category": "general",
+      "title": "Kurumsal konaklama mümkün mü?",
+      "question": "Kurumsal konaklama mümkün mü?",
+      "answer": "Evet, şirket çalışanları için toplu konaklama çözümleri sunulmaktadır.",
+      "tags": [
+        "general"
+      ]
+    },
+    {
+      "id": "master-q-012-ascii",
+      "category": "general",
+      "title": "Kurumsal konaklama mümkün mü? (ASCII)",
+      "question": "Kurumsal konaklama mumkun mu?",
+      "answer": "Evet, şirket çalışanları için toplu konaklama çözümleri sunulmaktadır.",
+      "tags": [
+        "general"
+      ]
+    },
+    {
+      "id": "master-q-013",
+      "category": "rooms",
+      "title": "Daireler mobilyalı mı?",
+      "question": "Daireler mobilyalı mı?",
+      "answer": "Evet, tüm daireler tamamen mobilyalıdır; yaşam için gerekli tüm temel donanıma sahiptir.",
+      "tags": [
+        "rooms"
+      ]
+    },
+    {
+      "id": "master-q-014",
+      "category": "rooms",
+      "title": "Odalarda mutfak var mı?",
+      "question": "Odalarda mutfak var mı?",
+      "answer": "Evet, tüm dairelerde tam donanımlı mutfak bulunmaktadır.",
+      "tags": [
+        "rooms"
+      ]
+    },
+    {
+      "id": "master-q-015",
+      "category": "rooms",
+      "title": "TV var mı?",
+      "question": "TV var mı?",
+      "answer": "Evet, dairelerde Smart TV bulunmaktadır.",
+      "tags": [
+        "rooms"
+      ]
+    },
+    {
+      "id": "master-q-016",
+      "category": "rooms",
+      "title": "Yataklar ortopedik mi?",
+      "question": "Yataklar ortopedik mi?",
+      "answer": "Evet, en konforlu ve sağlıklı mobilyalar tercih edilmektedir.",
+      "tags": [
+        "rooms"
+      ]
+    },
+    {
+      "id": "master-q-017",
+      "category": "rooms",
+      "title": "Balkon veya teras var mı?",
+      "question": "Balkon veya teras var mı?",
+      "answer": "Bazı dairelerde balkon veya teras bulunmaktadır. Sigara içmek isteyenler balkonlu oda talebinde bulunabilir.",
+      "tags": [
+        "rooms"
+      ]
+    },
+    {
+      "id": "master-q-017-ascii",
+      "category": "rooms",
+      "title": "Balkon veya teras var mı? (ASCII)",
+      "question": "Balkon veya teras var mi?",
+      "answer": "Bazı dairelerde balkon veya teras bulunmaktadır. Sigara içmek isteyenler balkonlu oda talebinde bulunabilir.",
+      "tags": [
+        "rooms"
+      ]
+    },
+    {
+      "id": "master-q-018",
+      "category": "rooms",
+      "title": "Odalarda çamaşır makinesi var mı?",
+      "question": "Odalarda çamaşır makinesi var mı?",
+      "answer": "Odalarda çamaşır makinesi bulunmamaktadır. Ortak kullanım çamaşırhaneler her katta mevcuttur.",
+      "tags": [
+        "rooms"
+      ]
+    },
+    {
+      "id": "master-q-019",
+      "category": "rooms",
+      "title": "Ütü var mı?",
+      "question": "Ütü var mı?",
+      "answer": "Evet, her odanın dolabında ütü mevcuttur.",
+      "tags": [
+        "rooms"
+      ]
+    },
+    {
+      "id": "master-q-019-ascii",
+      "category": "rooms",
+      "title": "Ütü var mı? (ASCII)",
+      "question": "Utu var mi?",
+      "answer": "Evet, her odanın dolabında ütü mevcuttur.",
+      "tags": [
+        "rooms"
+      ]
+    },
+    {
+      "id": "master-q-020",
+      "category": "rooms",
+      "title": "Klima var mı?",
+      "question": "Klima var mı?",
+      "answer": "Klima bulunmamaktadır. Vantilatörler tüm odalarda mevcuttur.",
+      "tags": [
+        "rooms"
+      ]
+    },
+    {
+      "id": "master-q-021",
+      "category": "rooms",
+      "title": "Bebek yatağı var mı?",
+      "question": "Bebek yatağı var mı?",
+      "answer": "Evet, talep üzerine temin edilmektedir.",
+      "tags": [
+        "rooms"
+      ]
+    },
+    {
+      "id": "master-q-021-ascii",
+      "category": "rooms",
+      "title": "Bebek yatağı var mı? (ASCII)",
+      "question": "Bebek yatagi var mi?",
+      "answer": "Evet, talep üzerine temin edilmektedir.",
+      "tags": [
+        "rooms"
+      ]
+    },
+    {
+      "id": "master-q-022",
+      "category": "rooms",
+      "title": "Ek yatak var mı?",
+      "question": "Ek yatak var mı?",
+      "answer": "Evet, talep üzerine temin edilmektedir.",
+      "tags": [
+        "rooms"
+      ]
+    },
+    {
+      "id": "master-q-022-ascii",
+      "category": "rooms",
+      "title": "Ek yatak var mı? (ASCII)",
+      "question": "Ek yatak var mi?",
+      "answer": "Evet, talep üzerine temin edilmektedir.",
+      "tags": [
+        "rooms"
+      ]
+    },
+    {
+      "id": "master-q-023",
+      "category": "rooms",
+      "title": "Telefon bağlantısı var mı?",
+      "question": "Telefon bağlantısı var mı?",
+      "answer": "Sabit telefon kaldırılmıştır; mobil cihazlar yeterli kabul edilmektedir.",
+      "tags": [
+        "rooms"
+      ]
+    },
+    {
+      "id": "master-q-023-ascii",
+      "category": "rooms",
+      "title": "Telefon bağlantısı var mı? (ASCII)",
+      "question": "Telefon baglantisi var mi?",
+      "answer": "Sabit telefon kaldırılmıştır; mobil cihazlar yeterli kabul edilmektedir.",
+      "tags": [
+        "rooms"
+      ]
+    },
+    {
+      "id": "master-q-024",
+      "category": "rooms",
+      "title": "Home office için uygun mu?",
+      "question": "Home office için uygun mu?",
+      "answer": "Evet, yüksek hızlı internet ve tam donanımlı yaşam alanları sayesinde home office için uygundur.",
+      "tags": [
+        "rooms"
+      ]
+    },
+    {
+      "id": "master-q-024-ascii",
+      "category": "rooms",
+      "title": "Home office için uygun mu? (ASCII)",
+      "question": "Home office icin uygun mu?",
+      "answer": "Evet, yüksek hızlı internet ve tam donanımlı yaşam alanları sayesinde home office için uygundur.",
+      "tags": [
+        "rooms"
+      ]
+    },
+    {
+      "id": "master-q-026",
+      "category": "services",
+      "title": "Ekstra ücretli hizmetler neler?",
+      "question": "Ekstra ücretli hizmetler neler?",
+      "answer": "Otopark ücreti ek olarak ücretlendirilmektedir.",
+      "tags": [
+        "services"
+      ]
+    },
+    {
+      "id": "master-q-026-ascii",
+      "category": "services",
+      "title": "Ekstra ücretli hizmetler neler? (ASCII)",
+      "question": "Ekstra ucretli hizmetler neler?",
+      "answer": "Otopark ücreti ek olarak ücretlendirilmektedir.",
+      "tags": [
+        "services"
+      ]
+    },
+    {
+      "id": "master-q-027",
+      "category": "services",
+      "title": "Wi-Fi ücretsiz mi?",
+      "question": "Wi-Fi ücretsiz mi?",
+      "answer": "Evet, Wi-Fi tamamen ücretsizdir.",
+      "tags": [
+        "services"
+      ]
+    },
+    {
+      "id": "master-q-027-ascii",
+      "category": "services",
+      "title": "Wi-Fi ücretsiz mi? (ASCII)",
+      "question": "Wi-Fi ucretsiz mi?",
+      "answer": "Evet, Wi-Fi tamamen ücretsizdir.",
+      "tags": [
+        "services"
+      ]
+    },
+    {
+      "id": "master-q-028",
+      "category": "services",
+      "title": "Wi-Fi hızı nedir?",
+      "question": "Wi-Fi hızı nedir?",
+      "answer": "Her odada ayrı modem bulunmaktadır; bu nedenle internet hızı çok yüksektir.",
+      "tags": [
+        "services"
+      ]
+    },
+    {
+      "id": "master-q-028-ascii",
+      "category": "services",
+      "title": "Wi-Fi hızı nedir? (ASCII)",
+      "question": "Wi-Fi hizi nedir?",
+      "answer": "Her odada ayrı modem bulunmaktadır; bu nedenle internet hızı çok yüksektir.",
+      "tags": [
+        "services"
+      ]
+    },
+    {
+      "id": "master-q-029",
+      "category": "services",
+      "title": "Wi-Fi şifresi nerede?",
+      "question": "Wi-Fi şifresi nerede?",
+      "answer": "Oda içinde belirtilmiştir.",
+      "tags": [
+        "services"
+      ]
+    },
+    {
+      "id": "master-q-029-ascii",
+      "category": "services",
+      "title": "Wi-Fi şifresi nerede? (ASCII)",
+      "question": "Wi-Fi sifresi nerede?",
+      "answer": "Oda içinde belirtilmiştir.",
+      "tags": [
+        "services"
+      ]
+    },
+    {
+      "id": "master-q-030",
+      "category": "services",
+      "title": "Wi-Fi çalışmıyorsa ne yapmalı?",
+      "question": "Wi-Fi çalışmıyorsa ne yapmalı?",
+      "answer": "Modemin kablosunu çıkarıp birkaç dakika bekledikten sonra tekrar takın. Sorun devam ederse: +49 152 064 19253",
+      "tags": [
+        "services"
+      ]
+    },
+    {
+      "id": "master-q-030-ascii",
+      "category": "services",
+      "title": "Wi-Fi çalışmıyorsa ne yapmalı? (ASCII)",
+      "question": "Wi-Fi calismiyorsa ne yapmali?",
+      "answer": "Modemin kablosunu çıkarıp birkaç dakika bekledikten sonra tekrar takın. Sorun devam ederse: +49 152 064 19253",
+      "tags": [
+        "services"
+      ]
+    },
+    {
+      "id": "master-q-031",
+      "category": "services",
+      "title": "Kahvaltı var mı?",
+      "question": "Kahvaltı var mı?",
+      "answer": "Otel bünyesinde kahvaltı hizmeti bulunmamaktadır. Talep üzerine ek ücretli kahvaltı kuponu temin edilebilir.",
+      "tags": [
+        "services"
+      ]
+    },
+    {
+      "id": "master-q-032",
+      "category": "services",
+      "title": "Oda temizliği yapılıyor mu?",
+      "question": "Oda temizliği yapılıyor mu?",
+      "answer": "Evet. Kısa süreli konaklamalarda günlük; uzun vadeli konaklamalarda haftada 1 veya 2 kez (anlaşmaya bağlı).",
+      "tags": [
+        "services"
+      ]
+    },
+    {
+      "id": "master-q-032-ascii",
+      "category": "services",
+      "title": "Oda temizliği yapılıyor mu? (ASCII)",
+      "question": "Oda temizligi yapiliyor mu?",
+      "answer": "Evet. Kısa süreli konaklamalarda günlük; uzun vadeli konaklamalarda haftada 1 veya 2 kez (anlaşmaya bağlı).",
+      "tags": [
+        "services"
+      ]
+    },
+    {
+      "id": "master-q-033",
+      "category": "services",
+      "title": "Havlu değişimi nasıl yapılır?",
+      "question": "Havlu değişimi nasıl yapılır?",
+      "answer": "Banyo zeminindeki havlular temizlik günü değiştirilir.",
+      "tags": [
+        "services"
+      ]
+    },
+    {
+      "id": "master-q-033-ascii",
+      "category": "services",
+      "title": "Havlu değişimi nasıl yapılır? (ASCII)",
+      "question": "Havlu degisimi nasil yapilir?",
+      "answer": "Banyo zeminindeki havlular temizlik günü değiştirilir.",
+      "tags": [
+        "services"
+      ]
+    },
+    {
+      "id": "master-q-034",
+      "category": "services",
+      "title": "Çarşaf değişimi sıklığı nedir?",
+      "question": "Çarşaf değişimi sıklığı nedir?",
+      "answer": "Kısa süreli konaklamalarda haftada 2 kez.",
+      "tags": [
+        "services"
+      ]
+    },
+    {
+      "id": "master-q-034-ascii",
+      "category": "services",
+      "title": "Çarşaf değişimi sıklığı nedir? (ASCII)",
+      "question": "Carsaf degisimi sikligi nedir?",
+      "answer": "Kısa süreli konaklamalarda haftada 2 kez.",
+      "tags": [
+        "services"
+      ]
+    },
+    {
+      "id": "master-q-035",
+      "category": "services",
+      "title": "Çamaşır yıkama hizmeti var mı?",
+      "question": "Çamaşır yıkama hizmeti var mı?",
+      "answer": "Her katta ortak çamaşırhane mevcuttur; kullanım talimatları makinelerin üzerinde belirtilmiştir.",
+      "tags": [
+        "services"
+      ]
+    },
+    {
+      "id": "master-q-035-ascii",
+      "category": "services",
+      "title": "Çamaşır yıkama hizmeti var mı? (ASCII)",
+      "question": "Camasir yikama hizmeti var mi?",
+      "answer": "Her katta ortak çamaşırhane mevcuttur; kullanım talimatları makinelerin üzerinde belirtilmiştir.",
+      "tags": [
+        "services"
+      ]
+    },
+    {
+      "id": "master-q-036",
+      "category": "services",
+      "title": "Temizlik talep etmek için ne yapmalı?",
+      "question": "Temizlik talep etmek için ne yapmalı?",
+      "answer": "Müşteri temsilcisiyle iletişime geçin: +49 152 064 19253 veya reservation@meri-group.de",
+      "tags": [
+        "services"
+      ]
+    },
+    {
+      "id": "master-q-036-ascii",
+      "category": "services",
+      "title": "Temizlik talep etmek için ne yapmalı? (ASCII)",
+      "question": "Temizlik talep etmek icin ne yapmali?",
+      "answer": "Müşteri temsilcisiyle iletişime geçin: +49 152 064 19253 veya reservation@meri-group.de",
+      "tags": [
+        "services"
+      ]
+    },
+    {
+      "id": "master-q-037",
+      "category": "services",
+      "title": "Ekstra havlu alabilir miyim?",
+      "question": "Ekstra havlu alabilir miyim?",
+      "answer": "Evet, havluyu banyo zemininde bıraktığınızda değişim gerçekleşir; ek talep için iletişime geçin.",
+      "tags": [
+        "services"
+      ]
+    },
+    {
+      "id": "master-q-038",
+      "category": "services",
+      "title": "Ekstra yastık alabilir miyim?",
+      "question": "Ekstra yastık alabilir miyim?",
+      "answer": "Evet, talep üzerine temin edilmektedir.",
+      "tags": [
+        "services"
+      ]
+    },
+    {
+      "id": "master-q-038-ascii",
+      "category": "services",
+      "title": "Ekstra yastık alabilir miyim? (ASCII)",
+      "question": "Ekstra yastik alabilir miyim?",
+      "answer": "Evet, talep üzerine temin edilmektedir.",
+      "tags": [
+        "services"
+      ]
+    },
+    {
+      "id": "master-q-040",
+      "category": "services",
+      "title": "Sigara içilebilir mi?",
+      "question": "Sigara içilebilir mi?",
+      "answer": "Odalarda sigara kesinlikle yasaktır. Balkonlu oda talebi için iletişime geçin.",
+      "tags": [
+        "services"
+      ]
+    },
+    {
+      "id": "master-q-040-ascii",
+      "category": "services",
+      "title": "Sigara içilebilir mi? (ASCII)",
+      "question": "Sigara icilebilir mi?",
+      "answer": "Odalarda sigara kesinlikle yasaktır. Balkonlu oda talebi için iletişime geçin.",
+      "tags": [
+        "services"
+      ]
+    },
+    {
+      "id": "master-q-041",
+      "category": "services",
+      "title": "Depozito alınıyor mu?",
+      "question": "Depozito alınıyor mu?",
+      "answer": "Yalnızca uzun vadeli konaklamalarda depozito talep edilmektedir.",
+      "tags": [
+        "services"
+      ]
+    },
+    {
+      "id": "master-q-041-ascii",
+      "category": "services",
+      "title": "Depozito alınıyor mu? (ASCII)",
+      "question": "Depozito aliniyor mu?",
+      "answer": "Yalnızca uzun vadeli konaklamalarda depozito talep edilmektedir.",
+      "tags": [
+        "services"
+      ]
+    },
+    {
+      "id": "master-q-042",
+      "category": "services",
+      "title": "Engelliler için altyapı var mı?",
+      "question": "Engelliler için altyapı var mı?",
+      "answer": "Engellilere özel otopark ve tuvalet altyapısı mevcuttur. Özel ihtiyaçlar için mutlaka müşteri temsilcisiyle görüşün: +49 152 064 19253",
+      "tags": [
+        "services"
+      ]
+    },
+    {
+      "id": "master-q-042-ascii",
+      "category": "services",
+      "title": "Engelliler için altyapı var mı? (ASCII)",
+      "question": "Engelliler icin altyapi var mi?",
+      "answer": "Engellilere özel otopark ve tuvalet altyapısı mevcuttur. Özel ihtiyaçlar için mutlaka müşteri temsilcisiyle görüşün: +49 152 064 19253",
+      "tags": [
+        "services"
+      ]
+    },
+    {
+      "id": "master-q-043",
+      "category": "reservation",
+      "title": "Rezervasyon nasıl yapılır?",
+      "question": "Rezervasyon nasıl yapılır?",
+      "answer": "1) E-posta: reservation@meri-group.de  2) WhatsApp: +49 152 064 19253  3) Web: www.meri-boarding.de  4) Booking.com ortakları üzerinden",
+      "tags": [
+        "reservation"
+      ]
+    },
+    {
+      "id": "master-q-044",
+      "category": "reservation",
+      "title": "Direkt rezervasyonun avantajı var mı?",
+      "question": "Direkt rezervasyonun avantajı var mı?",
+      "answer": "Evet, doğrudan rezervasyonda indirimli teklifler sunulabilmektedir.",
+      "tags": [
+        "reservation"
+      ]
+    },
+    {
+      "id": "master-q-044-ascii",
+      "category": "reservation",
+      "title": "Direkt rezervasyonun avantajı var mı? (ASCII)",
+      "question": "Direkt rezervasyonun avantaji var mi?",
+      "answer": "Evet, doğrudan rezervasyonda indirimli teklifler sunulabilmektedir.",
+      "tags": [
+        "reservation"
+      ]
+    },
+    {
+      "id": "master-q-045",
+      "category": "reservation",
+      "title": "WhatsApp numarası nedir?",
+      "question": "WhatsApp numarası nedir?",
+      "answer": "+49 152 064 19253",
+      "tags": [
+        "reservation"
+      ]
+    },
+    {
+      "id": "master-q-045-ascii",
+      "category": "reservation",
+      "title": "WhatsApp numarası nedir? (ASCII)",
+      "question": "WhatsApp numarasi nedir?",
+      "answer": "+49 152 064 19253",
+      "tags": [
+        "reservation"
+      ]
+    },
+    {
+      "id": "master-q-046",
+      "category": "reservation",
+      "title": "E-posta adresi nedir?",
+      "question": "E-posta adresi nedir?",
+      "answer": "reservation@meri-group.de",
+      "tags": [
+        "reservation"
+      ]
+    },
+    {
+      "id": "master-q-047",
+      "category": "reservation",
+      "title": "Web sitesi nedir?",
+      "question": "Web sitesi nedir?",
+      "answer": "www.meri-boarding.de",
+      "tags": [
+        "reservation"
+      ]
+    },
+    {
+      "id": "master-q-048",
+      "category": "reservation",
+      "title": "Check-in saati nedir?",
+      "question": "Check-in saati nedir?",
+      "answer": "14:00'den itibaren.",
+      "tags": [
+        "reservation"
+      ]
+    },
+    {
+      "id": "master-q-049",
+      "category": "reservation",
+      "title": "Check-out saati nedir?",
+      "question": "Check-out saati nedir?",
+      "answer": "12:00'ye kadar.",
+      "tags": [
+        "reservation"
+      ]
+    },
+    {
+      "id": "master-q-050",
+      "category": "reservation",
+      "title": "Erken check-in mümkün mü?",
+      "question": "Erken check-in mümkün mü?",
+      "answer": "Müsaitlik durumuna bağlı olarak mümkün olabilir. Önceden bilgi alın: +49 152 064 19253",
+      "tags": [
+        "reservation"
+      ]
+    },
+    {
+      "id": "master-q-050-ascii",
+      "category": "reservation",
+      "title": "Erken check-in mümkün mü? (ASCII)",
+      "question": "Erken check-in mumkun mu?",
+      "answer": "Müsaitlik durumuna bağlı olarak mümkün olabilir. Önceden bilgi alın: +49 152 064 19253",
+      "tags": [
+        "reservation"
+      ]
+    },
+    {
+      "id": "master-q-051",
+      "category": "reservation",
+      "title": "Geç check-out mümkün mü?",
+      "question": "Geç check-out mümkün mü?",
+      "answer": "Müsaitlik durumuna bağlı olarak mümkün olabilir. Önceden bilgi alın: +49 152 064 19253",
+      "tags": [
+        "reservation"
+      ]
+    },
+    {
+      "id": "master-q-051-ascii",
+      "category": "reservation",
+      "title": "Geç check-out mümkün mü? (ASCII)",
+      "question": "Gec check-out mumkun mu?",
+      "answer": "Müsaitlik durumuna bağlı olarak mümkün olabilir. Önceden bilgi alın: +49 152 064 19253",
+      "tags": [
+        "reservation"
+      ]
+    },
+    {
+      "id": "master-q-052",
+      "category": "reservation",
+      "title": "İptal politikası nedir?",
+      "question": "İptal politikası nedir?",
+      "answer": "Rezervasyon tarihinden 3 gün öncesine kadar ücretsiz iptal yapılabilir.",
+      "tags": [
+        "reservation"
+      ]
+    },
+    {
+      "id": "master-q-053",
+      "category": "reservation",
+      "title": "Bagaj depolama var mı?",
+      "question": "Bagaj depolama var mı?",
+      "answer": "Evet, check-out sonrasında da bagaj bırakılabilir.",
+      "tags": [
+        "reservation"
+      ]
+    },
+    {
+      "id": "master-q-054",
+      "category": "reservation",
+      "title": "Rezervasyon uzatılabilir mi?",
+      "question": "Rezervasyon uzatılabilir mi?",
+      "answer": "Evet, müsaitlik durumuna göre. İletişim: +49 152 064 19253",
+      "tags": [
+        "reservation"
+      ]
+    },
+    {
+      "id": "master-q-054-ascii",
+      "category": "reservation",
+      "title": "Rezervasyon uzatılabilir mi? (ASCII)",
+      "question": "Rezervasyon uzatilabilir mi?",
+      "answer": "Evet, müsaitlik durumuna göre. İletişim: +49 152 064 19253",
+      "tags": [
+        "reservation"
+      ]
+    },
+    {
+      "id": "master-q-055",
+      "category": "reservation",
+      "title": "Oda değiştirme mümkün mü?",
+      "question": "Oda değiştirme mümkün mü?",
+      "answer": "Müsaitlik durumuna göre. İletişim: +49 152 064 19253",
+      "tags": [
+        "reservation"
+      ]
+    },
+    {
+      "id": "master-q-055-ascii",
+      "category": "reservation",
+      "title": "Oda değiştirme mümkün mü? (ASCII)",
+      "question": "Oda degistirme mumkun mu?",
+      "answer": "Müsaitlik durumuna göre. İletişim: +49 152 064 19253",
+      "tags": [
+        "reservation"
+      ]
+    },
+    {
+      "id": "master-q-056",
+      "category": "reservation",
+      "title": "Otel çıkış işlemi nasıl yapılır?",
+      "question": "Otel çıkış işlemi nasıl yapılır?",
+      "answer": "Müşteri temsilcisine bilgi vermek yeterlidir.",
+      "tags": [
+        "reservation"
+      ]
+    },
+    {
+      "id": "master-q-056-ascii",
+      "category": "reservation",
+      "title": "Otel çıkış işlemi nasıl yapılır? (ASCII)",
+      "question": "Otel cikis islemi nasil yapilir?",
+      "answer": "Müşteri temsilcisine bilgi vermek yeterlidir.",
+      "tags": [
+        "reservation"
+      ]
+    },
+    {
+      "id": "master-q-058",
+      "category": "support",
+      "title": "Acil durumda kimi aramalıyım?",
+      "question": "Acil durumda kimi aramalıyım?",
+      "answer": "+49 152 064 19253 (7/24)",
+      "tags": [
+        "support"
+      ]
+    },
+    {
+      "id": "master-q-059",
+      "category": "support",
+      "title": "Teknik sorun varsa ne yapmalı?",
+      "question": "Teknik sorun varsa ne yapmalı?",
+      "answer": "İletişim: +49 152 064 19253",
+      "tags": [
+        "support"
+      ]
+    },
+    {
+      "id": "master-q-059-ascii",
+      "category": "support",
+      "title": "Teknik sorun varsa ne yapmalı? (ASCII)",
+      "question": "Teknik sorun varsa ne yapmali?",
+      "answer": "İletişim: +49 152 064 19253",
+      "tags": [
+        "support"
+      ]
+    },
+    {
+      "id": "master-q-060",
+      "category": "support",
+      "title": "Elektrik kesmesi durumunda ne yapmalı?",
+      "question": "Elektrik kesmesi durumunda ne yapmalı?",
+      "answer": "İletişim: +49 152 064 19253",
+      "tags": [
+        "support"
+      ]
+    },
+    {
+      "id": "master-q-060-ascii",
+      "category": "support",
+      "title": "Elektrik kesmesi durumunda ne yapmalı? (ASCII)",
+      "question": "Elektrik kesmesi durumunda ne yapmali?",
+      "answer": "İletişim: +49 152 064 19253",
+      "tags": [
+        "support"
+      ]
+    },
+    {
+      "id": "master-q-061",
+      "category": "support",
+      "title": "Sıcak su yoksa ne yapmalı?",
+      "question": "Sıcak su yoksa ne yapmalı?",
+      "answer": "İletişim: +49 152 064 19253",
+      "tags": [
+        "support"
+      ]
+    },
+    {
+      "id": "master-q-061-ascii",
+      "category": "support",
+      "title": "Sıcak su yoksa ne yapmalı? (ASCII)",
+      "question": "Sicak su yoksa ne yapmali?",
+      "answer": "İletişim: +49 152 064 19253",
+      "tags": [
+        "support"
+      ]
+    },
+    {
+      "id": "master-q-062",
+      "category": "support",
+      "title": "Oda anahtarı kaybolursa ne yapmalı?",
+      "question": "Oda anahtarı kaybolursa ne yapmalı?",
+      "answer": "İletişim: +49 152 064 19253",
+      "tags": [
+        "support"
+      ]
+    },
+    {
+      "id": "master-q-062-ascii",
+      "category": "support",
+      "title": "Oda anahtarı kaybolursa ne yapmalı? (ASCII)",
+      "question": "Oda anahtari kaybolursa ne yapmali?",
+      "answer": "İletişim: +49 152 064 19253",
+      "tags": [
+        "support"
+      ]
+    },
+    {
+      "id": "master-q-063",
+      "category": "support",
+      "title": "Gürültü şikayeti nasıl yapılır?",
+      "question": "Gürültü şikayeti nasıl yapılır?",
+      "answer": "İletişim: +49 152 064 19253",
+      "tags": [
+        "support"
+      ]
+    },
+    {
+      "id": "master-q-063-ascii",
+      "category": "support",
+      "title": "Gürültü şikayeti nasıl yapılır? (ASCII)",
+      "question": "Gurultu sikayeti nasil yapilir?",
+      "answer": "İletişim: +49 152 064 19253",
+      "tags": [
+        "support"
+      ]
+    },
+    {
+      "id": "master-q-064",
+      "category": "support",
+      "title": "Resepsiyona nasıl ulaşılır?",
+      "question": "Resepsiyona nasıl ulaşılır?",
+      "answer": "WhatsApp / Telefon: +49 152 064 19253 veya E-posta: reservation@meri-group.de",
+      "tags": [
+        "support"
+      ]
+    },
+    {
+      "id": "master-q-064-ascii",
+      "category": "support",
+      "title": "Resepsiyona nasıl ulaşılır? (ASCII)",
+      "question": "Resepsiyona nasil ulasilir?",
+      "answer": "WhatsApp / Telefon: +49 152 064 19253 veya E-posta: reservation@meri-group.de",
+      "tags": [
+        "support"
+      ]
+    },
+    {
+      "id": "master-q-065",
+      "category": "amenities",
+      "title": "Flamingo nerede?",
+      "question": "Flamingo nerede?",
+      "answer": "Stuttgart'ın kuzey-doğusunda, şehir merkezine yakın, yemyeşil bir doğa içinde yer alır.",
+      "tags": [
+        "amenities",
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-q-066",
+      "category": "amenities",
+      "title": "Bölge güvenli mi?",
+      "question": "Bölge güvenli mi?",
+      "answer": "Evet, sakin ve yeşil bir semt.",
+      "tags": [
+        "amenities",
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-q-066-ascii",
+      "category": "amenities",
+      "title": "Bölge güvenli mi? (ASCII)",
+      "question": "Bolge guvenli mi?",
+      "answer": "Evet, sakin ve yeşil bir semt.",
+      "tags": [
+        "amenities",
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-q-067",
+      "category": "amenities",
+      "title": "Europaplatz nerede?",
+      "question": "Europaplatz nerede?",
+      "answer": "Stuttgart'ın güney-batısında, havalimanına 9 dakika uzaklıkta.",
+      "tags": [
+        "amenities",
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-q-069",
+      "category": "amenities",
+      "title": "Hildesheim nerede?",
+      "question": "Hildesheim nerede?",
+      "answer": "Aşağı Saksonya eyaletinde, Hannover'e 15 km, Salzgitter'e 15 km, Braunschweig'a 30 km uzaklıkta. A7 otoyoluna yakın, 4 federal karayolunun kesişim noktası.",
+      "tags": [
+        "amenities",
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-001",
+      "category": "amenities",
+      "title": "Yatak & Yatak odası",
+      "question": "Yatak & Yatak odası nedir?",
+      "answer": "Büyük çift kişilik yatak, kaliteli şilte, nevresim takımı dahil ve düzenli değişim. Yerleşik gardrop. İstek üzerine ek/çocuk/bebek yatağı.",
+      "tags": [
+        "amenities"
+      ]
+    },
+    {
+      "id": "master-f-001-ascii",
+      "category": "amenities",
+      "title": "Yatak & Yatak odası (ASCII)",
+      "question": "Yatak & Yatak odasi nedir?",
+      "answer": "Büyük çift kişilik yatak, kaliteli şilte, nevresim takımı dahil ve düzenli değişim. Yerleşik gardrop. İstek üzerine ek/çocuk/bebek yatağı.",
+      "tags": [
+        "amenities"
+      ]
+    },
+    {
+      "id": "master-f-002",
+      "category": "amenities",
+      "title": "Oturma odası",
+      "question": "Oturma odası nedir?",
+      "answer": "Yüksek kaliteli mobilyalar. Smart TV (uydu: uluslararası kanallar). Yatağa dönüşen kanepe.",
+      "tags": [
+        "amenities"
+      ]
+    },
+    {
+      "id": "master-f-002-ascii",
+      "category": "amenities",
+      "title": "Oturma odası (ASCII)",
+      "question": "Oturma odasi nedir?",
+      "answer": "Yüksek kaliteli mobilyalar. Smart TV (uydu: uluslararası kanallar). Yatağa dönüşen kanepe.",
+      "tags": [
+        "amenities"
+      ]
+    },
+    {
+      "id": "master-f-003",
+      "category": "amenities",
+      "title": "Mutfak (tüm lokasyonlar)",
+      "question": "Mutfak (tüm lokasyonlar) nedir?",
+      "answer": "Bulaşık makinesi, kahve otomatı, mikrodalga, pirinç pişirici, Hint chapati tahtası, tam çatal/bıçak/tabak/bardak seti, alışveriş arabası.",
+      "tags": [
+        "amenities"
+      ]
+    },
+    {
+      "id": "master-f-003-ascii",
+      "category": "amenities",
+      "title": "Mutfak (tüm lokasyonlar) (ASCII)",
+      "question": "Mutfak (tum lokasyonlar) nedir?",
+      "answer": "Bulaşık makinesi, kahve otomatı, mikrodalga, pirinç pişirici, Hint chapati tahtası, tam çatal/bıçak/tabak/bardak seti, alışveriş arabası.",
+      "tags": [
+        "amenities"
+      ]
+    },
+    {
+      "id": "master-f-004",
+      "category": "amenities",
+      "title": "Balkon / Teras",
+      "question": "Balkon / Teras nedir?",
+      "answer": "Tüm dairelerde mobilyalı balkon veya teras.",
+      "tags": [
+        "amenities"
+      ]
+    },
+    {
+      "id": "master-f-005",
+      "category": "amenities",
+      "title": "Perdeler",
+      "question": "Perdeler nedir?",
+      "answer": "Isıya dayanıklı karartma perdeler.",
+      "tags": [
+        "amenities"
+      ]
+    },
+    {
+      "id": "master-f-006",
+      "category": "amenities",
+      "title": "Wi-Fi & İnternet",
+      "question": "Wi-Fi & İnternet nedir?",
+      "answer": "Ücretsiz Wi-Fi + DSL bağlantısı. (Europaplatz: her odada ayrı modem)",
+      "tags": [
+        "amenities"
+      ]
+    },
+    {
+      "id": "master-f-006-ascii",
+      "category": "amenities",
+      "title": "Wi-Fi & İnternet (ASCII)",
+      "question": "Wi-Fi & Internet nedir?",
+      "answer": "Ücretsiz Wi-Fi + DSL bağlantısı. (Europaplatz: her odada ayrı modem)",
+      "tags": [
+        "amenities"
+      ]
+    },
+    {
+      "id": "master-f-007",
+      "category": "amenities",
+      "title": "Telefon",
+      "question": "Telefon nedir?",
+      "answer": "Almanya sabit hattına sınırsız ücretsiz arama dahil özel hat.",
+      "tags": [
+        "amenities"
+      ]
+    },
+    {
+      "id": "master-f-008",
+      "category": "amenities",
+      "title": "Çamaşır",
+      "question": "Çamaşır nedir?",
+      "answer": "Flamingo & Europaplatz: ortak çamaşırhane (ücretsiz). Hildesheim: daire içinde çamaşır makinesi + kurutucu.",
+      "tags": [
+        "amenities"
+      ]
+    },
+    {
+      "id": "master-f-008-ascii",
+      "category": "amenities",
+      "title": "Çamaşır (ASCII)",
+      "question": "Camasir nedir?",
+      "answer": "Flamingo & Europaplatz: ortak çamaşırhane (ücretsiz). Hildesheim: daire içinde çamaşır makinesi + kurutucu.",
+      "tags": [
+        "amenities"
+      ]
+    },
+    {
+      "id": "master-f-009",
+      "category": "amenities",
+      "title": "Ütü",
+      "question": "Ütü nedir?",
+      "answer": "Her dairede ütü ve ütü masası mevcuttur.",
+      "tags": [
+        "amenities"
+      ]
+    },
+    {
+      "id": "master-f-009-ascii",
+      "category": "amenities",
+      "title": "Ütü (ASCII)",
+      "question": "Utu nedir?",
+      "answer": "Her dairede ütü ve ütü masası mevcuttur.",
+      "tags": [
+        "amenities"
+      ]
+    },
+    {
+      "id": "master-f-010",
+      "category": "amenities",
+      "title": "Anmeldung",
+      "question": "Anmeldung nedir?",
+      "answer": "İkamet tescili (Meldebestätigung / Wohnungsbescheinigung) tüm lokasyonlarda sağlanır.",
+      "tags": [
+        "amenities"
+      ]
+    },
+    {
+      "id": "master-f-011",
+      "category": "amenities",
+      "title": "İsim plaketi",
+      "question": "İsim plaketi nedir?",
+      "answer": "Taşınma gününde kapıya isim plaketi yerleştirilir.",
+      "tags": [
+        "amenities"
+      ]
+    },
+    {
+      "id": "master-f-011-ascii",
+      "category": "amenities",
+      "title": "İsim plaketi (ASCII)",
+      "question": "Isim plaketi nedir?",
+      "answer": "Taşınma gününde kapıya isim plaketi yerleştirilir.",
+      "tags": [
+        "amenities"
+      ]
+    },
+    {
+      "id": "master-f-012",
+      "category": "amenities",
+      "title": "Bisiklet (Europaplatz)",
+      "question": "Bisiklet (Europaplatz) nedir?",
+      "answer": "Üstü kapalı bisiklet parkı.",
+      "tags": [
+        "amenities"
+      ]
+    },
+    {
+      "id": "master-f-013",
+      "category": "amenities",
+      "title": "Misafir ücreti",
+      "question": "Misafir ücreti nedir?",
+      "answer": "Aylık yalnızca 10 €/kişi ek ücretle misafir kabulü.",
+      "tags": [
+        "amenities"
+      ]
+    },
+    {
+      "id": "master-f-013-ascii",
+      "category": "amenities",
+      "title": "Misafir ücreti (ASCII)",
+      "question": "Misafir ucreti nedir?",
+      "answer": "Aylık yalnızca 10 €/kişi ek ücretle misafir kabulü.",
+      "tags": [
+        "amenities"
+      ]
+    },
+    {
+      "id": "master-f-014",
+      "category": "amenities",
+      "title": "Evcil hayvan",
+      "question": "Evcil hayvan nedir?",
+      "answer": "Talep ve onay üzerine mümkün: +49 152 064 19253",
+      "tags": [
+        "amenities"
+      ]
+    },
+    {
+      "id": "master-f-015",
+      "category": "amenities",
+      "title": "Otopark",
+      "question": "Otopark nedir?",
+      "answer": "Tüm lokasyonlarda talep üzerine açık otopark veya kapalı garaj.",
+      "tags": [
+        "amenities"
+      ]
+    },
+    {
+      "id": "master-f-016",
+      "category": "location",
+      "title": "Adres",
+      "question": "Flamingo için adres nedir?",
+      "answer": "Flamingoweg 70, D-70378 Stuttgart",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-016-ascii",
+      "category": "location",
+      "title": "Adres (ASCII)",
+      "question": "Flamingo icin adres nedir?",
+      "answer": "Flamingoweg 70, D-70378 Stuttgart",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-017",
+      "category": "location",
+      "title": "Daire tipi ve sayısı",
+      "question": "Flamingo için daire tipi ve sayısı nedir?",
+      "answer": "76 adet tam donanımlı 1 odalı (1+0) apart daire.",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-017-ascii",
+      "category": "location",
+      "title": "Daire tipi ve sayısı (ASCII)",
+      "question": "Flamingo icin daire tipi ve sayisi nedir?",
+      "answer": "76 adet tam donanımlı 1 odalı (1+0) apart daire.",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-018",
+      "category": "location",
+      "title": "Doğa ve çevre",
+      "question": "Flamingo için doğa ve çevre nedir?",
+      "answer": "Neckar nehri ve Max-Eyth-See dinlenme alanı yakında; geniş çim alanlarda barbekü, yürüyüş ve pedalo keyfi mümkün.",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-018-ascii",
+      "category": "location",
+      "title": "Doğa ve çevre (ASCII)",
+      "question": "Flamingo icin doga ve cevre nedir?",
+      "answer": "Neckar nehri ve Max-Eyth-See dinlenme alanı yakında; geniş çim alanlarda barbekü, yürüyüş ve pedalo keyfi mümkün.",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-019",
+      "category": "location",
+      "title": "Toplu taşıma",
+      "question": "Flamingo için toplu taşıma nedir?",
+      "answer": "U-Bahn ve otobüs bağlantıları ile şehir merkezine ve çevresine kolay ulaşım.",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-019-ascii",
+      "category": "location",
+      "title": "Toplu taşıma (ASCII)",
+      "question": "Flamingo icin toplu tasima nedir?",
+      "answer": "U-Bahn ve otobüs bağlantıları ile şehir merkezine ve çevresine kolay ulaşım.",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-020",
+      "category": "location",
+      "title": "Araçla bölgeye erişim",
+      "question": "Flamingo için araçla bölgeye erişim nedir?",
+      "answer": "Stuttgart'ın kuzeyi ve doğu bölgesine araçla rahat ulaşım imkânı.",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-020-ascii",
+      "category": "location",
+      "title": "Araçla bölgeye erişim (ASCII)",
+      "question": "Flamingo icin aracla bolgeye erisim nedir?",
+      "answer": "Stuttgart'ın kuzeyi ve doğu bölgesine araçla rahat ulaşım imkânı.",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-021",
+      "category": "location",
+      "title": "Havalimanı transferi",
+      "question": "Flamingo için havalimanı transferi nedir?",
+      "answer": "Transfer hizmeti mevcuttur: +49 152 064 19253",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-021-ascii",
+      "category": "location",
+      "title": "Havalimanı transferi (ASCII)",
+      "question": "Flamingo icin havalimani transferi nedir?",
+      "answer": "Transfer hizmeti mevcuttur: +49 152 064 19253",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-022",
+      "category": "location",
+      "title": "Taksi hizmeti",
+      "question": "Flamingo için taksi hizmeti nedir?",
+      "answer": "Talep üzerine rezervasyon yapılabilir: +49 152 064 19253",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-022-ascii",
+      "category": "location",
+      "title": "Taksi hizmeti (ASCII)",
+      "question": "Flamingo icin taksi hizmeti nedir?",
+      "answer": "Talep üzerine rezervasyon yapılabilir: +49 152 064 19253",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-023",
+      "category": "location",
+      "title": "Mobilya",
+      "question": "Flamingo için mobilya nedir?",
+      "answer": "Yüksek kaliteli mobilyalarla tam donanımlı; eve hazır teslim.",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-023-ascii",
+      "category": "location",
+      "title": "Mobilya (ASCII)",
+      "question": "Flamingo icin mobilya nedir?",
+      "answer": "Yüksek kaliteli mobilyalarla tam donanımlı; eve hazır teslim.",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-024",
+      "category": "location",
+      "title": "Mutfak",
+      "question": "Flamingo için mutfak nedir?",
+      "answer": "Tam donanımlı mutfak: bulaşık makinesi, kahve otomatı, pirinç pişirici, Hint chapati tahtası, mikrodalga fırın ve alışveriş arabası.",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-024-ascii",
+      "category": "location",
+      "title": "Mutfak (ASCII)",
+      "question": "Flamingo icin mutfak nedir?",
+      "answer": "Tam donanımlı mutfak: bulaşık makinesi, kahve otomatı, pirinç pişirici, Hint chapati tahtası, mikrodalga fırın ve alışveriş arabası.",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-025",
+      "category": "location",
+      "title": "Oturma odası",
+      "question": "Flamingo için oturma odası nedir?",
+      "answer": "Modern Smart TV (uydu sistemiyle uluslararası kanallar). Kanepe yatağa dönüştürülebilir.",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-025-ascii",
+      "category": "location",
+      "title": "Oturma odası (ASCII)",
+      "question": "Flamingo icin oturma odasi nedir?",
+      "answer": "Modern Smart TV (uydu sistemiyle uluslararası kanallar). Kanepe yatağa dönüştürülebilir.",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-026",
+      "category": "location",
+      "title": "Yatak odası",
+      "question": "Flamingo için yatak odası nedir?",
+      "answer": "Büyük çift kişilik yatak, kaliteli şilte. Yerleşik dolap. İstek üzerine ek yatak.",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-026-ascii",
+      "category": "location",
+      "title": "Yatak odası (ASCII)",
+      "question": "Flamingo icin yatak odasi nedir?",
+      "answer": "Büyük çift kişilik yatak, kaliteli şilte. Yerleşik dolap. İstek üzerine ek yatak.",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-027",
+      "category": "location",
+      "title": "Yatakçamaşırı",
+      "question": "Flamingo için yatakçamaşırı nedir?",
+      "answer": "Nevresim takımı dahil, istek üzerine düzenli değişim.",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-027-ascii",
+      "category": "location",
+      "title": "Yatakçamaşırı (ASCII)",
+      "question": "Flamingo icin yatakcamasiri nedir?",
+      "answer": "Nevresim takımı dahil, istek üzerine düzenli değişim.",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-028",
+      "category": "location",
+      "title": "Balkon / Teras",
+      "question": "Flamingo için balkon / teras nedir?",
+      "answer": "Tüm dairelerde mobilyalı balkon veya teras mevcuttur.",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-028-ascii",
+      "category": "location",
+      "title": "Balkon / Teras (ASCII)",
+      "question": "Flamingo icin balkon / teras nedir?",
+      "answer": "Tüm dairelerde mobilyalı balkon veya teras mevcuttur.",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-029",
+      "category": "location",
+      "title": "Perdeler",
+      "question": "Flamingo için perdeler nedir?",
+      "answer": "Isıya dayanıklı karartma perdeler.",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-029-ascii",
+      "category": "location",
+      "title": "Perdeler (ASCII)",
+      "question": "Flamingo icin perdeler nedir?",
+      "answer": "Isıya dayanıklı karartma perdeler.",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-030",
+      "category": "location",
+      "title": "Wi-Fi & İnternet",
+      "question": "Flamingo için wi-fi & i̇nternet nedir?",
+      "answer": "Ücretsiz Wi-Fi ve DSL bağlantısı.",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-030-ascii",
+      "category": "location",
+      "title": "Wi-Fi & İnternet (ASCII)",
+      "question": "Flamingo icin wi-fi & i̇nternet nedir?",
+      "answer": "Ücretsiz Wi-Fi ve DSL bağlantısı.",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-031",
+      "category": "location",
+      "title": "Telefon",
+      "question": "Flamingo için telefon nedir?",
+      "answer": "Almanya sabit hattına sınırsız ücretsiz arama dahil özel hat.",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-031-ascii",
+      "category": "location",
+      "title": "Telefon (ASCII)",
+      "question": "Flamingo icin telefon nedir?",
+      "answer": "Almanya sabit hattına sınırsız ücretsiz arama dahil özel hat.",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-032",
+      "category": "location",
+      "title": "Çamaşır",
+      "question": "Flamingo için çamaşır nedir?",
+      "answer": "Ortak kullanım çamaşırhanede çamaşır makinesi ve kurutucu ücretsiz kullanım.",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-032-ascii",
+      "category": "location",
+      "title": "Çamaşır (ASCII)",
+      "question": "Flamingo icin camasir nedir?",
+      "answer": "Ortak kullanım çamaşırhanede çamaşır makinesi ve kurutucu ücretsiz kullanım.",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-033",
+      "category": "location",
+      "title": "Çocuk dostu",
+      "question": "Flamingo için çocuk dostu nedir?",
+      "answer": "Kapı önünde oyun parkı, istediğiniz zaman bebek/çocuk yatağı eklenebilir.",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-033-ascii",
+      "category": "location",
+      "title": "Çocuk dostu (ASCII)",
+      "question": "Flamingo icin cocuk dostu nedir?",
+      "answer": "Kapı önünde oyun parkı, istediğiniz zaman bebek/çocuk yatağı eklenebilir.",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-034",
+      "category": "location",
+      "title": "Evcil hayvan",
+      "question": "Flamingo için evcil hayvan nedir?",
+      "answer": "Talep üzerine mümkün: +49 152 064 19253",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-034-ascii",
+      "category": "location",
+      "title": "Evcil hayvan (ASCII)",
+      "question": "Flamingo icin evcil hayvan nedir?",
+      "answer": "Talep üzerine mümkün: +49 152 064 19253",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-035",
+      "category": "location",
+      "title": "Misafir ziyareti",
+      "question": "Flamingo için misafir ziyareti nedir?",
+      "answer": "Aylık yalnızca 10 €/kişi ek ücretle misafir kabul edilebilir.",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-035-ascii",
+      "category": "location",
+      "title": "Misafir ziyareti (ASCII)",
+      "question": "Flamingo icin misafir ziyareti nedir?",
+      "answer": "Aylık yalnızca 10 €/kişi ek ücretle misafir kabul edilebilir.",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-036",
+      "category": "location",
+      "title": "Temizlik & bakım hizmeti",
+      "question": "Flamingo için temizlik & bakım hizmeti nedir?",
+      "answer": "İsteğe bağlı: Facility hizmeti, temizlik hizmeti veya servissiz sakin yaşam seçenekleri.",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-036-ascii",
+      "category": "location",
+      "title": "Temizlik & bakım hizmeti (ASCII)",
+      "question": "Flamingo icin temizlik & bakim hizmeti nedir?",
+      "answer": "İsteğe bağlı: Facility hizmeti, temizlik hizmeti veya servissiz sakin yaşam seçenekleri.",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-037",
+      "category": "location",
+      "title": "24 saat bakım",
+      "question": "Flamingo için 24 saat bakım nedir?",
+      "answer": "Evet, 24 saat site görevlisi hizmeti mevcuttur.",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-037-ascii",
+      "category": "location",
+      "title": "24 saat bakım (ASCII)",
+      "question": "Flamingo icin 24 saat bakim nedir?",
+      "answer": "Evet, 24 saat site görevlisi hizmeti mevcuttur.",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-038",
+      "category": "location",
+      "title": "Anmeldung",
+      "question": "Flamingo için anmeldung nedir?",
+      "answer": "Evet, ikamet tescili (Meldebestätigung / Wohnungsbescheinigung) desteği sağlanır.",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-038-ascii",
+      "category": "location",
+      "title": "Anmeldung (ASCII)",
+      "question": "Flamingo icin anmeldung nedir?",
+      "answer": "Evet, ikamet tescili (Meldebestätigung / Wohnungsbescheinigung) desteği sağlanır.",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-039",
+      "category": "location",
+      "title": "İsim plaketi",
+      "question": "Flamingo için i̇sim plaketi nedir?",
+      "answer": "Taşınma gününden itibaren kapıda isim plaketi hazır.",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-039-ascii",
+      "category": "location",
+      "title": "İsim plaketi (ASCII)",
+      "question": "Flamingo icin i̇sim plaketi nedir?",
+      "answer": "Taşınma gününden itibaren kapıda isim plaketi hazır.",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-040",
+      "category": "location",
+      "title": "Multikulturalizm",
+      "question": "Flamingo için multikulturalizm nedir?",
+      "answer": "Çok kültürlü misafir yapısı ve ona özel atmosfer.",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-040-ascii",
+      "category": "location",
+      "title": "Multikulturalizm (ASCII)",
+      "question": "Flamingo icin multikulturalizm nedir?",
+      "answer": "Çok kültürlü misafir yapısı ve ona özel atmosfer.",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-041",
+      "category": "location",
+      "title": "Otopark",
+      "question": "Flamingo için otopark nedir?",
+      "answer": "Talep üzerine açık otopark veya kapalı garaj imkânı: +49 152 064 19253",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-041-ascii",
+      "category": "location",
+      "title": "Otopark (ASCII)",
+      "question": "Flamingo icin otopark nedir?",
+      "answer": "Talep üzerine açık otopark veya kapalı garaj imkânı: +49 152 064 19253",
+      "tags": [
+        "flamingo"
+      ]
+    },
+    {
+      "id": "master-f-042",
+      "category": "location",
+      "title": "Adres",
+      "question": "Europaplatz için adres nedir?",
+      "answer": "Europaplatz 20b, 70565 Stuttgart",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-042-ascii",
+      "category": "location",
+      "title": "Adres (ASCII)",
+      "question": "Europaplatz icin adres nedir?",
+      "answer": "Europaplatz 20b, 70565 Stuttgart",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-043",
+      "category": "location",
+      "title": "Daire tipi ve sayısı",
+      "question": "Europaplatz için daire tipi ve sayısı nedir?",
+      "answer": "65 adet tam donanımlı 1+0 ve 2+0 daire.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-043-ascii",
+      "category": "location",
+      "title": "Daire tipi ve sayısı (ASCII)",
+      "question": "Europaplatz icin daire tipi ve sayisi nedir?",
+      "answer": "65 adet tam donanımlı 1+0 ve 2+0 daire.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-044",
+      "category": "location",
+      "title": "Otoyol bağlantısı",
+      "question": "Europaplatz için otoyol bağlantısı nedir?",
+      "answer": "A8 otoyolu Stuttgart Havalimanı/Fuar çıkışına 1 km'den az; Stuttgart'ın güneyine mükemmel bağlantı.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-044-ascii",
+      "category": "location",
+      "title": "Otoyol bağlantısı (ASCII)",
+      "question": "Europaplatz icin otoyol baglantisi nedir?",
+      "answer": "A8 otoyolu Stuttgart Havalimanı/Fuar çıkışına 1 km'den az; Stuttgart'ın güneyine mükemmel bağlantı.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-045",
+      "category": "location",
+      "title": "Havalimanına mesafe",
+      "question": "Europaplatz için havalimanına mesafe nedir?",
+      "answer": "Stuttgart Havalimanı'na direkt U-Bahn ile yaklaşık 15 dakika. Araçla 9 dakika.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-045-ascii",
+      "category": "location",
+      "title": "Havalimanına mesafe (ASCII)",
+      "question": "Europaplatz icin havalimanina mesafe nedir?",
+      "answer": "Stuttgart Havalimanı'na direkt U-Bahn ile yaklaşık 15 dakika. Araçla 9 dakika.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-046",
+      "category": "location",
+      "title": "Metro istasyonu",
+      "question": "Europaplatz için metro istasyonu nedir?",
+      "answer": "Europaplatz U-Bahn istasyonu — binanın hemen yanında, 3 dakika yürüme.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-046-ascii",
+      "category": "location",
+      "title": "Metro istasyonu (ASCII)",
+      "question": "Europaplatz icin metro istasyonu nedir?",
+      "answer": "Europaplatz U-Bahn istasyonu — binanın hemen yanında, 3 dakika yürüme.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-047",
+      "category": "location",
+      "title": "Otobüs",
+      "question": "Europaplatz için otobüs nedir?",
+      "answer": "7 farklı otobüs hattı Europaplatz'ı şehrin çeşitli noktalarına bağlar.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-047-ascii",
+      "category": "location",
+      "title": "Otobüs (ASCII)",
+      "question": "Europaplatz icin otobus nedir?",
+      "answer": "7 farklı otobüs hattı Europaplatz'ı şehrin çeşitli noktalarına bağlar.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-048",
+      "category": "location",
+      "title": "Toplu taşımayla şehir merkezi",
+      "question": "Europaplatz için toplu taşımayla şehir merkezi nedir?",
+      "answer": "U-Bahn ile doğrudan Stuttgart şehir merkezine.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-048-ascii",
+      "category": "location",
+      "title": "Toplu taşımayla şehir merkezi (ASCII)",
+      "question": "Europaplatz icin toplu tasimayla sehir merkezi nedir?",
+      "answer": "U-Bahn ile doğrudan Stuttgart şehir merkezine.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-049",
+      "category": "location",
+      "title": "Havalimanı transferi",
+      "question": "Europaplatz için havalimanı transferi nedir?",
+      "answer": "Transfer hizmeti mevcuttur: +49 152 064 19253",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-049-ascii",
+      "category": "location",
+      "title": "Havalimanı transferi (ASCII)",
+      "question": "Europaplatz icin havalimani transferi nedir?",
+      "answer": "Transfer hizmeti mevcuttur: +49 152 064 19253",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-050",
+      "category": "location",
+      "title": "Taksi",
+      "question": "Europaplatz için taksi nedir?",
+      "answer": "Talep üzerine rezervasyon: +49 152 064 19253",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-050-ascii",
+      "category": "location",
+      "title": "Taksi (ASCII)",
+      "question": "Europaplatz icin taksi nedir?",
+      "answer": "Talep üzerine rezervasyon: +49 152 064 19253",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-051",
+      "category": "location",
+      "title": "Mobilya",
+      "question": "Europaplatz için mobilya nedir?",
+      "answer": "Yüksek kaliteli mobilyalarla tam donanımlı; eve hazır teslim.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-051-ascii",
+      "category": "location",
+      "title": "Mobilya (ASCII)",
+      "question": "Europaplatz icin mobilya nedir?",
+      "answer": "Yüksek kaliteli mobilyalarla tam donanımlı; eve hazır teslim.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-052",
+      "category": "location",
+      "title": "Mutfak",
+      "question": "Europaplatz için mutfak nedir?",
+      "answer": "Tam donanımlı mutfak: bulaşık makinesi, kahve otomatı, pirinç pişirici, Hint chapati tahtası, mikrodalga fırın ve alışveriş arabası.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-052-ascii",
+      "category": "location",
+      "title": "Mutfak (ASCII)",
+      "question": "Europaplatz icin mutfak nedir?",
+      "answer": "Tam donanımlı mutfak: bulaşık makinesi, kahve otomatı, pirinç pişirici, Hint chapati tahtası, mikrodalga fırın ve alışveriş arabası.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-053",
+      "category": "location",
+      "title": "Oturma odası",
+      "question": "Europaplatz için oturma odası nedir?",
+      "answer": "Modern Smart TV (uydu sistemiyle uluslararası kanallar). Kanepe yatağa dönüştürülebilir.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-053-ascii",
+      "category": "location",
+      "title": "Oturma odası (ASCII)",
+      "question": "Europaplatz icin oturma odasi nedir?",
+      "answer": "Modern Smart TV (uydu sistemiyle uluslararası kanallar). Kanepe yatağa dönüştürülebilir.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-054",
+      "category": "location",
+      "title": "Yatak odası",
+      "question": "Europaplatz için yatak odası nedir?",
+      "answer": "Büyük çift kişilik yatak, kaliteli şilte. Yerleşik dolap. İstek üzerine ek yatak.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-054-ascii",
+      "category": "location",
+      "title": "Yatak odası (ASCII)",
+      "question": "Europaplatz icin yatak odasi nedir?",
+      "answer": "Büyük çift kişilik yatak, kaliteli şilte. Yerleşik dolap. İstek üzerine ek yatak.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-055",
+      "category": "location",
+      "title": "Yatakyatakçamaşırı",
+      "question": "Europaplatz için yatakyatakçamaşırı nedir?",
+      "answer": "Nevresim takımı dahil, istek üzerine düzenli değişim.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-055-ascii",
+      "category": "location",
+      "title": "Yatakyatakçamaşırı (ASCII)",
+      "question": "Europaplatz icin yatakyatakcamasiri nedir?",
+      "answer": "Nevresim takımı dahil, istek üzerine düzenli değişim.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-056",
+      "category": "location",
+      "title": "Balkon / Teras",
+      "question": "Europaplatz için balkon / teras nedir?",
+      "answer": "Tüm dairelerde mobilyalı balkon veya teras mevcuttur.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-056-ascii",
+      "category": "location",
+      "title": "Balkon / Teras (ASCII)",
+      "question": "Europaplatz icin balkon / teras nedir?",
+      "answer": "Tüm dairelerde mobilyalı balkon veya teras mevcuttur.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-057",
+      "category": "location",
+      "title": "Perdeler",
+      "question": "Europaplatz için perdeler nedir?",
+      "answer": "Isıya dayanıklı karartma perdeler.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-057-ascii",
+      "category": "location",
+      "title": "Perdeler (ASCII)",
+      "question": "Europaplatz icin perdeler nedir?",
+      "answer": "Isıya dayanıklı karartma perdeler.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-058",
+      "category": "location",
+      "title": "Wi-Fi & İnternet",
+      "question": "Europaplatz için wi-fi & i̇nternet nedir?",
+      "answer": "Ücretsiz Wi-Fi ve DSL bağlantısı. Her odada ayrı modem.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-058-ascii",
+      "category": "location",
+      "title": "Wi-Fi & İnternet (ASCII)",
+      "question": "Europaplatz icin wi-fi & i̇nternet nedir?",
+      "answer": "Ücretsiz Wi-Fi ve DSL bağlantısı. Her odada ayrı modem.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-059",
+      "category": "location",
+      "title": "Telefon",
+      "question": "Europaplatz için telefon nedir?",
+      "answer": "Almanya sabit hattına sınırsız ücretsiz arama dahil özel hat.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-059-ascii",
+      "category": "location",
+      "title": "Telefon (ASCII)",
+      "question": "Europaplatz icin telefon nedir?",
+      "answer": "Almanya sabit hattına sınırsız ücretsiz arama dahil özel hat.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-060",
+      "category": "location",
+      "title": "Çamaşır",
+      "question": "Europaplatz için çamaşır nedir?",
+      "answer": "Ortak kullanım çamaşırhanede çamaşır makinesi ve kurutucu ücretsiz kullanım.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-060-ascii",
+      "category": "location",
+      "title": "Çamaşır (ASCII)",
+      "question": "Europaplatz icin camasir nedir?",
+      "answer": "Ortak kullanım çamaşırhanede çamaşır makinesi ve kurutucu ücretsiz kullanım.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-061",
+      "category": "location",
+      "title": "Bisiklet",
+      "question": "Europaplatz için bisiklet nedir?",
+      "answer": "Üstü kapalı bisiklet parkı mevcuttur.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-061-ascii",
+      "category": "location",
+      "title": "Bisiklet (ASCII)",
+      "question": "Europaplatz icin bisiklet nedir?",
+      "answer": "Üstü kapalı bisiklet parkı mevcuttur.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-062",
+      "category": "location",
+      "title": "Çocuk dostu",
+      "question": "Europaplatz için çocuk dostu nedir?",
+      "answer": "Kapı önünde oyun parkı, istek üzerine bebek/çocuk yatağı eklenebilir.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-062-ascii",
+      "category": "location",
+      "title": "Çocuk dostu (ASCII)",
+      "question": "Europaplatz icin cocuk dostu nedir?",
+      "answer": "Kapı önünde oyun parkı, istek üzerine bebek/çocuk yatağı eklenebilir.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-063",
+      "category": "location",
+      "title": "Evcil hayvan",
+      "question": "Europaplatz için evcil hayvan nedir?",
+      "answer": "Talep üzerine mümkün: +49 152 064 19253",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-063-ascii",
+      "category": "location",
+      "title": "Evcil hayvan (ASCII)",
+      "question": "Europaplatz icin evcil hayvan nedir?",
+      "answer": "Talep üzerine mümkün: +49 152 064 19253",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-064",
+      "category": "location",
+      "title": "Market (zemin kat)",
+      "question": "Europaplatz için market (zemin kat) nedir?",
+      "answer": "Binanın alt katında direkt market.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-064-ascii",
+      "category": "location",
+      "title": "Market (zemin kat) (ASCII)",
+      "question": "Europaplatz icin market (zemin kat) nedir?",
+      "answer": "Binanın alt katında direkt market.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-065",
+      "category": "location",
+      "title": "Market saatleri",
+      "question": "Europaplatz için market saatleri nedir?",
+      "answer": "Hf. içi ve Cumartesi ~21:00'e kadar. Pazar kapalı. Yanındaki fırın Pazar 17:00'ye kadar açık.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-065-ascii",
+      "category": "location",
+      "title": "Market saatleri (ASCII)",
+      "question": "Europaplatz icin market saatleri nedir?",
+      "answer": "Hf. içi ve Cumartesi ~21:00'e kadar. Pazar kapalı. Yanındaki fırın Pazar 17:00'ye kadar açık.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-066",
+      "category": "location",
+      "title": "24 saat market",
+      "question": "Europaplatz için 24 saat market nedir?",
+      "answer": "Mevcut değil.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-066-ascii",
+      "category": "location",
+      "title": "24 saat market (ASCII)",
+      "question": "Europaplatz icin 24 saat market nedir?",
+      "answer": "Mevcut değil.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-067",
+      "category": "location",
+      "title": "ATM",
+      "question": "Europaplatz için atm nedir?",
+      "answer": "Binanın doğrudan altında.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-067-ascii",
+      "category": "location",
+      "title": "ATM (ASCII)",
+      "question": "Europaplatz icin atm nedir?",
+      "answer": "Binanın doğrudan altında.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-068",
+      "category": "location",
+      "title": "Banka",
+      "question": "Europaplatz için banka nedir?",
+      "answer": "En yakın banka yaklaşık 1,5 km.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-068-ascii",
+      "category": "location",
+      "title": "Banka (ASCII)",
+      "question": "Europaplatz icin banka nedir?",
+      "answer": "En yakın banka yaklaşık 1,5 km.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-069",
+      "category": "location",
+      "title": "Eczane / Sağlık",
+      "question": "Europaplatz için eczane / sağlık nedir?",
+      "answer": "Müller mağazası binanın altında; temel sağlık ürünleri mevcuttur.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-069-ascii",
+      "category": "location",
+      "title": "Eczane / Sağlık (ASCII)",
+      "question": "Europaplatz icin eczane / saglik nedir?",
+      "answer": "Müller mağazası binanın altında; temel sağlık ürünleri mevcuttur.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-070",
+      "category": "location",
+      "title": "Hastane",
+      "question": "Europaplatz için hastane nedir?",
+      "answer": "Robert Bosch City Hastanesi — yaklaşık 8,6 km.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-070-ascii",
+      "category": "location",
+      "title": "Hastane (ASCII)",
+      "question": "Europaplatz icin hastane nedir?",
+      "answer": "Robert Bosch City Hastanesi — yaklaşık 8,6 km.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-071",
+      "category": "location",
+      "title": "Alışveriş merkezi",
+      "question": "Europaplatz için alışveriş merkezi nedir?",
+      "answer": "SI-Centrum — 1,6 km. Breuningerland — 14 km. Metzingen Outlet — şehir dışı.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-071-ascii",
+      "category": "location",
+      "title": "Alışveriş merkezi (ASCII)",
+      "question": "Europaplatz icin alisveris merkezi nedir?",
+      "answer": "SI-Centrum — 1,6 km. Breuningerland — 14 km. Metzingen Outlet — şehir dışı.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-072",
+      "category": "location",
+      "title": "Çocuk oyun alanı",
+      "question": "Europaplatz için çocuk oyun alanı nedir?",
+      "answer": "Bu lokasyonda çocuklar için özel alan mevcut. Fotoğraflar: www.meri-boarding.de",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-072-ascii",
+      "category": "location",
+      "title": "Çocuk oyun alanı (ASCII)",
+      "question": "Europaplatz icin cocuk oyun alani nedir?",
+      "answer": "Bu lokasyonda çocuklar için özel alan mevcut. Fotoğraflar: www.meri-boarding.de",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-073",
+      "category": "location",
+      "title": "Misafir ziyareti",
+      "question": "Europaplatz için misafir ziyareti nedir?",
+      "answer": "Aylık yalnızca 10 €/kişi ek ücretle misafir kabul edilebilir.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-073-ascii",
+      "category": "location",
+      "title": "Misafir ziyareti (ASCII)",
+      "question": "Europaplatz icin misafir ziyareti nedir?",
+      "answer": "Aylık yalnızca 10 €/kişi ek ücretle misafir kabul edilebilir.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-074",
+      "category": "location",
+      "title": "Temizlik & bakım hizmeti",
+      "question": "Europaplatz için temizlik & bakım hizmeti nedir?",
+      "answer": "İsteğe bağlı: Facility hizmeti, temizlik hizmeti veya servissiz sakin yaşam seçenekleri.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-074-ascii",
+      "category": "location",
+      "title": "Temizlik & bakım hizmeti (ASCII)",
+      "question": "Europaplatz icin temizlik & bakim hizmeti nedir?",
+      "answer": "İsteğe bağlı: Facility hizmeti, temizlik hizmeti veya servissiz sakin yaşam seçenekleri.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-075",
+      "category": "location",
+      "title": "24 saat bakım",
+      "question": "Europaplatz için 24 saat bakım nedir?",
+      "answer": "Evet, 24 saat site görevlisi hizmeti mevcuttur.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-075-ascii",
+      "category": "location",
+      "title": "24 saat bakım (ASCII)",
+      "question": "Europaplatz icin 24 saat bakim nedir?",
+      "answer": "Evet, 24 saat site görevlisi hizmeti mevcuttur.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-076",
+      "category": "location",
+      "title": "Anmeldung",
+      "question": "Europaplatz için anmeldung nedir?",
+      "answer": "Evet, ikamet tescili (Meldebestätigung / Wohnungsbescheinigung) desteği sağlanır.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-076-ascii",
+      "category": "location",
+      "title": "Anmeldung (ASCII)",
+      "question": "Europaplatz icin anmeldung nedir?",
+      "answer": "Evet, ikamet tescili (Meldebestätigung / Wohnungsbescheinigung) desteği sağlanır.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-077",
+      "category": "location",
+      "title": "İsim plaketi",
+      "question": "Europaplatz için i̇sim plaketi nedir?",
+      "answer": "Taşınma gününden itibaren kapıda isim plaketi hazır.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-077-ascii",
+      "category": "location",
+      "title": "İsim plaketi (ASCII)",
+      "question": "Europaplatz icin i̇sim plaketi nedir?",
+      "answer": "Taşınma gününden itibaren kapıda isim plaketi hazır.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-078",
+      "category": "location",
+      "title": "Multikulturalizm",
+      "question": "Europaplatz için multikulturalizm nedir?",
+      "answer": "Çok kültürlü misafir yapısı ve ona özel atmosfer.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-078-ascii",
+      "category": "location",
+      "title": "Multikulturalizm (ASCII)",
+      "question": "Europaplatz icin multikulturalizm nedir?",
+      "answer": "Çok kültürlü misafir yapısı ve ona özel atmosfer.",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-079",
+      "category": "location",
+      "title": "Engelliler için",
+      "question": "Europaplatz için engelliler için nedir?",
+      "answer": "Engellilere özel otopark ve tuvalet altyapısı mevcuttur. Özel ihtiyaçlar için: +49 152 064 19253",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-079-ascii",
+      "category": "location",
+      "title": "Engelliler için (ASCII)",
+      "question": "Europaplatz icin engelliler icin nedir?",
+      "answer": "Engellilere özel otopark ve tuvalet altyapısı mevcuttur. Özel ihtiyaçlar için: +49 152 064 19253",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-080",
+      "category": "location",
+      "title": "Otopark",
+      "question": "Europaplatz için otopark nedir?",
+      "answer": "Talep üzerine açık otopark veya kapalı garaj: +49 152 064 19253",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-080-ascii",
+      "category": "location",
+      "title": "Otopark (ASCII)",
+      "question": "Europaplatz icin otopark nedir?",
+      "answer": "Talep üzerine açık otopark veya kapalı garaj: +49 152 064 19253",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-081",
+      "category": "location",
+      "title": "Elektrikli araç şarjı",
+      "question": "Europaplatz için elektrikli araç şarjı nedir?",
+      "answer": "Mevcut. Detay için: +49 152 064 19253",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-081-ascii",
+      "category": "location",
+      "title": "Elektrikli araç şarjı (ASCII)",
+      "question": "Europaplatz icin elektrikli arac sarji nedir?",
+      "answer": "Mevcut. Detay için: +49 152 064 19253",
+      "tags": [
+        "europaplatz"
+      ]
+    },
+    {
+      "id": "master-f-082",
+      "category": "location",
+      "title": "Turistik değer",
+      "question": "Hildesheim için turistik değer nedir?",
+      "answer": "Tarihi pazar meydanı şehrin merkezi. St. Michaelis Kilisesi ve Mariendom UNESCO Dünya Mirası listesinde.",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-082-ascii",
+      "category": "location",
+      "title": "Turistik değer (ASCII)",
+      "question": "Hildesheim icin turistik deger nedir?",
+      "answer": "Tarihi pazar meydanı şehrin merkezi. St. Michaelis Kilisesi ve Mariendom UNESCO Dünya Mirası listesinde.",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-083",
+      "category": "location",
+      "title": "Daire tipi",
+      "question": "Hildesheim için daire tipi nedir?",
+      "answer": "Farklı küçük binalarda tam donanımlı çeşitli daireler.",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-083-ascii",
+      "category": "location",
+      "title": "Daire tipi (ASCII)",
+      "question": "Hildesheim icin daire tipi nedir?",
+      "answer": "Farklı küçük binalarda tam donanımlı çeşitli daireler.",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-084",
+      "category": "location",
+      "title": "Otoyol",
+      "question": "Hildesheim için otoyol nedir?",
+      "answer": "A7 otoyoluna yakın konum; bölgeye araçla kolay erişim.",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-084-ascii",
+      "category": "location",
+      "title": "Otoyol (ASCII)",
+      "question": "Hildesheim icin otoyol nedir?",
+      "answer": "A7 otoyoluna yakın konum; bölgeye araçla kolay erişim.",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-085",
+      "category": "location",
+      "title": "Toplu taşıma",
+      "question": "Hildesheim için toplu taşıma nedir?",
+      "answer": "U-Bahn ve otobüs hatlarına yakın. Detay: +49 152 064 19253",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-085-ascii",
+      "category": "location",
+      "title": "Toplu taşıma (ASCII)",
+      "question": "Hildesheim icin toplu tasima nedir?",
+      "answer": "U-Bahn ve otobüs hatlarına yakın. Detay: +49 152 064 19253",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-086",
+      "category": "location",
+      "title": "Hannover'e uzaklık",
+      "question": "Hildesheim için hannover'e uzaklık nedir?",
+      "answer": "Yaklaşık 15 km kuzey.",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-086-ascii",
+      "category": "location",
+      "title": "Hannover'e uzaklık (ASCII)",
+      "question": "Hildesheim icin hannover'e uzaklik nedir?",
+      "answer": "Yaklaşık 15 km kuzey.",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-087",
+      "category": "location",
+      "title": "Braunschweig'a uzaklık",
+      "question": "Hildesheim için braunschweig'a uzaklık nedir?",
+      "answer": "Yaklaşık 30 km.",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-087-ascii",
+      "category": "location",
+      "title": "Braunschweig'a uzaklık (ASCII)",
+      "question": "Hildesheim icin braunschweig'a uzaklik nedir?",
+      "answer": "Yaklaşık 30 km.",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-088",
+      "category": "location",
+      "title": "Havalimanı transferi",
+      "question": "Hildesheim için havalimanı transferi nedir?",
+      "answer": "Transfer hizmeti mevcuttur: +49 152 064 19253",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-088-ascii",
+      "category": "location",
+      "title": "Havalimanı transferi (ASCII)",
+      "question": "Hildesheim icin havalimani transferi nedir?",
+      "answer": "Transfer hizmeti mevcuttur: +49 152 064 19253",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-089",
+      "category": "location",
+      "title": "Mobilya",
+      "question": "Hildesheim için mobilya nedir?",
+      "answer": "Yüksek kaliteli mobilyalarla tam donanımlı; eve hazır teslim.",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-089-ascii",
+      "category": "location",
+      "title": "Mobilya (ASCII)",
+      "question": "Hildesheim icin mobilya nedir?",
+      "answer": "Yüksek kaliteli mobilyalarla tam donanımlı; eve hazır teslim.",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-090",
+      "category": "location",
+      "title": "Mutfak",
+      "question": "Hildesheim için mutfak nedir?",
+      "answer": "Tam donanımlı mutfak: bulaşık makinesi, kahve otomatı, pirinç pişirici, Hint chapati tahtası, mikrodalga fırın.",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-090-ascii",
+      "category": "location",
+      "title": "Mutfak (ASCII)",
+      "question": "Hildesheim icin mutfak nedir?",
+      "answer": "Tam donanımlı mutfak: bulaşık makinesi, kahve otomatı, pirinç pişirici, Hint chapati tahtası, mikrodalga fırın.",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-091",
+      "category": "location",
+      "title": "Oturma odası",
+      "question": "Hildesheim için oturma odası nedir?",
+      "answer": "Modern Smart TV (uydu sistemiyle uluslararası kanallar). Kanepe yatağa dönüştürülebilir.",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-091-ascii",
+      "category": "location",
+      "title": "Oturma odası (ASCII)",
+      "question": "Hildesheim icin oturma odasi nedir?",
+      "answer": "Modern Smart TV (uydu sistemiyle uluslararası kanallar). Kanepe yatağa dönüştürülebilir.",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-092",
+      "category": "location",
+      "title": "Yatak odası",
+      "question": "Hildesheim için yatak odası nedir?",
+      "answer": "Büyük çift kişilik yatak, kaliteli şilte. Yerleşik dolap. İstek üzerine ek yatak.",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-092-ascii",
+      "category": "location",
+      "title": "Yatak odası (ASCII)",
+      "question": "Hildesheim icin yatak odasi nedir?",
+      "answer": "Büyük çift kişilik yatak, kaliteli şilte. Yerleşik dolap. İstek üzerine ek yatak.",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-093",
+      "category": "location",
+      "title": "Balkon / Teras",
+      "question": "Hildesheim için balkon / teras nedir?",
+      "answer": "Mobilyalı balkon veya teras mevcuttur.",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-093-ascii",
+      "category": "location",
+      "title": "Balkon / Teras (ASCII)",
+      "question": "Hildesheim icin balkon / teras nedir?",
+      "answer": "Mobilyalı balkon veya teras mevcuttur.",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-094",
+      "category": "location",
+      "title": "Wi-Fi & İnternet",
+      "question": "Hildesheim için wi-fi & i̇nternet nedir?",
+      "answer": "Ücretsiz Wi-Fi ve DSL bağlantısı.",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-094-ascii",
+      "category": "location",
+      "title": "Wi-Fi & İnternet (ASCII)",
+      "question": "Hildesheim icin wi-fi & i̇nternet nedir?",
+      "answer": "Ücretsiz Wi-Fi ve DSL bağlantısı.",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-095",
+      "category": "location",
+      "title": "Telefon",
+      "question": "Hildesheim için telefon nedir?",
+      "answer": "Almanya sabit hattına sınırsız ücretsiz arama dahil özel hat.",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-095-ascii",
+      "category": "location",
+      "title": "Telefon (ASCII)",
+      "question": "Hildesheim icin telefon nedir?",
+      "answer": "Almanya sabit hattına sınırsız ücretsiz arama dahil özel hat.",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-096",
+      "category": "location",
+      "title": "Çamaşır",
+      "question": "Hildesheim için çamaşır nedir?",
+      "answer": "Daire içinde çamaşır makinesi ve kurutucu.",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-096-ascii",
+      "category": "location",
+      "title": "Çamaşır (ASCII)",
+      "question": "Hildesheim icin camasir nedir?",
+      "answer": "Daire içinde çamaşır makinesi ve kurutucu.",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-097",
+      "category": "location",
+      "title": "Çocuk dostu",
+      "question": "Hildesheim için çocuk dostu nedir?",
+      "answer": "Kapı önünde oyun parkı, istek üzerine bebek/çocuk yatağı eklenebilir.",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-097-ascii",
+      "category": "location",
+      "title": "Çocuk dostu (ASCII)",
+      "question": "Hildesheim icin cocuk dostu nedir?",
+      "answer": "Kapı önünde oyun parkı, istek üzerine bebek/çocuk yatağı eklenebilir.",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-098",
+      "category": "location",
+      "title": "Evcil hayvan",
+      "question": "Hildesheim için evcil hayvan nedir?",
+      "answer": "Talep üzerine mümkün: +49 152 064 19253",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-098-ascii",
+      "category": "location",
+      "title": "Evcil hayvan (ASCII)",
+      "question": "Hildesheim icin evcil hayvan nedir?",
+      "answer": "Talep üzerine mümkün: +49 152 064 19253",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-099",
+      "category": "location",
+      "title": "Misafir ziyareti",
+      "question": "Hildesheim için misafir ziyareti nedir?",
+      "answer": "Aylık yalnızca 10 €/kişi ek ücretle misafir kabul edilebilir.",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-099-ascii",
+      "category": "location",
+      "title": "Misafir ziyareti (ASCII)",
+      "question": "Hildesheim icin misafir ziyareti nedir?",
+      "answer": "Aylık yalnızca 10 €/kişi ek ücretle misafir kabul edilebilir.",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-100",
+      "category": "location",
+      "title": "Temizlik & bakım hizmeti",
+      "question": "Hildesheim için temizlik & bakım hizmeti nedir?",
+      "answer": "İsteğe bağlı: Facility hizmeti, temizlik hizmeti veya servissiz sakin yaşam seçenekleri.",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-100-ascii",
+      "category": "location",
+      "title": "Temizlik & bakım hizmeti (ASCII)",
+      "question": "Hildesheim icin temizlik & bakim hizmeti nedir?",
+      "answer": "İsteğe bağlı: Facility hizmeti, temizlik hizmeti veya servissiz sakin yaşam seçenekleri.",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-101",
+      "category": "location",
+      "title": "Anmeldung",
+      "question": "Hildesheim için anmeldung nedir?",
+      "answer": "Evet, ikamet tescili (Meldebestätigung / Wohnungsbescheinigung) desteği sağlanır.",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-101-ascii",
+      "category": "location",
+      "title": "Anmeldung (ASCII)",
+      "question": "Hildesheim icin anmeldung nedir?",
+      "answer": "Evet, ikamet tescili (Meldebestätigung / Wohnungsbescheinigung) desteği sağlanır.",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-102",
+      "category": "location",
+      "title": "İsim plaketi",
+      "question": "Hildesheim için i̇sim plaketi nedir?",
+      "answer": "Taşınma gününden itibaren kapıda isim plaketi hazır.",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-102-ascii",
+      "category": "location",
+      "title": "İsim plaketi (ASCII)",
+      "question": "Hildesheim icin i̇sim plaketi nedir?",
+      "answer": "Taşınma gününden itibaren kapıda isim plaketi hazır.",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-103",
+      "category": "location",
+      "title": "Multikulturalizm",
+      "question": "Hildesheim için multikulturalizm nedir?",
+      "answer": "Çok kültürlü misafir yapısı ve ona özel atmosfer.",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-103-ascii",
+      "category": "location",
+      "title": "Multikulturalizm (ASCII)",
+      "question": "Hildesheim icin multikulturalizm nedir?",
+      "answer": "Çok kültürlü misafir yapısı ve ona özel atmosfer.",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-104",
+      "category": "location",
+      "title": "Otopark",
+      "question": "Hildesheim için otopark nedir?",
+      "answer": "Talep üzerine açık otopark veya kapalı garaj: +49 152 064 19253",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-f-104-ascii",
+      "category": "location",
+      "title": "Otopark (ASCII)",
+      "question": "Hildesheim icin otopark nedir?",
+      "answer": "Talep üzerine açık otopark veya kapalı garaj: +49 152 064 19253",
+      "tags": [
+        "hildesheim"
+      ]
+    },
+    {
+      "id": "master-c-105",
+      "category": "contact",
+      "title": "📞 Santral",
+      "question": "Santral numarası nedir?",
+      "answer": "+49 (0) 711 54 89 84-0",
+      "tags": [
+        "contact"
+      ]
+    },
+    {
+      "id": "master-c-105-ascii",
+      "category": "contact",
+      "title": "📞 Santral (ASCII)",
+      "question": "Santral numarasi nedir?",
+      "answer": "+49 (0) 711 54 89 84-0",
+      "tags": [
+        "contact"
+      ]
+    },
+    {
+      "id": "master-c-107",
+      "category": "contact",
+      "title": "📧 Rezervasyon",
+      "question": "Rezervasyon e-posta adresi nedir?",
+      "answer": "reservation@meri-group.de",
+      "tags": [
+        "contact"
+      ]
+    },
+    {
+      "id": "master-c-108",
+      "category": "contact",
+      "title": "📧 Genel",
+      "question": "Genel e-posta adresi nedir?",
+      "answer": "info@meri-group.de",
+      "tags": [
+        "contact"
+      ]
+    },
+    {
+      "id": "master-c-110",
+      "category": "contact",
+      "title": "🕐 Ofis Saatleri",
+      "question": "Ofis saatleri nedir?",
+      "answer": "Pzt–Cum: 08:00–12:00 / 13:00–17:00  |  Cmt–Paz: Randevuyla",
+      "tags": [
+        "contact"
+      ]
+    },
+    {
+      "id": "master-c-111",
+      "category": "contact",
+      "title": "📍 Flamingo (Merkez)",
+      "question": "Flamingo adresi nedir?",
+      "answer": "Flamingoweg 70, D-70378 Stuttgart",
+      "tags": [
+        "contact"
+      ]
+    },
+    {
+      "id": "master-c-112",
+      "category": "contact",
+      "title": "📍 Europaplatz",
+      "question": "Europaplatz adresi nedir?",
+      "answer": "Europaplatz 20b, 70565 Stuttgart",
+      "tags": [
+        "contact"
+      ]
+    },
+    {
+      "id": "master-c-113",
+      "category": "contact",
+      "title": "📍 Hildesheim",
+      "question": "Hildesheim iletişim detayı nedir?",
+      "answer": "Hildesheim — detay için telefon",
+      "tags": [
+        "contact"
+      ]
+    },
+    {
+      "id": "master-c-113-ascii",
+      "category": "contact",
+      "title": "📍 Hildesheim (ASCII)",
+      "question": "Hildesheim iletisim detayi nedir?",
+      "answer": "Hildesheim — detay için telefon",
+      "tags": [
+        "contact"
+      ]
     }
   ]
 }

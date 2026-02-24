@@ -583,6 +583,102 @@ server.delete('/api/v1/admin/contact-submissions/:submissionId', async (request,
   return reply.send({ ok: true });
 });
 
+server.get('/api/v1/admin/chat-quality', async (request, reply) => {
+  const admin = await getRequestAdmin(request.headers.authorization);
+  if (!canManageContent(admin)) {
+    return reply.code(403).send({ error: 'Only super_admin or moderator can access this route' });
+  }
+
+  const query = request.query as { locale?: string; days?: string | number } | undefined;
+  const locale = String(query?.locale || 'all').trim().toLowerCase();
+  const days = Math.min(90, Math.max(1, Number(query?.days || 30)));
+  const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+
+  const db = await getDb();
+  const sessions = db.collection('chat_sessions');
+  const messages = db.collection('chat_messages');
+  const events = db.collection('chat_events');
+
+  const sessionFilter: Record<string, unknown> = { createdAt: { $gte: since } };
+  const eventFilter: Record<string, unknown> = { createdAt: { $gte: since } };
+  const messageFilter: Record<string, unknown> = { createdAt: { $gte: since } };
+  if (locale === 'de' || locale === 'en' || locale === 'tr') {
+    sessionFilter.locale = locale;
+    eventFilter.locale = locale;
+    messageFilter.locale = locale;
+  }
+
+  const [totalSessions, handoffRows, assistantRows, feedbackRows, topQuestionRows] = await Promise.all([
+    sessions.countDocuments(sessionFilter),
+    events
+      .aggregate([
+        { $match: { ...eventFilter, sessionId: { $ne: null }, $or: [{ intent: 'handoff' }, { event: 'chat_handoff' }] } },
+        { $group: { _id: '$sessionId' } },
+        { $project: { _id: 1 } },
+      ])
+      .toArray(),
+    messages
+      .aggregate([
+        { $match: { ...messageFilter, role: 'assistant', sessionId: { $ne: null } } },
+        { $group: { _id: '$sessionId' } },
+        { $project: { _id: 1 } },
+      ])
+      .toArray(),
+    events
+      .aggregate([
+        { $match: { ...eventFilter, event: 'chat_feedback', intent: { $in: ['correct', 'incorrect'] } } },
+        { $group: { _id: '$intent', count: { $sum: 1 } } },
+      ])
+      .toArray(),
+    messages
+      .aggregate([
+        { $match: { ...messageFilter, role: 'user' } },
+        { $project: { text: { $substrCP: [{ $trim: { input: { $toLower: '$text' } } }, 0, 180] } } },
+        { $project: { text: { $trim: { input: { $replaceAll: { input: '$text', find: '\n', replacement: ' ' } } } } } },
+        { $match: { text: { $ne: '' } } },
+        { $group: { _id: '$text', count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+        { $limit: 20 },
+      ])
+      .toArray(),
+  ]);
+
+  const handoffSessionIds = new Set(handoffRows.map((row: any) => String(row?._id || '')));
+  const assistantSessionIds = new Set(assistantRows.map((row: any) => String(row?._id || '')));
+  let autoResolvedSessions = 0;
+  assistantSessionIds.forEach((sessionId) => {
+    if (!handoffSessionIds.has(sessionId)) autoResolvedSessions += 1;
+  });
+
+  const feedbackCorrect = Number(feedbackRows.find((row: any) => row._id === 'correct')?.count || 0);
+  const feedbackIncorrect = Number(feedbackRows.find((row: any) => row._id === 'incorrect')?.count || 0);
+
+  return reply.send({
+    periodDays: days,
+    locale,
+    totals: {
+      sessions: totalSessions,
+      handoffSessions: handoffSessionIds.size,
+      assistantAnsweredSessions: assistantSessionIds.size,
+      autoResolvedSessions,
+      handoffRate: totalSessions > 0 ? Number(((handoffSessionIds.size / totalSessions) * 100).toFixed(1)) : 0,
+      autoResolveRate: totalSessions > 0 ? Number(((autoResolvedSessions / totalSessions) * 100).toFixed(1)) : 0,
+    },
+    feedback: {
+      correct: feedbackCorrect,
+      incorrect: feedbackIncorrect,
+      incorrectRate:
+        feedbackCorrect + feedbackIncorrect > 0
+          ? Number(((feedbackIncorrect / (feedbackCorrect + feedbackIncorrect)) * 100).toFixed(1))
+          : 0,
+    },
+    topQuestions: topQuestionRows.map((row: any) => ({
+      text: String(row?._id || ''),
+      count: Number(row?.count || 0),
+    })),
+  });
+});
+
 server.get('/api/v1/admin/chat-sessions', async (request, reply) => {
   const admin = await getRequestAdmin(request.headers.authorization);
   if (!canManageContent(admin)) {
@@ -615,9 +711,6 @@ server.get('/api/v1/admin/chat-sessions', async (request, reply) => {
 
   const db = await getDb();
   const sessions = db.collection('chat_sessions');
-  await sessions.createIndex({ createdAt: -1 });
-  await sessions.createIndex({ email: 1, createdAt: -1 });
-  await sessions.createIndex({ locale: 1, createdAt: -1 });
 
   const [items, total] = await Promise.all([
     sessions.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit).toArray(),

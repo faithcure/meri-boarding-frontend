@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Locale } from "@/i18n/getLocale";
 import { localePath } from "@/i18n/localePath";
 import { useLocale } from "@/i18n/useLocale";
@@ -14,6 +15,7 @@ type Message = {
   html?: string;
   variant?: "default" | "meta" | "error" | "action" | "warn";
 };
+type FeedbackChoice = "correct" | "incorrect";
 
 type ChatApiResponse = {
   answer?: string;
@@ -27,6 +29,19 @@ type PublicHotel = {
   name?: string;
   available?: boolean;
 };
+
+type ReservationDraft = {
+  hotelSlugs: string[];
+  checkin: string;
+  checkout: string;
+  guests: string;
+};
+
+const fallbackReservationHotels: PublicHotel[] = [
+  { slug: "europaplatz", name: "Europaplatz", available: true },
+  { slug: "flamingo", name: "Flamingo", available: true },
+  { slug: "hildesheim", name: "Hildesheim", available: true },
+];
 
 const initialMessages = (t: Messages["chatWidget"]): Message[] => [
   {
@@ -91,6 +106,8 @@ const chatApiUrl = withPublicApiBaseIfNeeded("/api/v1/chat");
 const chatEventsApiUrl = withPublicApiBaseIfNeeded("/api/v1/chat/events");
 const chatSessionsApiUrl = withPublicApiBaseIfNeeded("/api/v1/chat/sessions");
 const hotelsApiBaseUrl = withPublicApiBaseIfNeeded("/api/v1/public/hotels");
+const minAssistantDelayMs = 1000;
+const maxAssistantDelayMs = 2000;
 
 function getChatErrorText(locale: Locale) {
   if (locale === "tr") return "Mesaj gonderilemedi. Lutfen tekrar deneyin.";
@@ -104,7 +121,7 @@ function getUiLabels(locale: Locale) {
       locale: "TR",
       online: "Online",
       avgResponse: "Ort. yanit",
-      quickActions: ["Rezervasyon", "Fiyat", "Check-in/out", "Temsilci"],
+      quickActions: ["Rezervasyon", "Pet izni", "Erisilebilir oda", "Temsilci"],
       policy: "Politika",
       reservationCardTitle: "Hizli Rezervasyon Akisi",
       checkinAsk: "Lutfen giris tarihini YYYY-MM-DD formatinda yazin.",
@@ -115,7 +132,24 @@ function getUiLabels(locale: Locale) {
       badGuests: "Misafir sayisi 1 ile 20 arasinda olmalidir.",
       complete: (link: string) => `Harika, bilgileri tamamladik. Buradan devam edebilirsiniz: ${link}`,
       handoff: "Musteri temsilcisine baglan: +49 152 064 19253 | reservation@meri-group.de",
+      priceRedirect: "Fiyat bilgisi icin sizi yetkili ekibe yonlendireyim.",
       lowConfidence: "Bu bilgi sinirli olabilir. Gerekirse temsilciye yonlendirebilirim.",
+      hotelPickerTitle: "Otel secimi",
+      hotelPickerHelp: "Birden fazla otel secilebilir.",
+      hotelPickerContinue: "Secimle devam et",
+      hotelPickerUnavailable: "Dolu",
+      hotelPickerSelected: (names: string) => `Secilen oteller: ${names}`,
+      contactAsk: "Daha iyi hizmet icin lutfen ad soyad ve e-posta adresinizi paylasin.",
+      contactPending: "Devam edebilmek icin lutfen asagidaki bilgileri doldurun.",
+      contactNameLabel: "Ad Soyad",
+      contactEmailLabel: "E-posta",
+      contactNamePlaceholder: "Ornek: Ahmet Yilmaz",
+      contactEmailPlaceholder: "ornek@email.com",
+      contactSubmit: "Bilgileri gonder",
+      contactValidation: "Lutfen gecerli bir ad soyad ve e-posta girin.",
+      contactThanks: "Tesekkurler, bilgilerinizi aldim.",
+      greeting: (name: string) =>
+        name ? `Merhaba ${name}, size nasil yardimci olabilirim?` : "Merhaba, size nasil yardimci olabilirim?",
     };
   }
   if (locale === "de") {
@@ -123,7 +157,7 @@ function getUiLabels(locale: Locale) {
       locale: "DE",
       online: "Online",
       avgResponse: "Ø Antwort",
-      quickActions: ["Reservierung", "Preis", "Check-in/out", "Kontakt"],
+      quickActions: ["Reservierung", "Haustiere", "Barrierefrei", "Kontakt"],
       policy: "Richtlinie",
       reservationCardTitle: "Schneller Reservierungsablauf",
       checkinAsk: "Bitte geben Sie das Check-in Datum im Format YYYY-MM-DD ein.",
@@ -134,14 +168,31 @@ function getUiLabels(locale: Locale) {
       badGuests: "Die Gaestezahl muss zwischen 1 und 20 liegen.",
       complete: (link: string) => `Perfekt, wir haben alles. Hier koennen Sie fortfahren: ${link}`,
       handoff: "Direkter Kontakt: +49 152 064 19253 | reservation@meri-group.de",
+      priceRedirect: "Fuer Preisangaben leite ich Sie direkt an unser Team weiter.",
       lowConfidence: "Diese Information kann begrenzt sein. Ich kann Sie an unser Team weiterleiten.",
+      hotelPickerTitle: "Hotelauswahl",
+      hotelPickerHelp: "Mehrfachauswahl ist moeglich.",
+      hotelPickerContinue: "Mit Auswahl fortfahren",
+      hotelPickerUnavailable: "Ausgebucht",
+      hotelPickerSelected: (names: string) => `Ausgewaehlte Hotels: ${names}`,
+      contactAsk: "Fuer besseren Service teilen Sie bitte Ihren Vor- und Nachnamen sowie Ihre E-Mail-Adresse mit.",
+      contactPending: "Bitte fuellen Sie die folgenden Angaben aus, um fortzufahren.",
+      contactNameLabel: "Vor- und Nachname",
+      contactEmailLabel: "E-Mail",
+      contactNamePlaceholder: "Beispiel: Max Mustermann",
+      contactEmailPlaceholder: "beispiel@email.com",
+      contactSubmit: "Daten senden",
+      contactValidation: "Bitte geben Sie einen gueltigen Namen und eine gueltige E-Mail ein.",
+      contactThanks: "Danke, ich habe Ihre Angaben erhalten.",
+      greeting: (name: string) =>
+        name ? `Hallo ${name}, wie kann ich Ihnen helfen?` : "Hallo, wie kann ich Ihnen helfen?",
     };
   }
   return {
     locale: "EN",
     online: "Online",
     avgResponse: "Avg response",
-    quickActions: ["Reservation", "Price", "Check-in/out", "Agent"],
+    quickActions: ["Reservation", "Pet policy", "Accessible room", "Agent"],
     policy: "Policy",
     reservationCardTitle: "Quick Reservation Flow",
     checkinAsk: "Please enter check-in date in YYYY-MM-DD format.",
@@ -152,7 +203,24 @@ function getUiLabels(locale: Locale) {
     badGuests: "Guest count must be between 1 and 20.",
     complete: (link: string) => `Great, we captured the details. Continue here: ${link}`,
     handoff: "Contact reservation team: +49 152 064 19253 | reservation@meri-group.de",
+    priceRedirect: "For pricing details, I will connect you with our authorized team.",
     lowConfidence: "This answer may be limited. I can connect you to our team if needed.",
+    hotelPickerTitle: "Hotel selection",
+    hotelPickerHelp: "You can select multiple hotels.",
+    hotelPickerContinue: "Continue with selection",
+    hotelPickerUnavailable: "Full",
+    hotelPickerSelected: (names: string) => `Selected hotels: ${names}`,
+    contactAsk: "For better service, please share your full name and email address.",
+    contactPending: "Please complete the details below to continue.",
+    contactNameLabel: "Full name",
+    contactEmailLabel: "Email",
+    contactNamePlaceholder: "Example: John Doe",
+    contactEmailPlaceholder: "example@email.com",
+    contactSubmit: "Submit details",
+    contactValidation: "Please enter a valid full name and email.",
+    contactThanks: "Thanks, I received your details.",
+    greeting: (name: string) =>
+      name ? `Hello ${name}, how can I help you today?` : "Hello, how can I help you today?",
   };
 }
 
@@ -172,9 +240,64 @@ function isReservationIntent(text: string) {
   return /(rezervasyon|reservation|book|booking|buchen|reservieren|reservierung)/.test(q);
 }
 
-function detectHotelSlug(input: string, hotels: PublicHotel[]) {
+function isPriceIntent(text: string) {
+  const q = normalizeForMatch(text);
+  if (!q) return false;
+  return /(price|pricing|cost|costs|rate|rates|quote|fiyat|ucret|ücret|preis|kosten|tarif)/.test(q);
+}
+
+function isAgentIntent(text: string) {
+  const q = normalizeForMatch(text);
+  if (!q) return false;
+  return (
+    /(agent|human|representative|reservation team|connect me|contact team|yetkili|temsilci|rezervasyon ekibi|musteri temsilcisi|mitarbeiter|ansprechpartner|kontakt|verbinden)/.test(
+      q,
+    )
+  );
+}
+
+function isGeneralInfoIntent(text: string) {
+  const q = normalizeForMatch(text);
+  if (!q) return false;
+  return (
+    /\?$/.test(String(text || "").trim()) ||
+    /(check in|check out|checkin|checkout|price|fiyat|preis|pet|pets|haustier|wifi|location|standort|how many|what|when|wann|wie|was|kac|kaç|nedir)/.test(
+      q,
+    )
+  );
+}
+
+function isValidFullName(value: string) {
+  const parts = String(value || "")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+  return parts.length >= 2 && parts.every((part) => part.length >= 2);
+}
+
+function isGreetingIntent(text: string) {
+  const q = normalizeForMatch(text);
+  if (!q) return false;
+  return /(merhaba|selam|selamlar|hello|hi|hey|guten tag|hallo|moin)/.test(q);
+}
+
+function detectHotelSlugs(input: string, hotels: PublicHotel[]) {
   const q = normalizeForMatch(input);
-  if (!q) return "";
+  if (!q) return [];
+
+  const found = new Map<string, string>();
+  const addFoundSlug = (slug: string) => {
+    const key = normalizeForMatch(slug);
+    if (!key) return;
+    if (!found.has(key)) found.set(key, slug);
+  };
+
+  const sourceHotels = hotels.length ? hotels : fallbackReservationHotels;
+  const findCanonicalHotelSlug = (canonicalSlug: string) => {
+    const canonical = normalizeForMatch(canonicalSlug);
+    const hit = sourceHotels.find((hotel) => normalizeForMatch(hotel.slug || "") === canonical);
+    return String(hit?.slug || canonicalSlug);
+  };
 
   const aliasMap: Array<{ slug: string; aliases: string[] }> = [
     { slug: "europaplatz", aliases: ["europaplatz", "europa platz", "europa"] },
@@ -183,26 +306,27 @@ function detectHotelSlug(input: string, hotels: PublicHotel[]) {
   ];
 
   for (const item of aliasMap) {
-    if (item.aliases.some((a) => q.includes(a))) return item.slug;
+    if (item.aliases.some((a) => q.includes(a))) addFoundSlug(findCanonicalHotelSlug(item.slug));
   }
 
-  for (const hotel of hotels) {
-    const slug = normalizeForMatch(hotel.slug || "");
+  for (const hotel of sourceHotels) {
+    const rawSlug = String(hotel.slug || "").trim();
+    const slug = normalizeForMatch(rawSlug);
     const name = normalizeForMatch(hotel.name || "");
-    if (slug && q.includes(slug)) return hotel.slug;
-    if (name && q.includes(name)) return hotel.slug;
+    if (slug && q.includes(slug)) addFoundSlug(rawSlug);
+    if (name && q.includes(name)) addFoundSlug(rawSlug);
   }
 
-  return "";
+  return Array.from(found.values());
 }
 
 function getReservationFlowText(locale: Locale) {
   if (locale === "tr") {
     return {
       askHotel:
-        "Memnuniyetle yardimci olayim. Hangi oteli secmek istersiniz?\n- Europaplatz\n- Flamingo\n- Hildesheim",
+        "Memnuniyetle yardimci olayim. Asagidaki kutucuklardan bir veya birden fazla otel secin.",
       unknownHotel:
-        "Anlayamadim. Lutfen su otellerden birini yazin: Europaplatz, Flamingo veya Hildesheim.",
+        "En az bir otel secmeniz gerekiyor. Asagidaki kutucuklardan secim yapabilirsiniz.",
       available: (hotelName: string, link: string) =>
         `${hotelName} icin su an uygunluk gorunuyor. Rezervasyon formuna buradan gecebilirsiniz: ${link}`,
       unavailable:
@@ -212,9 +336,9 @@ function getReservationFlowText(locale: Locale) {
   if (locale === "de") {
     return {
       askHotel:
-        "Gern helfe ich Ihnen weiter. Welches Hotel moechten Sie auswaehlen?\n- Europaplatz\n- Flamingo\n- Hildesheim",
+        "Gern helfe ich Ihnen weiter. Bitte waehlen Sie unten ein oder mehrere Hotels per Checkbox aus.",
       unknownHotel:
-        "Ich konnte das Hotel nicht erkennen. Bitte waehlen Sie: Europaplatz, Flamingo oder Hildesheim.",
+        "Bitte waehlen Sie mindestens ein Hotel in der Liste unten aus.",
       available: (hotelName: string, link: string) =>
         `Fuer ${hotelName} ist aktuell Verfuegbarkeit sichtbar. Sie koennen hier direkt zur Reservierungsseite gehen: ${link}`,
       unavailable:
@@ -223,9 +347,9 @@ function getReservationFlowText(locale: Locale) {
   }
   return {
     askHotel:
-      "Happy to help with that. Which hotel would you like to select?\n- Europaplatz\n- Flamingo\n- Hildesheim",
+      "Happy to help with that. Please select one or more hotels using the checkboxes below.",
     unknownHotel:
-      "I could not identify the hotel. Please choose one of these: Europaplatz, Flamingo, or Hildesheim.",
+      "Please select at least one hotel from the list below.",
     available: (hotelName: string, link: string) =>
       `${hotelName} currently appears available. You can continue via the reservation page here: ${link}`,
     unavailable:
@@ -253,7 +377,11 @@ function parseFlexibleDate(input: string) {
   const raw = String(input || "").trim();
   if (!raw) return "";
 
-  const lower = raw.toLowerCase().replace(/\s+/g, " ").trim();
+  const lower = raw
+    .toLowerCase()
+    .replace(/[?!.,]+$/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
   const now = new Date();
   const today = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
   const tomorrow = new Date(today);
@@ -304,6 +432,49 @@ function parseFlexibleDate(input: string) {
   return "";
 }
 
+function parseDateRange(input: string): { checkin: string; checkout: string } | null {
+  const raw = String(input || "").trim();
+  if (!raw) return null;
+
+  const candidates: string[] = [];
+  const regexes = [/\b\d{4}[\/.-]\d{1,2}[\/.-]\d{1,2}\b/g, /\b\d{1,2}[\/.-]\d{1,2}[\/.-]\d{2,4}\b/g];
+  for (const re of regexes) {
+    for (const match of raw.matchAll(re)) {
+      const token = String(match[0] || "").trim();
+      if (!token) continue;
+      const parsed = parseFlexibleDate(token);
+      if (parsed && !candidates.includes(parsed)) candidates.push(parsed);
+    }
+  }
+
+  if (candidates.length < 2) return null;
+  return { checkin: candidates[0], checkout: candidates[1] };
+}
+
+function parseGuestCount(input: string) {
+  const raw = String(input || "").trim();
+  if (!raw) return NaN;
+  if (/^\d{1,2}$/.test(raw)) return Number(raw);
+
+  const numericParts = Array.from(raw.matchAll(/\b\d{1,2}\b/g))
+    .map((item) => Number(item[0]))
+    .filter((value) => Number.isFinite(value) && value > 0);
+  if (numericParts.length) return numericParts.reduce((sum, value) => sum + value, 0);
+
+  const wordMap: Record<string, number> = {
+    one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10,
+    ein: 1, eins: 1, zwei: 2, drei: 3, vier: 4, funf: 5, fuenf: 5, sechs: 6, sieben: 7, acht: 8, neun: 9, zehn: 10,
+    bir: 1, iki: 2, uc: 3, dort: 4, bes: 5, alti: 6, yedi: 7, sekiz: 8, dokuz: 9, on: 10,
+  };
+  const tokens = normalizeForMatch(raw).split(" ").filter(Boolean);
+  const total = tokens.reduce((sum, token) => sum + (wordMap[token] || 0), 0);
+  return total > 0 ? total : NaN;
+}
+
+const wait = (ms: number) => new Promise<void>((resolve) => window.setTimeout(resolve, ms));
+const getAssistantDelayMs = () =>
+  minAssistantDelayMs + Math.floor(Math.random() * (maxAssistantDelayMs - minAssistantDelayMs + 1));
+
 export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
   const activeLocale = useLocale();
   const locale = activeLocale ?? localeProp ?? "de";
@@ -312,28 +483,61 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [messages, setMessages] = useState<Message[]>(() => initialMessages(t));
   const [input, setInput] = useState("");
-  const [stage, setStage] = useState<"collect" | "ready">("collect");
-  const [contactDraft, setContactDraft] = useState({ name: "", email: "" });
-  const [contactError, setContactError] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [reservationStep, setReservationStep] = useState<"idle" | "hotel" | "checkin" | "checkout" | "guests">("idle");
   const [avgResponseMs, setAvgResponseMs] = useState<number>(0);
   const [chatSessionId, setChatSessionId] = useState("");
   const [hotels, setHotels] = useState<PublicHotel[]>([]);
-  const [reservationDraft, setReservationDraft] = useState<{ hotelSlug: string; checkin: string; checkout: string; guests: string }>({
-    hotelSlug: "",
+  const [showDataNotice, setShowDataNotice] = useState(true);
+  const [showFeedbackPrompt, setShowFeedbackPrompt] = useState(false);
+  const [feedbackChoice, setFeedbackChoice] = useState<FeedbackChoice | null>(null);
+  const [feedbackAskedOnce, setFeedbackAskedOnce] = useState(false);
+  const [contactRequested, setContactRequested] = useState(false);
+  const [contactCompleted, setContactCompleted] = useState(false);
+  const [contactFullName, setContactFullName] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
+  const [contactError, setContactError] = useState("");
+  const [pendingFirstMessage, setPendingFirstMessage] = useState("");
+  const [reservationDraft, setReservationDraft] = useState<ReservationDraft>({
+    hotelSlugs: [],
     checkin: "",
     checkout: "",
     guests: "",
   });
   const inputRef = useRef<HTMLInputElement>(null);
-  const nameRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const loggedMessageCountRef = useRef(0);
-  const normalizedName = contactDraft.name.trim();
-  const normalizedEmail = contactDraft.email.trim();
-  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail);
+  const feedbackTimerRef = useRef<number | null>(null);
   const labels = getUiLabels(locale);
+  const privacyHref = localePath(locale, "/privacy");
+  const reservationPath = localePath(locale, "/reservation");
+  const reservationHotelOptions = useMemo(() => {
+    const source = hotels.length ? hotels : fallbackReservationHotels;
+    return source
+      .filter((item) => String(item?.slug || "").trim())
+      .map((item) => {
+        const slug = String(item.slug || "").trim();
+        return {
+          slug,
+          name: String(item.name || slug),
+          available: item.available !== false,
+        };
+      });
+  }, [hotels]);
+  const needsContactInfo = contactRequested && !contactCompleted;
+  const preferredName = useMemo(() => {
+    if (!contactCompleted) return "";
+    return contactFullName.trim().split(/\s+/).filter(Boolean)[0] || "";
+  }, [contactFullName, contactCompleted]);
+  const personalizeAssistantText = (text: string, variant?: Message["variant"]) => {
+    const safeText = String(text || "");
+    if (!preferredName) return safeText;
+    if (variant !== "default") return safeText;
+    const normalizedName = normalizeForMatch(preferredName);
+    const normalizedText = normalizeForMatch(safeText);
+    if (normalizedName && normalizedText.includes(normalizedName)) return safeText;
+    return `${preferredName}, ${safeText}`;
+  };
   const trackEvent = (event: string, extras?: { intent?: string; model?: string; latencyMs?: number }) => {
     fetch(chatEventsApiUrl, {
       method: "POST",
@@ -366,12 +570,8 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
 
   useEffect(() => {
     if (!isOpen) return;
-    if (stage === "collect") {
-      nameRef.current?.focus();
-    } else {
-      inputRef.current?.focus();
-    }
-  }, [isOpen, stage]);
+    inputRef.current?.focus();
+  }, [isOpen]);
 
   useEffect(() => {
     if (isOpen) {
@@ -383,14 +583,25 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
     const localeMessages = getMessages(locale).chatWidget;
     setMessages(initialMessages(localeMessages));
     setInput("");
-    setStage("collect");
-    setContactDraft({ name: "", email: "" });
-    setContactError("");
     setIsTyping(false);
     setReservationStep("idle");
-    setReservationDraft({ hotelSlug: "", checkin: "", checkout: "", guests: "" });
+    setShowDataNotice(true);
+    setShowFeedbackPrompt(false);
+    setFeedbackChoice(null);
+    setFeedbackAskedOnce(false);
+    setContactRequested(false);
+    setContactCompleted(false);
+    setContactFullName("");
+    setContactEmail("");
+    setContactError("");
+    setPendingFirstMessage("");
+    setReservationDraft({ hotelSlugs: [], checkin: "", checkout: "", guests: "" });
     setChatSessionId("");
     loggedMessageCountRef.current = 0;
+    if (feedbackTimerRef.current) {
+      window.clearTimeout(feedbackTimerRef.current);
+      feedbackTimerRef.current = null;
+    }
   }, [locale]);
 
   useEffect(() => {
@@ -442,116 +653,282 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [isOpen]);
 
-  const handleSend = async () => {
-    if (stage !== "ready" || isTyping) return;
-    const trimmed = input.trim();
-    if (!trimmed) return;
+  useEffect(() => {
+    if (!isOpen || feedbackAskedOnce || showFeedbackPrompt) return;
+    if (messages.length < 2) return;
+    const last = messages[messages.length - 1];
+    if (last?.role !== "assistant") return;
+    if (last?.variant === "error" || last?.variant === "meta") return;
 
-    setMessages((prev) => [...prev, { role: "user", text: trimmed }]);
-    setInput("");
-    const flowText = getReservationFlowText(locale);
-    const hotelSlug = detectHotelSlug(trimmed, hotels);
-    const selectedHotel = hotelSlug
-      ? hotels.find((h) => normalizeForMatch(h.slug) === normalizeForMatch(hotelSlug)) || { slug: hotelSlug, name: hotelSlug, available: true }
-      : undefined;
-    const reservationPath = localePath(locale, "/reservation");
-    const createReservationLink = (draft: { hotelSlug: string; checkin: string; checkout: string; guests: string }) => {
-      const query = new URLSearchParams();
-      if (draft.hotelSlug) query.set("hotel", draft.hotelSlug);
-      if (draft.checkin) query.set("checkin", draft.checkin);
-      if (draft.checkout) query.set("checkout", draft.checkout);
-      if (draft.guests) query.set("guests", draft.guests);
-      const path = `${reservationPath}${query.toString() ? `?${query.toString()}` : ""}`;
-      return typeof window !== "undefined" ? `${window.location.origin}${path}` : path;
+    if (feedbackTimerRef.current) {
+      window.clearTimeout(feedbackTimerRef.current);
+    }
+    feedbackTimerRef.current = window.setTimeout(() => {
+      setShowFeedbackPrompt(true);
+      setFeedbackAskedOnce(true);
+    }, 10000);
+
+    return () => {
+      if (feedbackTimerRef.current) {
+        window.clearTimeout(feedbackTimerRef.current);
+        feedbackTimerRef.current = null;
+      }
     };
-    const normalizeDate = (value: string) => parseFlexibleDate(value);
+  }, [messages, isOpen, feedbackAskedOnce, showFeedbackPrompt]);
 
-    if (reservationStep === "hotel") {
-      if (!selectedHotel) {
-        setMessages((prev) => [...prev, { role: "assistant", text: flowText.unknownHotel, variant: "default" }]);
-        return;
-      }
-      if (selectedHotel.available === false) {
-        setReservationStep("idle");
-        setMessages((prev) => [...prev, { role: "assistant", text: flowText.unavailable, variant: "warn" }]);
-        return;
-      }
-      setReservationDraft((prev) => ({ ...prev, hotelSlug: selectedHotel.slug }));
-      setReservationStep("checkin");
-      setMessages((prev) => [...prev, { role: "assistant", text: labels.checkinAsk, variant: "action" }]);
-      trackEvent("reservation_step", { intent: "hotel_selected" });
+  useEffect(() => {
+    if (!feedbackChoice) return;
+    const timer = window.setTimeout(() => setFeedbackChoice(null), 2500);
+    return () => window.clearTimeout(timer);
+  }, [feedbackChoice]);
+
+  const handleFeedbackChoice = (choice: FeedbackChoice) => {
+    setFeedbackChoice(choice);
+    trackEvent("chat_feedback", { intent: choice });
+    setShowFeedbackPrompt(false);
+  };
+
+  const ensureChatSession = async () => {
+    if (chatSessionId) return chatSessionId;
+    try {
+      const response = await fetch(chatSessionsApiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          locale,
+          sourcePage: typeof window !== "undefined" ? window.location.pathname : "/",
+        }),
+      });
+      if (!response.ok) return "";
+      const data = await response.json();
+      const nextSessionId = String(data?.sessionId || "").trim();
+      if (!nextSessionId) return "";
+      loggedMessageCountRef.current = messages.length;
+      setChatSessionId(nextSessionId);
+      return nextSessionId;
+    } catch {
+      return "";
+    }
+  };
+
+  const pushAssistantMessagesWithDelay = async (next: Message | Message[]) => {
+    const rows = Array.isArray(next) ? next : [next];
+    const personalizedRows = rows.map((item) =>
+      item.role === "assistant" ? { ...item, text: personalizeAssistantText(item.text, item.variant) } : item,
+    );
+    setIsTyping(true);
+    await wait(getAssistantDelayMs());
+    setMessages((prev) => [...prev, ...personalizedRows]);
+    setIsTyping(false);
+  };
+
+  const findReservationHotel = (slug: string) =>
+    reservationHotelOptions.find((item) => normalizeForMatch(item.slug) === normalizeForMatch(slug));
+
+  const createReservationLink = (draft: ReservationDraft) => {
+    const query = new URLSearchParams();
+    const selected = Array.from(new Set(draft.hotelSlugs.filter(Boolean)));
+    if (selected.length === 1) query.set("hotel", selected[0]);
+    if (selected.length > 1) query.set("hotels", selected.join(","));
+    if (draft.checkin) query.set("checkin", draft.checkin);
+    if (draft.checkout) query.set("checkout", draft.checkout);
+    if (draft.guests) query.set("guests", draft.guests);
+    const path = `${reservationPath}${query.toString() ? `?${query.toString()}` : ""}`;
+    return typeof window !== "undefined" ? `${window.location.origin}${path}` : path;
+  };
+
+  const handleHotelCheckboxToggle = (slug: string) => {
+    if (isTyping || reservationStep !== "hotel") return;
+    setReservationDraft((prev) => {
+      const exists = prev.hotelSlugs.includes(slug);
+      return {
+        ...prev,
+        hotelSlugs: exists ? prev.hotelSlugs.filter((item) => item !== slug) : [...prev.hotelSlugs, slug],
+      };
+    });
+  };
+
+  const handleHotelSelectionContinue = async () => {
+    if (isTyping || reservationStep !== "hotel") return;
+    const flowText = getReservationFlowText(locale);
+    const selectedHotels = reservationDraft.hotelSlugs
+      .map((slug) => findReservationHotel(slug) || { slug, name: slug, available: true })
+      .filter((item) => String(item.slug || "").trim());
+    if (!selectedHotels.length) {
+      await pushAssistantMessagesWithDelay({ role: "assistant", text: flowText.unknownHotel, variant: "warn" });
       return;
     }
 
-    if (reservationStep === "checkin") {
+    const availableHotels = selectedHotels.filter((item) => item.available !== false);
+    if (!availableHotels.length) {
+      setReservationStep("idle");
+      await pushAssistantMessagesWithDelay({ role: "assistant", text: flowText.unavailable, variant: "warn" });
+      return;
+    }
+
+    await ensureChatSession();
+    const selectedHotelNames = availableHotels.map((item) => item.name || item.slug).join(", ");
+    setMessages((prev) => [...prev, { role: "user", text: labels.hotelPickerSelected(selectedHotelNames) }]);
+    setReservationDraft((prev) => ({ ...prev, hotelSlugs: availableHotels.map((item) => item.slug) }));
+    setReservationStep("checkin");
+    await pushAssistantMessagesWithDelay({ role: "assistant", text: labels.checkinAsk, variant: "action" });
+    trackEvent("reservation_step", { intent: availableHotels.length > 1 ? "hotels_selected_multi" : "hotel_selected" });
+  };
+
+  const processUserMessage = async (trimmed: string, options?: { appendUserMessage?: boolean }) => {
+    if (!trimmed) return;
+    await ensureChatSession();
+    if (options?.appendUserMessage !== false) {
+      setMessages((prev) => [...prev, { role: "user", text: trimmed }]);
+    }
+
+    const flowText = getReservationFlowText(locale);
+    const detectedHotelSlugs = detectHotelSlugs(trimmed, reservationHotelOptions);
+    const selectedHotels = detectedHotelSlugs
+      .map((slug) => findReservationHotel(slug) || { slug, name: slug, available: true })
+      .filter((item) => String(item.slug || "").trim());
+    const normalizeDate = (value: string) => parseFlexibleDate(value);
+
+    let activeReservationStep = reservationStep;
+
+    // If user asks a general info question while reservation flow is active,
+    // gracefully exit flow and answer via normal chat/RAG.
+    if (activeReservationStep !== "idle") {
+      const hasDate = Boolean(normalizeDate(trimmed)) || Boolean(parseDateRange(trimmed));
+      const looksLikeGuestCount = Number.isFinite(parseGuestCount(trimmed));
+      if (!hasDate && !looksLikeGuestCount && (isGeneralInfoIntent(trimmed) || isPriceIntent(trimmed) || isAgentIntent(trimmed))) {
+        activeReservationStep = "idle";
+        setReservationStep("idle");
+      }
+    }
+
+    if (
+      activeReservationStep === "idle" &&
+      isGreetingIntent(trimmed) &&
+      !isReservationIntent(trimmed) &&
+      !isPriceIntent(trimmed) &&
+      !isGeneralInfoIntent(trimmed)
+    ) {
+      await pushAssistantMessagesWithDelay({ role: "assistant", text: labels.greeting(preferredName), variant: "default" });
+      trackEvent("chat_response", { intent: "greeting", model: "local_greeting" });
+      return;
+    }
+
+    if (activeReservationStep === "hotel") {
+      if (!selectedHotels.length) {
+        await pushAssistantMessagesWithDelay({ role: "assistant", text: flowText.unknownHotel, variant: "default" });
+        return;
+      }
+      const availableHotels = selectedHotels.filter((item) => item.available !== false);
+      if (!availableHotels.length) {
+        setReservationStep("idle");
+        await pushAssistantMessagesWithDelay({ role: "assistant", text: flowText.unavailable, variant: "warn" });
+        return;
+      }
+      setReservationDraft((prev) => ({ ...prev, hotelSlugs: availableHotels.map((item) => item.slug) }));
+      setReservationStep("checkin");
+      await pushAssistantMessagesWithDelay({ role: "assistant", text: labels.checkinAsk, variant: "action" });
+      trackEvent("reservation_step", { intent: availableHotels.length > 1 ? "hotels_selected_multi" : "hotel_selected" });
+      return;
+    }
+
+    if (activeReservationStep === "checkin") {
+      const range = parseDateRange(trimmed);
+      if (range) {
+        if (range.checkout < range.checkin) {
+          await pushAssistantMessagesWithDelay({ role: "assistant", text: labels.badCheckout, variant: "warn" });
+          return;
+        }
+        setReservationDraft((prev) => ({ ...prev, checkin: range.checkin, checkout: range.checkout }));
+        setReservationStep("guests");
+        await pushAssistantMessagesWithDelay({ role: "assistant", text: labels.guestsAsk, variant: "action" });
+        trackEvent("reservation_step", { intent: "checkin_checkout_set" });
+        return;
+      }
       const normalized = normalizeDate(trimmed);
       if (!normalized) {
-        setMessages((prev) => [...prev, { role: "assistant", text: labels.badDate, variant: "warn" }]);
+        await pushAssistantMessagesWithDelay({ role: "assistant", text: labels.badDate, variant: "warn" });
         return;
       }
       setReservationDraft((prev) => ({ ...prev, checkin: normalized }));
       setReservationStep("checkout");
-      setMessages((prev) => [...prev, { role: "assistant", text: labels.checkoutAsk, variant: "action" }]);
+      await pushAssistantMessagesWithDelay({ role: "assistant", text: labels.checkoutAsk, variant: "action" });
       trackEvent("reservation_step", { intent: "checkin_set" });
       return;
     }
 
-    if (reservationStep === "checkout") {
+    if (activeReservationStep === "checkout") {
       const normalized = normalizeDate(trimmed);
       if (!normalized) {
-        setMessages((prev) => [...prev, { role: "assistant", text: labels.badDate, variant: "warn" }]);
+        await pushAssistantMessagesWithDelay({ role: "assistant", text: labels.badDate, variant: "warn" });
         return;
       }
       const checkin = reservationDraft.checkin;
       if (checkin && normalized < checkin) {
-        setMessages((prev) => [...prev, { role: "assistant", text: labels.badCheckout, variant: "warn" }]);
+        await pushAssistantMessagesWithDelay({ role: "assistant", text: labels.badCheckout, variant: "warn" });
         return;
       }
       setReservationDraft((prev) => ({ ...prev, checkout: normalized }));
       setReservationStep("guests");
-      setMessages((prev) => [...prev, { role: "assistant", text: labels.guestsAsk, variant: "action" }]);
+      await pushAssistantMessagesWithDelay({ role: "assistant", text: labels.guestsAsk, variant: "action" });
       trackEvent("reservation_step", { intent: "checkout_set" });
       return;
     }
 
-    if (reservationStep === "guests") {
-      const guests = Number(trimmed);
+    if (activeReservationStep === "guests") {
+      const guests = parseGuestCount(trimmed);
       if (!Number.isFinite(guests) || guests < 1 || guests > 20) {
-        setMessages((prev) => [...prev, { role: "assistant", text: labels.badGuests, variant: "warn" }]);
+        await pushAssistantMessagesWithDelay({ role: "assistant", text: labels.badGuests, variant: "warn" });
         return;
       }
       const draft = { ...reservationDraft, guests: String(guests) };
       setReservationDraft(draft);
       setReservationStep("idle");
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", text: labels.complete(createReservationLink(draft)), variant: "action" },
-      ]);
+      await pushAssistantMessagesWithDelay({ role: "assistant", text: labels.complete(createReservationLink(draft)), variant: "action" });
       trackEvent("reservation_flow_complete", { intent: "reservation_prefill_ready" });
       return;
     }
 
+    if (isPriceIntent(trimmed)) {
+      setReservationStep("idle");
+      trackEvent("chat_handoff", { intent: "handoff" });
+      await pushAssistantMessagesWithDelay([
+        { role: "assistant", text: labels.priceRedirect, variant: "warn" },
+        { role: "assistant", text: labels.handoff, variant: "action" },
+      ]);
+      return;
+    }
+
+    if (isAgentIntent(trimmed)) {
+      setReservationStep("idle");
+      trackEvent("chat_handoff", { intent: "agent_contact" });
+      await pushAssistantMessagesWithDelay({ role: "assistant", text: labels.handoff, variant: "action" });
+      return;
+    }
+
     if (isReservationIntent(trimmed)) {
-      if (selectedHotel) {
-        if (selectedHotel.available === false) {
-          setMessages((prev) => [...prev, { role: "assistant", text: flowText.unavailable, variant: "warn" }]);
+      if (selectedHotels.length) {
+        const availableHotels = selectedHotels.filter((item) => item.available !== false);
+        if (!availableHotels.length) {
+          await pushAssistantMessagesWithDelay({ role: "assistant", text: flowText.unavailable, variant: "warn" });
           return;
         }
-        const hotelLabel = selectedHotel.name || selectedHotel.slug;
-        setReservationDraft((prev) => ({ ...prev, hotelSlug: selectedHotel.slug }));
+        const nextHotelSlugs = availableHotels.map((item) => item.slug);
+        const hotelLabel = availableHotels.map((item) => item.name || item.slug).join(", ");
+        setReservationDraft((prev) => ({ ...prev, hotelSlugs: nextHotelSlugs }));
         setReservationStep("checkin");
-        setMessages((prev) => [
-          ...prev,
-          { role: "assistant", text: flowText.available(hotelLabel, createReservationLink({ ...reservationDraft, hotelSlug: selectedHotel.slug })), variant: "action" },
+        await pushAssistantMessagesWithDelay([
+          {
+            role: "assistant",
+            text: flowText.available(hotelLabel, createReservationLink({ ...reservationDraft, hotelSlugs: nextHotelSlugs })),
+            variant: "action",
+          },
           { role: "assistant", text: labels.checkinAsk, variant: "action" },
         ]);
         return;
       }
       setReservationStep("hotel");
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", text: `${labels.reservationCardTitle}\n${flowText.askHotel}`, variant: "action" },
-      ]);
+      await pushAssistantMessagesWithDelay({ role: "assistant", text: `${labels.reservationCardTitle}\n${flowText.askHotel}`, variant: "action" });
       trackEvent("reservation_flow_start", { intent: "hotel_selection_needed" });
       return;
     }
@@ -588,7 +965,7 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
       const nextMessages: Message[] = [
         {
           role: "assistant",
-          text: answer,
+          text: personalizeAssistantText(answer, variant),
           variant,
         },
       ];
@@ -597,9 +974,11 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
         nextMessages.push({ role: "assistant", text: `${labels.policy}: ${labels.handoff}`, variant: "meta" });
       }
 
+      await wait(getAssistantDelayMs());
       setMessages((prev) => [...prev, ...nextMessages]);
       trackEvent("chat_response", { intent: "qa", model, latencyMs: elapsed });
     } catch (_error) {
+      await wait(getAssistantDelayMs());
       setMessages((prev) => [
         ...prev,
         {
@@ -614,77 +993,83 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
     }
   };
 
-  const handleQuickAction = (action: string) => {
-    if (stage !== "ready" || isTyping) return;
-    if (action.includes("erv")) {
-      trackEvent("quick_action", { intent: "reservation" });
-      setInput(locale === "tr" ? "Rezervasyon yapmak istiyorum" : locale === "de" ? "Ich moechte reservieren" : "I want to make a reservation");
-      return;
-    }
-    if (action.includes("iyat") || action.includes("Preis") || action.includes("Price")) {
-      trackEvent("quick_action", { intent: "price" });
-      setInput(locale === "tr" ? "Fiyat bilgisi alabilir miyim?" : locale === "de" ? "Kann ich den Preis erfahren?" : "Can I get pricing information?");
-      return;
-    }
-    if (action.includes("Check")) {
-      trackEvent("quick_action", { intent: "checkin_checkout" });
-      setInput(locale === "tr" ? "Check-in ve check-out saatleri nedir?" : locale === "de" ? "Wann sind Check-in und Check-out?" : "What are check-in and check-out times?");
-      return;
-    }
-    trackEvent("quick_action", { intent: "handoff" });
-    setMessages((prev) => [...prev, { role: "assistant", text: labels.handoff, variant: "action" }]);
-  };
-
-  const handleContactSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    const name = normalizedName;
-    const email = normalizedEmail;
-    if (!name) return;
-    if (!isEmailValid) {
-      setContactError(t.emailInvalid);
+  const handleContactSubmit = async () => {
+    if (isTyping || contactCompleted) return;
+    const fullName = contactFullName.trim().replace(/\s+/g, " ");
+    const email = contactEmail.trim();
+    const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    if (!isValidFullName(fullName) || !isEmailValid) {
+      setContactError(labels.contactValidation);
       return;
     }
 
     setContactError("");
-    setContactDraft({ name, email });
-    setIsTyping(true);
+    await ensureChatSession();
+    logSessionMessage("user", `contact_name:${fullName} | contact_email:${email}`, "contact");
+    setContactCompleted(true);
+    setContactRequested(false);
+    setMessages((prev) => [...prev, { role: "assistant", text: labels.contactThanks, variant: "meta" }]);
+    trackEvent("contact_collected", { intent: "name_email" });
 
-    let nextSessionId = "";
-    try {
-      const response = await fetch(chatSessionsApiUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name,
-          email,
-          locale,
-          sourcePage: typeof window !== "undefined" ? window.location.pathname : "/",
-        }),
-      });
-      if (response.ok) {
-        const data = await response.json();
-        nextSessionId = String(data?.sessionId || "");
-      }
-    } catch {
-      nextSessionId = "";
+    const queued = pendingFirstMessage.trim();
+    setPendingFirstMessage("");
+    if (queued) {
+      await processUserMessage(queued, { appendUserMessage: false });
+    }
+  };
+
+  const handleSend = async () => {
+    if (isTyping) return;
+    const trimmed = input.trim();
+    if (!trimmed) return;
+    setInput("");
+    setContactError("");
+
+    if (!contactCompleted) {
+      await ensureChatSession();
+      setMessages((prev) => [...prev, { role: "user", text: trimmed }]);
+      setPendingFirstMessage(trimmed);
+      setContactRequested(true);
+      await pushAssistantMessagesWithDelay({ role: "assistant", text: labels.contactAsk, variant: "meta" });
+      trackEvent("contact_gate_requested", { intent: "after_first_message" });
+      return;
     }
 
-    setChatSessionId(nextSessionId);
-    loggedMessageCountRef.current = messages.length;
-    setStage("ready");
+    await processUserMessage(trimmed);
+  };
 
-    const safeName = escapeHtml(name || t.fallbackName);
-    const greetingText = t.greeting.replace("{{name}}", name || t.fallbackName);
-    const greetingHtml = t.greeting.replace("{{name}}", `<strong>${safeName}</strong>`);
-    setMessages((prev) => [
-      ...prev,
-      {
-        role: "assistant",
-        text: greetingText,
-        html: greetingHtml,
-      },
-    ]);
-    setIsTyping(false);
+  const handleQuickAction = (action: string) => {
+    if (isTyping || needsContactInfo) return;
+    const normalized = normalizeForMatch(action);
+    if (/(rezerv|reserv|book)/.test(normalized)) {
+      trackEvent("quick_action", { intent: "reservation" });
+      setInput(locale === "tr" ? "Rezervasyon yapmak istiyorum" : locale === "de" ? "Ich moechte reservieren" : "I want to make a reservation");
+      return;
+    }
+    if (/(pet|haustier|evcil)/.test(normalized)) {
+      trackEvent("quick_action", { intent: "pet_policy" });
+      setInput(
+        locale === "tr"
+          ? "Evcil hayvan kabul ediyor musunuz?"
+          : locale === "de"
+            ? "Sind Haustiere erlaubt?"
+            : "Are pets allowed?",
+      );
+      return;
+    }
+    if (/(barriere|accessible|engelli|erisilebilir)/.test(normalized)) {
+      trackEvent("quick_action", { intent: "accessibility" });
+      setInput(
+        locale === "tr"
+          ? "Engelli erisimi uygun oda var mi?"
+          : locale === "de"
+            ? "Gibt es barrierefreie Zimmer?"
+            : "Do you have accessible rooms?",
+      );
+      return;
+    }
+    trackEvent("quick_action", { intent: "handoff" });
+    void pushAssistantMessagesWithDelay({ role: "assistant", text: labels.handoff, variant: "action" });
   };
 
   return (
@@ -709,11 +1094,16 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
               M
             </div>
             <div>
-            <div className="chat-panel-title">
-              <i className="fa fa-headset chat-title-icon" aria-hidden="true"></i>
-              {t.panelTitle}
-            </div>
-            <div className="chat-panel-meta">{labels.locale} · {labels.online}{avgResponseMs > 0 ? ` · ${labels.avgResponse} ${avgResponseMs}ms` : ""}</div>
+              <div className="chat-title-row">
+                <div className="chat-panel-title">
+                  <i className="fa fa-headset chat-title-icon" aria-hidden="true"></i>
+                  {t.panelTitle}
+                </div>
+                <div className="chat-panel-meta">
+                  {labels.locale} · {labels.online}
+                  {avgResponseMs > 0 ? ` · ${labels.avgResponse} ${avgResponseMs}ms` : ""}
+                </div>
+              </div>
             </div>
           </div>
           <div className="chat-header-actions">
@@ -740,8 +1130,37 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
             </button>
           </div>
         </div>
+        {showDataNotice ? (
+          <div className="chat-data-notice">
+            <span>
+              {t.dataNotice} <Link href={privacyHref}>{t.dataNoticeLink}</Link>.
+            </span>
+            <button
+              type="button"
+              className="chat-data-notice-close"
+              aria-label={t.close}
+              onClick={() => setShowDataNotice(false)}
+            >
+              <i className="fa fa-times" aria-hidden="true" />
+            </button>
+          </div>
+        ) : null}
 
         <div className="chat-panel-body" ref={listRef} role="log" aria-live="polite" aria-relevant="additions text">
+          {showFeedbackPrompt ? (
+            <div className="chat-feedback-banner">
+              <div className="chat-feedback-label">{t.feedbackPrompt}</div>
+              <div className="chat-feedback-actions">
+                <button type="button" className="chat-quick-chip" onClick={() => handleFeedbackChoice("correct")}>
+                  {t.feedbackHelpful}
+                </button>
+                <span className="chat-feedback-divider" aria-hidden="true" />
+                <button type="button" className="chat-quick-chip" onClick={() => handleFeedbackChoice("incorrect")}>
+                  {t.feedbackWrong}
+                </button>
+              </div>
+            </div>
+          ) : null}
           {messages.map((message, index) => (
             <div
               key={`${message.role}-${index}`}
@@ -758,45 +1177,80 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
               )}
             </div>
           ))}
-          {stage === "collect" && (
-            <form className="chat-contact-card" onSubmit={handleContactSubmit}>
-              <label htmlFor="chat-name">{t.fullName}</label>
+          {needsContactInfo ? (
+            <div className="chat-contact-card" aria-label={labels.contactAsk}>
+              <label htmlFor="chat-contact-fullname">{labels.contactNameLabel}</label>
               <input
-                ref={nameRef}
-                id="chat-name"
+                id="chat-contact-fullname"
                 type="text"
-                value={contactDraft.name}
+                value={contactFullName}
+                placeholder={labels.contactNamePlaceholder}
                 onChange={(event) => {
-                  setContactDraft((prev) => ({ ...prev, name: event.target.value }));
+                  setContactFullName(event.target.value);
                   if (contactError) setContactError("");
                 }}
-                placeholder={t.namePlaceholder}
-                autoComplete="name"
-                required
+                disabled={isTyping}
               />
-              <label htmlFor="chat-email">{t.email}</label>
+              <label htmlFor="chat-contact-email">{labels.contactEmailLabel}</label>
               <input
-                id="chat-email"
+                id="chat-contact-email"
                 type="email"
-                value={contactDraft.email}
+                value={contactEmail}
+                placeholder={labels.contactEmailPlaceholder}
                 onChange={(event) => {
-                  setContactDraft((prev) => ({ ...prev, email: event.target.value }));
+                  setContactEmail(event.target.value);
                   if (contactError) setContactError("");
                 }}
-                placeholder={t.emailPlaceholder}
-                autoComplete="email"
-                required
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    event.preventDefault();
+                    void handleContactSubmit();
+                  }
+                }}
+                disabled={isTyping}
               />
-              {contactError ? (
-                <p className="chat-contact-error" role="alert">
-                  {contactError}
-                </p>
-              ) : null}
-              <button type="submit" disabled={!normalizedName || !isEmailValid}>
-                {t.continue}
+              {contactError ? <div className="chat-contact-error">{contactError}</div> : null}
+              <button type="button" onClick={() => void handleContactSubmit()} disabled={isTyping}>
+                {labels.contactSubmit}
               </button>
-            </form>
-          )}
+            </div>
+          ) : null}
+          {reservationStep === "hotel" ? (
+            <div className="chat-hotel-picker" aria-label={labels.hotelPickerTitle}>
+              <div className="chat-hotel-picker-title">{labels.hotelPickerTitle}</div>
+              <div className="chat-hotel-picker-help">{labels.hotelPickerHelp}</div>
+              <div className="chat-hotel-picker-list">
+                {reservationHotelOptions.map((hotel) => {
+                  const checked = reservationDraft.hotelSlugs.includes(hotel.slug);
+                  const unavailable = hotel.available === false;
+                  return (
+                    <label
+                      key={hotel.slug}
+                      className={`chat-hotel-picker-item ${checked ? "is-selected" : ""} ${unavailable ? "is-unavailable" : ""}`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() => handleHotelCheckboxToggle(hotel.slug)}
+                        disabled={isTyping}
+                      />
+                      <span className="chat-hotel-picker-name">{hotel.name || hotel.slug}</span>
+                      {unavailable ? <span className="chat-hotel-picker-status">{labels.hotelPickerUnavailable}</span> : null}
+                    </label>
+                  );
+                })}
+              </div>
+              <button
+                type="button"
+                className="chat-hotel-picker-submit"
+                onClick={() => void handleHotelSelectionContinue()}
+                disabled={isTyping}
+              >
+                {labels.hotelPickerContinue}
+              </button>
+            </div>
+          ) : null}
+          {feedbackChoice ? <div className="chat-feedback-saved">{t.feedbackSaved}</div> : null}
           {isTyping && (
             <div className="chat-typing" aria-live="polite">
               <span className="typing-dots">
@@ -809,34 +1263,44 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
           )}
         </div>
 
-        {stage === "ready" && (
-          <div className="chat-panel-footer">
-            <div className="chat-quick-actions">
-              {labels.quickActions.map((action) => (
-                <button key={action} type="button" className="chat-quick-chip" onClick={() => handleQuickAction(action)}>
-                  {action}
-                </button>
-              ))}
-            </div>
-            <input
-              ref={inputRef}
-              type="text"
-              value={input}
-              placeholder={t.placeholder}
-              disabled={isTyping}
-              onChange={(event) => setInput(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") {
-                  event.preventDefault();
-                  void handleSend();
-                }
-              }}
-            />
-            <button type="button" className="chat-send-button" onClick={() => void handleSend()} disabled={isTyping}>
-              {t.send}
-            </button>
+        <div className="chat-panel-footer">
+          <div className="chat-quick-actions">
+            {labels.quickActions.map((action) => (
+              <button
+                key={action}
+                type="button"
+                className="chat-quick-chip"
+                onClick={() => handleQuickAction(action)}
+                disabled={isTyping || needsContactInfo}
+              >
+                {action}
+              </button>
+            ))}
           </div>
-        )}
+          <input
+            ref={inputRef}
+            type="text"
+            value={input}
+            placeholder={needsContactInfo ? labels.contactPending : t.placeholder}
+            disabled={isTyping || needsContactInfo}
+            onChange={(event) => setInput(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                event.preventDefault();
+                void handleSend();
+              }
+            }}
+          />
+          <button
+            type="button"
+            className="chat-send-button"
+            onClick={() => void handleSend()}
+            disabled={isTyping || needsContactInfo}
+          >
+            <i className="fa fa-paper-plane" aria-hidden="true" style={{ marginRight: 6 }} />
+            <span>{t.send}</span>
+          </button>
+        </div>
       </div>
     </div>
   );

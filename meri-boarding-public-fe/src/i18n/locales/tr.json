@@ -594,7 +594,7 @@
     "toggle": "Meri ile konuş",
     "panelTitle": "Meri ile konuş",
     "badge": "Çevrimiçi",
-    "intro": "Merhaba! Ben Meri asistanıyım. Başlamak için adınızı ve e‑posta adresinizi paylaşın.",
+    "intro": "Merhaba! Ben Meri. Uygunluk ve rezervasyon konularinda yardimci olabilirim.",
     "fullName": "Ad Soyad",
     "email": "E-posta",
     "continue": "Devam",
@@ -609,7 +609,14 @@
     "greeting": "Teşekkürler, {{name}}! Size nasıl yardımcı olabilirim?",
     "fallbackName": "orada",
     "namePlaceholder": "Ad Soyad",
-    "emailPlaceholder": "ornek@eposta.com"
+    "emailPlaceholder": "ornek@eposta.com",
+    "dataNotice": "Bu sohbet hizmet kalitesini iyileştirmek için saklanır.",
+    "dataNoticeLink": "Gizlilik Politikası",
+    "retentionLabel": "saklama süresi: 180 gün",
+    "feedbackPrompt": "Bu cevap yararli miydi?",
+    "feedbackHelpful": "Yardimci oldu",
+    "feedbackWrong": "Dogru degil",
+    "feedbackSaved": "Kaydedildi"
   },
   "amenitiesHero": {
     "subtitle": "Meri Boarding",

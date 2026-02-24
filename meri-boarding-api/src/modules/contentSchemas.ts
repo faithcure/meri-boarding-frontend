@@ -50,6 +50,17 @@ export type GeneralSettingsContent = {
     enabled: boolean;
     order: number;
   }>;
+  formDelivery: {
+    requestFormActionUrl: string;
+    contactNotificationEmails: string[];
+  };
+  smtp: {
+    host: string;
+    port: number;
+    user: string;
+    pass: string;
+    from: string;
+  };
 };
 
 export type ContentEntry<T> = {
@@ -1078,4 +1089,15 @@ export const defaultGeneralSettingsContent: GeneralSettingsContent = {
       order: 2,
     },
   ],
+  formDelivery: {
+    requestFormActionUrl: 'https://meri-boarding.de/boarding-booking.php',
+    contactNotificationEmails: [],
+  },
+  smtp: {
+    host: '',
+    port: 465,
+    user: '',
+    pass: '',
+    from: '',
+  },
 };

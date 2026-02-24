@@ -412,6 +412,24 @@ async function ensureAdminIndexes() {
   await admins.createIndex({ email: 1 }, { unique: true });
 }
 
+async function ensureChatIndexes() {
+  const db = await getDb();
+  const sessions = db.collection('chat_sessions');
+  const messages = db.collection('chat_messages');
+  const events = db.collection('chat_events');
+  await Promise.all([
+    sessions.createIndex({ createdAt: -1 }),
+    sessions.createIndex({ email: 1, createdAt: -1 }),
+    sessions.createIndex({ locale: 1, createdAt: -1 }),
+    messages.createIndex({ sessionId: 1, createdAt: 1 }),
+    messages.createIndex({ role: 1, createdAt: -1 }),
+    messages.createIndex({ locale: 1, createdAt: -1 }),
+    events.createIndex({ sessionId: 1, createdAt: -1 }),
+    events.createIndex({ event: 1, createdAt: -1 }),
+    events.createIndex({ locale: 1, createdAt: -1 }),
+  ]);
+}
+
 async function seedHeaderContents() {
   for (const locale of allowedLocales) {
     await getHeaderContent(locale);
@@ -592,6 +610,7 @@ async function getRequestAdmin(authorization?: string) {
     getContactSubmissionsCollection,
     resolveContactNotificationRecipients,
     ensureAdminIndexes,
+    ensureChatIndexes,
     seedHeaderContents,
     seedHomeContents,
     seedServicesContents,

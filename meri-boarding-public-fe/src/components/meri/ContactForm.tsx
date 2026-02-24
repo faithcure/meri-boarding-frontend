@@ -21,6 +21,12 @@ type ContactFormErrors = Partial<Record<ContactField, string>>
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const phonePattern = /^[0-9+()\-\s]{7,}$/
+const collapseWhitespace = (value: string) => String(value || '').replace(/\s+/g, ' ').trim()
+const isMeaningfulMessage = (value: string) => {
+  const normalized = collapseWhitespace(value)
+  if (normalized.length < 10) return false
+  return normalized.split(' ').filter(Boolean).length >= 2
+}
 
 export default function ContactForm({ locale: localeProp, content }: ContactFormProps = {}) {
   const locale = localeProp ?? 'de'
@@ -53,7 +59,7 @@ export default function ContactForm({ locale: localeProp, content }: ContactForm
         phoneInvalid: 'Lütfen geçerli bir telefon girin.',
         countryRequired: 'Lütfen ülke seçin.',
         subjectRequired: 'Lütfen başvuru konusu seçin.',
-        messageRequired: 'Lütfen mesajınızı yazın.',
+        messageRequired: 'Lütfen en az 10 karakter ve en az 2 kelime içeren bir mesaj yazın.',
         countryLabel: 'Ülke',
         countryPlaceholder: 'Ülke seçin',
         subjectLabel: 'Başvuru Konusu',
@@ -77,7 +83,7 @@ export default function ContactForm({ locale: localeProp, content }: ContactForm
         phoneInvalid: 'Please enter a valid phone number.',
         countryRequired: 'Please select your country.',
         subjectRequired: 'Please select an inquiry topic.',
-        messageRequired: 'Please enter your message.',
+        messageRequired: 'Please enter a meaningful message with at least 10 characters and 2 words.',
         countryLabel: 'Country',
         countryPlaceholder: 'Select country',
         subjectLabel: 'Inquiry Topic',
@@ -100,7 +106,7 @@ export default function ContactForm({ locale: localeProp, content }: ContactForm
       phoneInvalid: 'Bitte geben Sie eine gültige Telefonnummer ein.',
       countryRequired: 'Bitte wählen Sie ein Land aus.',
       subjectRequired: 'Bitte wählen Sie ein Anliegen aus.',
-      messageRequired: 'Bitte geben Sie Ihre Nachricht ein.',
+      messageRequired: 'Bitte geben Sie eine aussagekräftige Nachricht mit mindestens 10 Zeichen und 2 Wörtern ein.',
       countryLabel: 'Land',
       countryPlaceholder: 'Land auswählen',
       subjectLabel: 'Anliegen',
@@ -212,7 +218,7 @@ export default function ContactForm({ locale: localeProp, content }: ContactForm
     if (field === 'subject') {
       return !trimmedValue ? ui.subjectRequired : ''
     }
-    return trimmedValue.length < 3 ? ui.messageRequired : ''
+    return !isMeaningfulMessage(trimmedValue) ? ui.messageRequired : ''
   }
 
   const validateForm = (values: ContactFormValues): ContactFormErrors => {
@@ -295,7 +301,7 @@ export default function ContactForm({ locale: localeProp, content }: ContactForm
           phone: formValues.phone.trim(),
           country: formValues.country.trim(),
           subject: String(subjectOptions.find(item => item.value === formValues.subject)?.label || formValues.subject).trim(),
-          message: formValues.message.trim()
+          message: collapseWhitespace(formValues.message)
         })
       })
 
