@@ -144,7 +144,7 @@ function getUiLabels(locale: Locale) {
       phoneInputLabel: "Telefon numarasi",
       phoneInputPlaceholder: "Ornek: +49 152 064 19253",
       phoneContinue: "Telefonla devam et",
-      complete: (link: string) => `Harika, bilgileri tamamladik. Buradan devam edebilirsiniz: ${link}`,
+      complete: "❤ Tesekkurler, talebinizi aldik.",
       handoff: "Musteri temsilcisine baglan: +49 152 064 19253 | reservation@meri-group.de",
       priceRedirect: "Fiyat bilgisi icin sizi yetkili ekibe yonlendireyim.",
       lowConfidence: "Bu bilgi sinirli olabilir. Gerekirse temsilciye yonlendirebilirim.",
@@ -194,7 +194,7 @@ function getUiLabels(locale: Locale) {
       phoneInputLabel: "Telefonnummer",
       phoneInputPlaceholder: "Beispiel: +49 152 064 19253",
       phoneContinue: "Mit Telefon fortfahren",
-      complete: (link: string) => `Perfekt, wir haben alles. Hier koennen Sie fortfahren: ${link}`,
+      complete: "❤ Vielen Dank, wir haben Ihre Anfrage erhalten.",
       handoff: "Direkter Kontakt: +49 152 064 19253 | reservation@meri-group.de",
       priceRedirect: "Fuer Preisangaben leite ich Sie direkt an unser Team weiter.",
       lowConfidence: "Diese Information kann begrenzt sein. Ich kann Sie an unser Team weiterleiten.",
@@ -243,7 +243,7 @@ function getUiLabels(locale: Locale) {
     phoneInputLabel: "Phone number",
     phoneInputPlaceholder: "Example: +49 152 064 19253",
     phoneContinue: "Continue with phone",
-    complete: (link: string) => `Great, we captured the details. Continue here: ${link}`,
+    complete: "❤ Thank you, we received your request.",
     handoff: "Contact reservation team: +49 152 064 19253 | reservation@meri-group.de",
     priceRedirect: "For pricing details, I will connect you with our authorized team.",
     lowConfidence: "This answer may be limited. I can connect you to our team if needed.",
@@ -1075,7 +1075,7 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
     setReservationDraft(draft);
     setReservationStep("idle");
     sendChatQuoteRequest(draft, normalizedPhone);
-    await pushAssistantMessagesWithDelay({ role: "assistant", text: labels.complete(createReservationLink(draft)), variant: "action" });
+    await pushAssistantMessagesWithDelay({ role: "assistant", text: labels.complete, variant: "action" });
     trackEvent("reservation_flow_complete", { intent: "reservation_prefill_ready" });
   };
 
@@ -1221,7 +1221,7 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
       setPhoneValue(normalizedPhone);
       setReservationStep("idle");
       sendChatQuoteRequest(draft, normalizedPhone);
-      await pushAssistantMessagesWithDelay({ role: "assistant", text: labels.complete(createReservationLink(draft)), variant: "action" });
+      await pushAssistantMessagesWithDelay({ role: "assistant", text: labels.complete, variant: "action" });
       trackEvent("reservation_flow_complete", { intent: "reservation_prefill_ready" });
       return;
     }
