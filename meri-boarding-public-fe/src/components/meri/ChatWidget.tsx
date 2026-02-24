@@ -148,6 +148,10 @@ function getUiLabels(locale: Locale) {
       contactSubmit: "Bilgileri gonder",
       contactValidation: "Lutfen gecerli bir ad soyad ve e-posta girin.",
       contactThanks: "Tesekkurler, bilgilerinizi aldim.",
+      datePickerTitleCheckin: "Giris tarihi secin",
+      datePickerTitleCheckout: "Cikis tarihi secin",
+      datePickerContinue: "Tarihle devam et",
+      pastDate: "Bugunden onceki bir tarih secemezsiniz.",
       greeting: (name: string) =>
         name ? `Merhaba ${name}, size nasil yardimci olabilirim?` : "Merhaba, size nasil yardimci olabilirim?",
     };
@@ -184,6 +188,10 @@ function getUiLabels(locale: Locale) {
       contactSubmit: "Daten senden",
       contactValidation: "Bitte geben Sie einen gueltigen Namen und eine gueltige E-Mail ein.",
       contactThanks: "Danke, ich habe Ihre Angaben erhalten.",
+      datePickerTitleCheckin: "Check-in Datum waehlen",
+      datePickerTitleCheckout: "Check-out Datum waehlen",
+      datePickerContinue: "Mit Datum fortfahren",
+      pastDate: "Sie koennen kein Datum vor heute auswaehlen.",
       greeting: (name: string) =>
         name ? `Hallo ${name}, wie kann ich Ihnen helfen?` : "Hallo, wie kann ich Ihnen helfen?",
     };
@@ -219,6 +227,10 @@ function getUiLabels(locale: Locale) {
     contactSubmit: "Submit details",
     contactValidation: "Please enter a valid full name and email.",
     contactThanks: "Thanks, I received your details.",
+    datePickerTitleCheckin: "Select check-in date",
+    datePickerTitleCheckout: "Select check-out date",
+    datePickerContinue: "Continue with date",
+    pastDate: "You cannot select a date earlier than today.",
     greeting: (name: string) =>
       name ? `Hello ${name}, how can I help you today?` : "Hello, how can I help you today?",
   };
@@ -471,6 +483,17 @@ function parseGuestCount(input: string) {
   return total > 0 ? total : NaN;
 }
 
+function toLocalIsoDate(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function getTodayIsoDate() {
+  return toLocalIsoDate(new Date());
+}
+
 const wait = (ms: number) => new Promise<void>((resolve) => window.setTimeout(resolve, ms));
 const getAssistantDelayMs = () =>
   minAssistantDelayMs + Math.floor(Math.random() * (maxAssistantDelayMs - minAssistantDelayMs + 1));
@@ -498,6 +521,9 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
   const [contactEmail, setContactEmail] = useState("");
   const [contactError, setContactError] = useState("");
   const [pendingFirstMessage, setPendingFirstMessage] = useState("");
+  const [checkinPickerValue, setCheckinPickerValue] = useState("");
+  const [checkoutPickerValue, setCheckoutPickerValue] = useState("");
+  const [datePickerError, setDatePickerError] = useState("");
   const [reservationDraft, setReservationDraft] = useState<ReservationDraft>({
     hotelSlugs: [],
     checkin: "",
@@ -595,6 +621,9 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
     setContactEmail("");
     setContactError("");
     setPendingFirstMessage("");
+    setCheckinPickerValue("");
+    setCheckoutPickerValue("");
+    setDatePickerError("");
     setReservationDraft({ hotelSlugs: [], checkin: "", checkout: "", guests: "" });
     setChatSessionId("");
     loggedMessageCountRef.current = 0;
@@ -681,6 +710,29 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
     const timer = window.setTimeout(() => setFeedbackChoice(null), 2500);
     return () => window.clearTimeout(timer);
   }, [feedbackChoice]);
+
+  useEffect(() => {
+    const today = getTodayIsoDate();
+    if (reservationStep === "checkin") {
+      const nextCheckin = reservationDraft.checkin && reservationDraft.checkin >= today ? reservationDraft.checkin : today;
+      setCheckinPickerValue((prev) => (prev && prev >= today ? prev : nextCheckin));
+      setDatePickerError("");
+      return;
+    }
+    if (reservationStep === "checkout") {
+      const minCheckout = reservationDraft.checkin && reservationDraft.checkin >= today ? reservationDraft.checkin : today;
+      const nextCheckout =
+        reservationDraft.checkout && reservationDraft.checkout >= minCheckout
+          ? reservationDraft.checkout
+          : reservationDraft.checkin
+            ? reservationDraft.checkin
+            : minCheckout;
+      setCheckoutPickerValue((prev) => (prev && prev >= minCheckout ? prev : nextCheckout));
+      setDatePickerError("");
+      return;
+    }
+    setDatePickerError("");
+  }, [reservationStep, reservationDraft.checkin, reservationDraft.checkout]);
 
   const handleFeedbackChoice = (choice: FeedbackChoice) => {
     setFeedbackChoice(choice);
@@ -775,6 +827,51 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
     trackEvent("reservation_step", { intent: availableHotels.length > 1 ? "hotels_selected_multi" : "hotel_selected" });
   };
 
+  const handleDatePickerContinue = async () => {
+    if (isTyping) return;
+    const today = getTodayIsoDate();
+
+    if (reservationStep === "checkin") {
+      const selectedCheckin = String(checkinPickerValue || "").trim();
+      if (!selectedCheckin) {
+        setDatePickerError(labels.badDate);
+        return;
+      }
+      if (selectedCheckin < today) {
+        setDatePickerError(labels.pastDate);
+        return;
+      }
+      setDatePickerError("");
+      setReservationDraft((prev) => ({
+        ...prev,
+        checkin: selectedCheckin,
+        checkout: prev.checkout && prev.checkout >= selectedCheckin ? prev.checkout : "",
+      }));
+      setReservationStep("checkout");
+      await pushAssistantMessagesWithDelay({ role: "assistant", text: labels.checkoutAsk, variant: "action" });
+      trackEvent("reservation_step", { intent: "checkin_set_picker" });
+      return;
+    }
+
+    if (reservationStep === "checkout") {
+      const selectedCheckout = String(checkoutPickerValue || "").trim();
+      const minCheckout = reservationDraft.checkin && reservationDraft.checkin >= today ? reservationDraft.checkin : today;
+      if (!selectedCheckout) {
+        setDatePickerError(labels.badDate);
+        return;
+      }
+      if (selectedCheckout < minCheckout) {
+        setDatePickerError(labels.badCheckout);
+        return;
+      }
+      setDatePickerError("");
+      setReservationDraft((prev) => ({ ...prev, checkout: selectedCheckout }));
+      setReservationStep("guests");
+      await pushAssistantMessagesWithDelay({ role: "assistant", text: labels.guestsAsk, variant: "action" });
+      trackEvent("reservation_step", { intent: "checkout_set_picker" });
+    }
+  };
+
   const processUserMessage = async (trimmed: string, options?: { appendUserMessage?: boolean }) => {
     if (!trimmed) return;
     await ensureChatSession();
@@ -833,8 +930,13 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
     }
 
     if (activeReservationStep === "checkin") {
+      const today = getTodayIsoDate();
       const range = parseDateRange(trimmed);
       if (range) {
+        if (range.checkin < today) {
+          await pushAssistantMessagesWithDelay({ role: "assistant", text: labels.pastDate, variant: "warn" });
+          return;
+        }
         if (range.checkout < range.checkin) {
           await pushAssistantMessagesWithDelay({ role: "assistant", text: labels.badCheckout, variant: "warn" });
           return;
@@ -850,6 +952,10 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
         await pushAssistantMessagesWithDelay({ role: "assistant", text: labels.badDate, variant: "warn" });
         return;
       }
+      if (normalized < today) {
+        await pushAssistantMessagesWithDelay({ role: "assistant", text: labels.pastDate, variant: "warn" });
+        return;
+      }
       setReservationDraft((prev) => ({ ...prev, checkin: normalized }));
       setReservationStep("checkout");
       await pushAssistantMessagesWithDelay({ role: "assistant", text: labels.checkoutAsk, variant: "action" });
@@ -858,9 +964,14 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
     }
 
     if (activeReservationStep === "checkout") {
+      const today = getTodayIsoDate();
       const normalized = normalizeDate(trimmed);
       if (!normalized) {
         await pushAssistantMessagesWithDelay({ role: "assistant", text: labels.badDate, variant: "warn" });
+        return;
+      }
+      if (normalized < today) {
+        await pushAssistantMessagesWithDelay({ role: "assistant", text: labels.pastDate, variant: "warn" });
         return;
       }
       const checkin = reservationDraft.checkin;
@@ -1247,6 +1358,37 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
                 disabled={isTyping}
               >
                 {labels.hotelPickerContinue}
+              </button>
+            </div>
+          ) : null}
+          {reservationStep === "checkin" || reservationStep === "checkout" ? (
+            <div className="chat-date-picker" aria-label={reservationStep === "checkin" ? labels.datePickerTitleCheckin : labels.datePickerTitleCheckout}>
+              <div className="chat-date-picker-title">
+                {reservationStep === "checkin" ? labels.datePickerTitleCheckin : labels.datePickerTitleCheckout}
+              </div>
+              <input
+                type="date"
+                value={reservationStep === "checkin" ? checkinPickerValue : checkoutPickerValue}
+                min={reservationStep === "checkin" ? getTodayIsoDate() : reservationDraft.checkin || getTodayIsoDate()}
+                onChange={(event) => {
+                  if (reservationStep === "checkin") {
+                    setCheckinPickerValue(event.target.value);
+                  } else {
+                    setCheckoutPickerValue(event.target.value);
+                  }
+                  if (datePickerError) setDatePickerError("");
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    event.preventDefault();
+                    void handleDatePickerContinue();
+                  }
+                }}
+                disabled={isTyping}
+              />
+              {datePickerError ? <div className="chat-contact-error">{datePickerError}</div> : null}
+              <button type="button" className="chat-date-picker-submit" onClick={() => void handleDatePickerContinue()} disabled={isTyping}>
+                {labels.datePickerContinue}
               </button>
             </div>
           ) : null}

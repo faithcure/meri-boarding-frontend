@@ -2297,6 +2297,58 @@ header .menu_side_area {
   cursor: wait;
 }
 
+.chat-date-picker {
+  align-self: stretch;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(26, 22, 19, 0.14);
+  border-radius: 14px;
+  box-shadow: 0 8px 18px rgba(24, 20, 17, 0.09);
+  padding: 12px;
+  display: grid;
+  gap: 10px;
+}
+
+.chat-date-picker-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(26, 22, 19, 0.9);
+}
+
+.chat-date-picker input[type="date"] {
+  border: 1px solid rgba(26, 22, 19, 0.16);
+  border-radius: 10px;
+  padding: 8px 10px;
+  background: #f9fafb;
+  min-height: 38px;
+}
+
+.chat-date-picker input[type="date"]:focus {
+  outline: none;
+  border-color: rgba(178, 129, 61, 0.64);
+  box-shadow: 0 0 0 3px rgba(178, 129, 61, 0.18);
+}
+
+.chat-date-picker-submit {
+  border: 0;
+  background: linear-gradient(135deg, var(--chat-accent), var(--chat-accent-strong));
+  color: #ffffff;
+  border-radius: 999px;
+  padding: 9px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.chat-date-picker-submit:hover,
+.chat-date-picker-submit:focus-visible {
+  transform: translateY(-1px);
+}
+
+.chat-date-picker-submit:disabled {
+  opacity: 0.72;
+  cursor: wait;
+}
+
 .chat-typing {
   display: inline-flex;
   align-items: center;
