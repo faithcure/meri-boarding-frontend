@@ -115,6 +115,9 @@ const maxAssistantDelayMs = 1900;
 const baseAssistantDelayMs = 520;
 const perCharacterDelayMs = 12;
 const assistantDelayJitterMs = 120;
+const autoInviteDelayMinMs = 5000;
+const autoInviteDelayMaxMs = 10000;
+const autoInviteSessionKey = "meri_chat_auto_invite_seen";
 
 function getChatErrorText(locale: Locale) {
   if (locale === "tr") return "Mesaj gonderilemedi. Lutfen tekrar deneyin.";
@@ -165,6 +168,7 @@ function getUiLabels(locale: Locale) {
       contactSubmit: "Bilgileri gonder",
       contactValidation: "Lutfen gecerli bir ad soyad ve e-posta girin.",
       contactThanks: "Super, bilgileri aldim.",
+      autoInvite: "Merhaba 👋 Yardimci olmami ister misiniz? Size en uygun konaklamayi birlikte bulabiliriz.",
       datePickerTitleCheckin: "Giris tarihi secin",
       datePickerTitleCheckout: "Cikis tarihi secin",
       datePickerContinue: "Tarihle devam et",
@@ -215,6 +219,7 @@ function getUiLabels(locale: Locale) {
       contactSubmit: "Daten senden",
       contactValidation: "Bitte geben Sie einen gueltigen Namen und eine gueltige E-Mail ein.",
       contactThanks: "Perfekt, ich habe Ihre Angaben erhalten.",
+      autoInvite: "Hallo 👋 Soll ich Ihnen kurz helfen? Gemeinsam finden wir schnell die passende Unterkunft.",
       datePickerTitleCheckin: "Check-in Datum waehlen",
       datePickerTitleCheckout: "Check-out Datum waehlen",
       datePickerContinue: "Mit Datum fortfahren",
@@ -264,6 +269,7 @@ function getUiLabels(locale: Locale) {
     contactSubmit: "Submit details",
     contactValidation: "Please enter a valid full name and email.",
     contactThanks: "Perfect, I got your details.",
+    autoInvite: "Hi 👋 Want a quick hand? We can find the best stay option for you in a minute.",
     datePickerTitleCheckin: "Select check-in date",
     datePickerTitleCheckout: "Select check-out date",
     datePickerContinue: "Continue with date",
@@ -542,6 +548,47 @@ function splitFullName(value: string) {
   return { firstName: parts[0], lastName: parts.slice(1).join(" ") };
 }
 
+function playInviteSound() {
+  if (typeof window === "undefined") return;
+  type ExtendedWindow = Window &
+    typeof globalThis & {
+      webkitAudioContext?: typeof AudioContext;
+    };
+  const win = window as ExtendedWindow;
+  const AudioContextCtor = win.AudioContext || win.webkitAudioContext;
+  if (!AudioContextCtor) return;
+  try {
+    const context = new AudioContextCtor();
+    const now = context.currentTime;
+    const master = context.createGain();
+    master.gain.setValueAtTime(0.0001, now);
+    master.gain.exponentialRampToValueAtTime(0.1, now + 0.04);
+    master.gain.exponentialRampToValueAtTime(0.0001, now + 0.65);
+    master.connect(context.destination);
+    const notes = [659.25, 783.99, 987.77];
+    notes.forEach((freq, index) => {
+      const startAt = now + index * 0.1;
+      const osc = context.createOscillator();
+      const gain = context.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, startAt);
+      gain.gain.setValueAtTime(0.0001, startAt);
+      gain.gain.exponentialRampToValueAtTime(0.18, startAt + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startAt + 0.2);
+      osc.connect(gain);
+      gain.connect(master);
+      osc.start(startAt);
+      osc.stop(startAt + 0.2);
+    });
+    void context.resume().catch(() => undefined);
+    window.setTimeout(() => {
+      void context.close().catch(() => undefined);
+    }, 1000);
+  } catch {
+    return;
+  }
+}
+
 function toLocalIsoDate(date: Date) {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -610,6 +657,9 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
   const dateInputRef = useRef<HTMLInputElement>(null);
   const loggedMessageCountRef = useRef(0);
   const feedbackTimerRef = useRef<number | null>(null);
+  const autoInviteTimerRef = useRef<number | null>(null);
+  const hasAutoInviteShownRef = useRef(false);
+  const hasManualChatInteractionRef = useRef(false);
   const labels = getUiLabels(locale);
   const privacyHref = localePath(locale, "/privacy");
   const reservationPath = localePath(locale, "/reservation");
@@ -707,6 +757,11 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
     setPhoneValue("");
     setPhoneError("");
     setReservationDraft({ hotelSlugs: [], checkin: "", checkout: "", guests: "", children: "0", accessible: false, phone: "" });
+    hasAutoInviteShownRef.current = typeof window !== "undefined" && window.sessionStorage.getItem(autoInviteSessionKey) === "1";
+    if (autoInviteTimerRef.current) {
+      window.clearTimeout(autoInviteTimerRef.current);
+      autoInviteTimerRef.current = null;
+    }
     setChatSessionId("");
     loggedMessageCountRef.current = 0;
     if (feedbackTimerRef.current) {
@@ -792,6 +847,37 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
     const timer = window.setTimeout(() => setFeedbackChoice(null), 2500);
     return () => window.clearTimeout(timer);
   }, [feedbackChoice]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (isOpen || hasAutoInviteShownRef.current || hasManualChatInteractionRef.current) return;
+    const alreadyShown = window.sessionStorage.getItem(autoInviteSessionKey) === "1";
+    if (alreadyShown) {
+      hasAutoInviteShownRef.current = true;
+      return;
+    }
+
+    const delayMs = autoInviteDelayMinMs + Math.floor(Math.random() * (autoInviteDelayMaxMs - autoInviteDelayMinMs + 1));
+    autoInviteTimerRef.current = window.setTimeout(() => {
+      if (hasAutoInviteShownRef.current || hasManualChatInteractionRef.current || isOpen) return;
+      hasAutoInviteShownRef.current = true;
+      window.sessionStorage.setItem(autoInviteSessionKey, "1");
+      setIsOpen(true);
+      setMessages((prev) => {
+        if (prev.some((item) => item.role === "assistant" && item.text === labels.autoInvite)) return prev;
+        return [...prev, { role: "assistant", text: labels.autoInvite, variant: "meta" }];
+      });
+      playInviteSound();
+      trackEvent("chat_auto_invite", { intent: "open_with_greeting" });
+    }, delayMs);
+
+    return () => {
+      if (autoInviteTimerRef.current) {
+        window.clearTimeout(autoInviteTimerRef.current);
+        autoInviteTimerRef.current = null;
+      }
+    };
+  }, [isOpen, labels.autoInvite]);
 
   useEffect(() => {
     const today = getTodayIsoDate();
@@ -1424,7 +1510,14 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
         className="chat-toggle"
         aria-expanded={isOpen}
         aria-controls="meri-chat-panel"
-        onClick={() => setIsOpen((prev) => !prev)}
+        onClick={() => {
+          hasManualChatInteractionRef.current = true;
+          if (autoInviteTimerRef.current) {
+            window.clearTimeout(autoInviteTimerRef.current);
+            autoInviteTimerRef.current = null;
+          }
+          setIsOpen((prev) => !prev);
+        }}
         aria-label={t.toggle}
       >
         <span className="chat-toggle-label">{t.toggle}</span>
@@ -1467,6 +1560,7 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
               className="chat-close"
               aria-label={t.close}
               onClick={() => {
+                hasManualChatInteractionRef.current = true;
                 setIsExpanded(false);
                 setIsOpen(false);
               }}
