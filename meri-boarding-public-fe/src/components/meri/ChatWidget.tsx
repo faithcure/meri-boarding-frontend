@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Locale } from "@/i18n/getLocale";
 import { localePath } from "@/i18n/localePath";
@@ -114,9 +113,6 @@ const maxAssistantDelayMs = 1900;
 const baseAssistantDelayMs = 520;
 const perCharacterDelayMs = 12;
 const assistantDelayJitterMs = 120;
-const autoOpenDelayMinMs = 4000;
-const autoOpenDelayMaxMs = 5000;
-const autoOpenDisabledStorageKey = "meri_chat_auto_open_disabled";
 
 function getChatErrorText(locale: Locale) {
   if (locale === "tr") return "Mesaj gonderilemedi. Lutfen tekrar deneyin.";
@@ -547,30 +543,6 @@ function splitFullName(value: string) {
   return { firstName: parts[0], lastName: parts.slice(1).join(" ") };
 }
 
-function playInviteSound(context: AudioContext) {
-  const now = context.currentTime;
-  const master = context.createGain();
-  master.gain.setValueAtTime(0.0001, now);
-  master.gain.exponentialRampToValueAtTime(0.1, now + 0.04);
-  master.gain.exponentialRampToValueAtTime(0.0001, now + 0.65);
-  master.connect(context.destination);
-  const notes = [659.25, 783.99, 987.77];
-  notes.forEach((freq, index) => {
-    const startAt = now + index * 0.1;
-    const osc = context.createOscillator();
-    const gain = context.createGain();
-    osc.type = "sine";
-    osc.frequency.setValueAtTime(freq, startAt);
-    gain.gain.setValueAtTime(0.0001, startAt);
-    gain.gain.exponentialRampToValueAtTime(0.18, startAt + 0.02);
-    gain.gain.exponentialRampToValueAtTime(0.0001, startAt + 0.2);
-    osc.connect(gain);
-    gain.connect(master);
-    osc.start(startAt);
-    osc.stop(startAt + 0.2);
-  });
-}
-
 function toLocalIsoDate(date: Date) {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -594,7 +566,6 @@ const getAssistantDelayMs = (next: Message | Message[]) => {
 };
 
 export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
-  const pathname = usePathname();
   const activeLocale = useLocale();
   const locale = activeLocale ?? localeProp ?? "de";
   const t = getMessages(locale).chatWidget;
@@ -640,44 +611,9 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
   const dateInputRef = useRef<HTMLInputElement>(null);
   const loggedMessageCountRef = useRef(0);
   const feedbackTimerRef = useRef<number | null>(null);
-  const autoOpenTimerRef = useRef<number | null>(null);
-  const isAutoOpenDisabledRef = useRef(false);
-  const inviteAudioContextRef = useRef<AudioContext | null>(null);
-  const isInviteAudioPrimedRef = useRef(false);
   const labels = getUiLabels(locale);
   const privacyHref = localePath(locale, "/privacy");
   const reservationPath = localePath(locale, "/reservation");
-  const getInviteAudioContext = () => {
-    if (typeof window === "undefined") return null;
-    if (inviteAudioContextRef.current) return inviteAudioContextRef.current;
-    type ExtendedWindow = Window &
-      typeof globalThis & {
-        webkitAudioContext?: typeof AudioContext;
-      };
-    const win = window as ExtendedWindow;
-    const AudioContextCtor = win.AudioContext || win.webkitAudioContext;
-    if (!AudioContextCtor) return null;
-    try {
-      inviteAudioContextRef.current = new AudioContextCtor();
-      return inviteAudioContextRef.current;
-    } catch {
-      inviteAudioContextRef.current = null;
-      return null;
-    }
-  };
-  const disableAutoOpen = () => {
-    isAutoOpenDisabledRef.current = true;
-    if (autoOpenTimerRef.current) {
-      window.clearTimeout(autoOpenTimerRef.current);
-      autoOpenTimerRef.current = null;
-    }
-    if (typeof window === "undefined") return;
-    try {
-      window.localStorage.setItem(autoOpenDisabledStorageKey, "1");
-    } catch {
-      return;
-    }
-  };
 
   const reservationHotelOptions = useMemo(() => {
     const source = hotels.length ? hotels : fallbackReservationHotels;
@@ -772,19 +708,6 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
     setPhoneValue("");
     setPhoneError("");
     setReservationDraft({ hotelSlugs: [], checkin: "", checkout: "", guests: "", children: "0", accessible: false, phone: "" });
-    if (autoOpenTimerRef.current) {
-      window.clearTimeout(autoOpenTimerRef.current);
-      autoOpenTimerRef.current = null;
-    }
-    if (typeof window !== "undefined") {
-      try {
-        isAutoOpenDisabledRef.current = window.localStorage.getItem(autoOpenDisabledStorageKey) === "1";
-      } catch {
-        isAutoOpenDisabledRef.current = false;
-      }
-    } else {
-      isAutoOpenDisabledRef.current = false;
-    }
     setChatSessionId("");
     loggedMessageCountRef.current = 0;
     if (feedbackTimerRef.current) {
@@ -792,39 +715,6 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
       feedbackTimerRef.current = null;
     }
   }, [locale]);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const primeInviteAudio = () => {
-      if (isInviteAudioPrimedRef.current) return;
-      const context = getInviteAudioContext();
-      if (!context) return;
-      void context
-        .resume()
-        .then(() => {
-          isInviteAudioPrimedRef.current = true;
-        })
-        .catch(() => undefined);
-    };
-
-    window.addEventListener("pointerdown", primeInviteAudio, { passive: true });
-    window.addEventListener("keydown", primeInviteAudio);
-    return () => {
-      window.removeEventListener("pointerdown", primeInviteAudio);
-      window.removeEventListener("keydown", primeInviteAudio);
-    };
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      const context = inviteAudioContextRef.current;
-      if (context) {
-        void context.close().catch(() => undefined);
-      }
-      inviteAudioContextRef.current = null;
-      isInviteAudioPrimedRef.current = false;
-    };
-  }, []);
 
   useEffect(() => {
     if (!chatSessionId) return;
@@ -868,7 +758,6 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
     if (!isOpen) return;
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key !== "Escape") return;
-      disableAutoOpen();
       setIsExpanded(false);
       setIsOpen(false);
     };
@@ -904,48 +793,6 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
     const timer = window.setTimeout(() => setFeedbackChoice(null), 2500);
     return () => window.clearTimeout(timer);
   }, [feedbackChoice]);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (autoOpenTimerRef.current) {
-      window.clearTimeout(autoOpenTimerRef.current);
-      autoOpenTimerRef.current = null;
-    }
-    try {
-      isAutoOpenDisabledRef.current = window.localStorage.getItem(autoOpenDisabledStorageKey) === "1";
-    } catch {
-      isAutoOpenDisabledRef.current = false;
-    }
-    if (isAutoOpenDisabledRef.current || isOpen) return;
-
-    const delayMs = autoOpenDelayMinMs + Math.floor(Math.random() * (autoOpenDelayMaxMs - autoOpenDelayMinMs + 1));
-    autoOpenTimerRef.current = window.setTimeout(() => {
-      if (isAutoOpenDisabledRef.current || isOpen) return;
-      setIsOpen(true);
-      setMessages((prev) => {
-        const last = prev[prev.length - 1];
-        if (last?.role === "assistant" && last.text === labels.autoInvite && last.variant === "meta") return prev;
-        return [...prev, { role: "assistant", text: labels.autoInvite, variant: "meta" }];
-      });
-      const context = getInviteAudioContext();
-      if (context) {
-        void context
-          .resume()
-          .then(() => {
-            playInviteSound(context);
-          })
-          .catch(() => undefined);
-      }
-      trackEvent("chat_auto_invite", { intent: "open_after_route_change" });
-    }, delayMs);
-
-    return () => {
-      if (autoOpenTimerRef.current) {
-        window.clearTimeout(autoOpenTimerRef.current);
-        autoOpenTimerRef.current = null;
-      }
-    };
-  }, [pathname, isOpen, labels.autoInvite]);
 
   useEffect(() => {
     const today = getTodayIsoDate();
@@ -1581,7 +1428,6 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
         onClick={() => {
           const nextIsOpen = !isOpen;
           if (!nextIsOpen) {
-            disableAutoOpen();
             setIsExpanded(false);
             setIsOpen(false);
             return;
@@ -1633,7 +1479,6 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
               className="chat-close"
               aria-label={t.close}
               onClick={() => {
-                disableAutoOpen();
                 setIsExpanded(false);
                 setIsOpen(false);
               }}
