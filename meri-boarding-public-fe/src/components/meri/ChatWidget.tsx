@@ -930,6 +930,7 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
       nationality: "-",
       guests: draft.guests || "1",
       children: draft.children || "0",
+      accessible: draft.accessible ? 1 : 0,
       rooms: suggestedRooms,
       boarding: selectedHotelNames.join(", ") || "Meri Boarding",
       moveIn: draft.checkin || "",

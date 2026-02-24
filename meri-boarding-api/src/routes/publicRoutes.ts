@@ -779,6 +779,7 @@ server.post('/api/v1/public/forms/request', async (request, reply) => {
         nationality?: string;
         guests?: string | number;
         children?: string | number;
+        accessible?: string | number | boolean;
         rooms?: string;
         boarding?: string;
         moveIn?: string;
@@ -799,6 +800,14 @@ server.post('/api/v1/public/forms/request', async (request, reply) => {
   const guests = Number(guestsRaw);
   const childrenRaw = String(body?.children || '0').trim();
   const children = Number(childrenRaw);
+  const accessibleRaw = body?.accessible;
+  const accessibleProvided = accessibleRaw !== undefined && String(accessibleRaw).trim() !== '';
+  const accessibleNormalized = String(accessibleRaw ?? '').trim().toLowerCase();
+  const accessible =
+    accessibleRaw === true ||
+    accessibleRaw === 1 ||
+    ['1', 'true', 'yes', 'ja', 'evet'].includes(accessibleNormalized);
+  const accessibilityValue = accessibleProvided ? (accessible ? 'Yes' : 'No') : '-';
   const rooms = String(body?.rooms || '').trim();
   const boarding = String(body?.boarding || '').trim();
   const moveIn = String(body?.moveIn || '').trim();
@@ -858,6 +867,7 @@ server.post('/api/v1/public/forms/request', async (request, reply) => {
         `Nationality: ${nationality || '-'}`,
         `Guests: ${guests}`,
         `Children: ${children}`,
+        `Accessibility need: ${accessibilityValue}`,
         `Rooms: ${rooms}`,
         `Boarding house: ${boarding}`,
         `Move-in date: ${moveIn || '-'}`,
@@ -881,6 +891,7 @@ server.post('/api/v1/public/forms/request', async (request, reply) => {
           { label: 'Nationality', value: nationality || '-' },
           { label: 'Guests', value: String(guests) },
           { label: 'Children', value: String(children) },
+          { label: 'Accessibility Need', value: accessibilityValue },
           { label: 'Rooms', value: rooms },
           { label: 'Boarding House', value: boarding },
           { label: 'Move-in Date', value: moveIn || '-' },
