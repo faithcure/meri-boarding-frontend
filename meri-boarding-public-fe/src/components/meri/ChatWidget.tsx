@@ -46,12 +46,10 @@ const fallbackReservationHotels: PublicHotel[] = [
   { slug: "hildesheim", name: "Hildesheim", available: true },
 ];
 
-const initialMessages = (t: Messages["chatWidget"]): Message[] => [
-  {
-    role: "assistant",
-    text: t.intro,
-  },
-];
+const getIntroMessage = (t: Messages["chatWidget"]): Message => ({
+  role: "assistant",
+  text: t.intro,
+});
 
 const escapeHtml = (value: string) =>
   value
@@ -548,45 +546,28 @@ function splitFullName(value: string) {
   return { firstName: parts[0], lastName: parts.slice(1).join(" ") };
 }
 
-function playInviteSound() {
-  if (typeof window === "undefined") return;
-  type ExtendedWindow = Window &
-    typeof globalThis & {
-      webkitAudioContext?: typeof AudioContext;
-    };
-  const win = window as ExtendedWindow;
-  const AudioContextCtor = win.AudioContext || win.webkitAudioContext;
-  if (!AudioContextCtor) return;
-  try {
-    const context = new AudioContextCtor();
-    const now = context.currentTime;
-    const master = context.createGain();
-    master.gain.setValueAtTime(0.0001, now);
-    master.gain.exponentialRampToValueAtTime(0.1, now + 0.04);
-    master.gain.exponentialRampToValueAtTime(0.0001, now + 0.65);
-    master.connect(context.destination);
-    const notes = [659.25, 783.99, 987.77];
-    notes.forEach((freq, index) => {
-      const startAt = now + index * 0.1;
-      const osc = context.createOscillator();
-      const gain = context.createGain();
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(freq, startAt);
-      gain.gain.setValueAtTime(0.0001, startAt);
-      gain.gain.exponentialRampToValueAtTime(0.18, startAt + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.0001, startAt + 0.2);
-      osc.connect(gain);
-      gain.connect(master);
-      osc.start(startAt);
-      osc.stop(startAt + 0.2);
-    });
-    void context.resume().catch(() => undefined);
-    window.setTimeout(() => {
-      void context.close().catch(() => undefined);
-    }, 1000);
-  } catch {
-    return;
-  }
+function playInviteSound(context: AudioContext) {
+  const now = context.currentTime;
+  const master = context.createGain();
+  master.gain.setValueAtTime(0.0001, now);
+  master.gain.exponentialRampToValueAtTime(0.1, now + 0.04);
+  master.gain.exponentialRampToValueAtTime(0.0001, now + 0.65);
+  master.connect(context.destination);
+  const notes = [659.25, 783.99, 987.77];
+  notes.forEach((freq, index) => {
+    const startAt = now + index * 0.1;
+    const osc = context.createOscillator();
+    const gain = context.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(freq, startAt);
+    gain.gain.setValueAtTime(0.0001, startAt);
+    gain.gain.exponentialRampToValueAtTime(0.18, startAt + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, startAt + 0.2);
+    osc.connect(gain);
+    gain.connect(master);
+    osc.start(startAt);
+    osc.stop(startAt + 0.2);
+  });
 }
 
 function toLocalIsoDate(date: Date) {
@@ -617,7 +598,7 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
   const t = getMessages(locale).chatWidget;
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [messages, setMessages] = useState<Message[]>(() => initialMessages(t));
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [reservationStep, setReservationStep] = useState<"idle" | "hotel" | "checkin" | "checkout" | "guests" | "phone">("idle");
@@ -660,9 +641,30 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
   const autoInviteTimerRef = useRef<number | null>(null);
   const hasAutoInviteShownRef = useRef(false);
   const hasManualChatInteractionRef = useRef(false);
+  const inviteAudioContextRef = useRef<AudioContext | null>(null);
+  const isInviteAudioPrimedRef = useRef(false);
   const labels = getUiLabels(locale);
   const privacyHref = localePath(locale, "/privacy");
   const reservationPath = localePath(locale, "/reservation");
+  const getInviteAudioContext = () => {
+    if (typeof window === "undefined") return null;
+    if (inviteAudioContextRef.current) return inviteAudioContextRef.current;
+    type ExtendedWindow = Window &
+      typeof globalThis & {
+        webkitAudioContext?: typeof AudioContext;
+      };
+    const win = window as ExtendedWindow;
+    const AudioContextCtor = win.AudioContext || win.webkitAudioContext;
+    if (!AudioContextCtor) return null;
+    try {
+      inviteAudioContextRef.current = new AudioContextCtor();
+      return inviteAudioContextRef.current;
+    } catch {
+      inviteAudioContextRef.current = null;
+      return null;
+    }
+  };
+
   const reservationHotelOptions = useMemo(() => {
     const source = hotels.length ? hotels : fallbackReservationHotels;
     return source
@@ -732,8 +734,7 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
   }, [messages, isOpen, isTyping]);
 
   useEffect(() => {
-    const localeMessages = getMessages(locale).chatWidget;
-    setMessages(initialMessages(localeMessages));
+    setMessages([]);
     setInput("");
     setIsTyping(false);
     setReservationStep("idle");
@@ -769,6 +770,39 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
       feedbackTimerRef.current = null;
     }
   }, [locale]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const primeInviteAudio = () => {
+      if (isInviteAudioPrimedRef.current) return;
+      const context = getInviteAudioContext();
+      if (!context) return;
+      void context
+        .resume()
+        .then(() => {
+          isInviteAudioPrimedRef.current = true;
+        })
+        .catch(() => undefined);
+    };
+
+    window.addEventListener("pointerdown", primeInviteAudio, { passive: true });
+    window.addEventListener("keydown", primeInviteAudio);
+    return () => {
+      window.removeEventListener("pointerdown", primeInviteAudio);
+      window.removeEventListener("keydown", primeInviteAudio);
+    };
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      const context = inviteAudioContextRef.current;
+      if (context) {
+        void context.close().catch(() => undefined);
+      }
+      inviteAudioContextRef.current = null;
+      isInviteAudioPrimedRef.current = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (!chatSessionId) return;
@@ -867,7 +901,15 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
         if (prev.some((item) => item.role === "assistant" && item.text === labels.autoInvite)) return prev;
         return [...prev, { role: "assistant", text: labels.autoInvite, variant: "meta" }];
       });
-      playInviteSound();
+      const context = getInviteAudioContext();
+      if (context) {
+        void context
+          .resume()
+          .then(() => {
+            playInviteSound(context);
+          })
+          .catch(() => undefined);
+      }
       trackEvent("chat_auto_invite", { intent: "open_with_greeting" });
     }, delayMs);
 
@@ -1516,7 +1558,11 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
             window.clearTimeout(autoInviteTimerRef.current);
             autoInviteTimerRef.current = null;
           }
-          setIsOpen((prev) => !prev);
+          const nextIsOpen = !isOpen;
+          if (nextIsOpen) {
+            setMessages((prev) => (prev.length ? prev : [getIntroMessage(t)]));
+          }
+          setIsOpen(nextIsOpen);
         }}
         aria-label={t.toggle}
       >
