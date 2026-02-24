@@ -597,6 +597,7 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
   });
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
+  const dateInputRef = useRef<HTMLInputElement>(null);
   const loggedMessageCountRef = useRef(0);
   const feedbackTimerRef = useRef<number | null>(null);
   const labels = getUiLabels(locale);
@@ -997,9 +998,10 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
   const handleDatePickerContinue = async () => {
     if (isTyping) return;
     const today = getTodayIsoDate();
+    const pickerRawValue = String(dateInputRef.current?.value || "").trim();
 
     if (reservationStep === "checkin") {
-      const selectedCheckin = String(checkinPickerValue || "").trim();
+      const selectedCheckin = pickerRawValue || String(checkinPickerValue || "").trim();
       if (!selectedCheckin) {
         setDatePickerError(labels.badDate);
         return;
@@ -1021,7 +1023,7 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
     }
 
     if (reservationStep === "checkout") {
-      const selectedCheckout = String(checkoutPickerValue || "").trim();
+      const selectedCheckout = pickerRawValue || String(checkoutPickerValue || "").trim();
       const minCheckout = reservationDraft.checkin && reservationDraft.checkin >= today ? reservationDraft.checkin : today;
       if (!selectedCheckout) {
         setDatePickerError(labels.badDate);
@@ -1591,6 +1593,7 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
                 {reservationStep === "checkin" ? labels.datePickerTitleCheckin : labels.datePickerTitleCheckout}
               </div>
               <input
+                ref={dateInputRef}
                 type="date"
                 value={reservationStep === "checkin" ? checkinPickerValue : checkoutPickerValue}
                 min={reservationStep === "checkin" ? getTodayIsoDate() : reservationDraft.checkin || getTodayIsoDate()}
