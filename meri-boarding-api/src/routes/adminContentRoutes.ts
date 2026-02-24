@@ -96,7 +96,6 @@ server.put('/api/v1/admin/content/header', async (request, reply) => {
 
   const db = await getDb();
   const contents = db.collection<ContentEntry<HeaderContent>>('content_entries');
-  await contents.createIndex({ key: 1, locale: 1 }, { unique: true });
 
   const now = new Date();
   await contents.updateOne(
@@ -202,7 +201,6 @@ server.put('/api/v1/admin/settings/general', async (request, reply) => {
 
   const db = await getDb();
   const contents = db.collection<ContentEntry<GeneralSettingsContent>>('content_entries');
-  await contents.createIndex({ key: 1, locale: 1 }, { unique: true });
 
   const now = new Date();
   await contents.updateOne(
@@ -263,7 +261,6 @@ server.put('/api/v1/admin/content/services', async (request, reply) => {
 
   const db = await getDb();
   const contents = db.collection<ContentEntry<ServicesCmsContent>>('content_entries');
-  await contents.createIndex({ key: 1, locale: 1 }, { unique: true });
   const localizedFallback = await getLocalizedDefaultServicesContent(locale);
   const existing = await contents.findOne({ key: 'page.services', locale });
   const fallbackContent = existing ? normalizeServicesContent(existing.value, localizedFallback) : localizedFallback;
@@ -319,7 +316,6 @@ server.put('/api/v1/admin/content/amenities', async (request, reply) => {
 
   const db = await getDb();
   const contents = db.collection<ContentEntry<AmenitiesCmsContent>>('content_entries');
-  await contents.createIndex({ key: 1, locale: 1 }, { unique: true });
   const localizedFallback = await getLocalizedDefaultAmenitiesContent(locale);
   const existing = await contents.findOne({ key: 'page.amenities', locale });
   const fallbackContent = existing ? normalizeAmenitiesContent(existing.value, localizedFallback) : localizedFallback;
@@ -375,7 +371,6 @@ server.put('/api/v1/admin/content/reservation', async (request, reply) => {
 
   const db = await getDb();
   const contents = db.collection<ContentEntry<ReservationCmsContent>>('content_entries');
-  await contents.createIndex({ key: 1, locale: 1 }, { unique: true });
   const localizedFallback = await getLocalizedDefaultReservationContent(locale);
   const existing = await contents.findOne({ key: 'page.reservation', locale });
   const fallbackContent = existing ? normalizeReservationContent(existing.value, localizedFallback) : localizedFallback;
@@ -431,7 +426,6 @@ server.put('/api/v1/admin/content/contact', async (request, reply) => {
 
   const db = await getDb();
   const contents = db.collection<ContentEntry<ContactCmsContent>>('content_entries');
-  await contents.createIndex({ key: 1, locale: 1 }, { unique: true });
   const localizedFallback = await getLocalizedDefaultContactContent(locale);
   const existing = await contents.findOne({ key: 'page.contact', locale });
   const fallbackContent = existing ? normalizeContactContent(existing.value, localizedFallback) : localizedFallback;
@@ -885,7 +879,6 @@ server.put('/api/v1/admin/content/home', async (request, reply) => {
 
   const db = await getDb();
   const contents = db.collection<ContentEntry<HomeCmsContent>>('content_entries');
-  await contents.createIndex({ key: 1, locale: 1 }, { unique: true });
   const existing = await contents.findOne({ key: 'page.home', locale });
   const fallbackContent = existing ? normalizeHomeContent(existing.value, defaultHomeContent) : defaultHomeContent;
   const nextContent = normalizeHomeContent(body?.content, fallbackContent);

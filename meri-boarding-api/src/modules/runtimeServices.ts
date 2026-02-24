@@ -98,7 +98,6 @@ export function createRuntimeServices(options: CreateRuntimeServicesOptions) {
 async function getHeaderContent(locale: ContentLocale) {
   const db = await getDb();
   const contents = db.collection<ContentEntry<HeaderContent>>('content_entries');
-  await contents.createIndex({ key: 1, locale: 1 }, { unique: true });
 
   const content = await contents.findOne({ key: 'shared.header', locale });
   if (content) {
@@ -122,7 +121,6 @@ async function getHeaderContent(locale: ContentLocale) {
 async function getGeneralSettingsContent() {
   const db = await getDb();
   const contents = db.collection<ContentEntry<GeneralSettingsContent>>('content_entries');
-  await contents.createIndex({ key: 1, locale: 1 }, { unique: true });
 
   const content = await contents.findOne({ key: 'shared.general_settings', locale: 'en' });
   if (content) {
@@ -158,7 +156,6 @@ async function getLocalizedDefaultHomeContent(locale: ContentLocale): Promise<Ho
 async function getHomeContent(locale: ContentLocale) {
   const db = await getDb();
   const contents = db.collection<ContentEntry<HomeCmsContent>>('content_entries');
-  await contents.createIndex({ key: 1, locale: 1 }, { unique: true });
   const localizedFallback = await getLocalizedDefaultHomeContent(locale);
 
   const content = await contents.findOne({ key: 'page.home', locale });
@@ -255,7 +252,6 @@ async function getLocalizedDefaultServicesContent(locale: ContentLocale): Promis
 async function getServicesContent(locale: ContentLocale) {
   const db = await getDb();
   const contents = db.collection<ContentEntry<ServicesCmsContent>>('content_entries');
-  await contents.createIndex({ key: 1, locale: 1 }, { unique: true });
   const localizedFallback = await getLocalizedDefaultServicesContent(locale);
 
   const content = await contents.findOne({ key: 'page.services', locale });
@@ -291,7 +287,6 @@ async function getLocalizedDefaultAmenitiesContent(locale: ContentLocale): Promi
 async function getAmenitiesContent(locale: ContentLocale) {
   const db = await getDb();
   const contents = db.collection<ContentEntry<AmenitiesCmsContent>>('content_entries');
-  await contents.createIndex({ key: 1, locale: 1 }, { unique: true });
   const localizedFallback = await getLocalizedDefaultAmenitiesContent(locale);
 
   const content = await contents.findOne({ key: 'page.amenities', locale });
@@ -327,7 +322,6 @@ async function getLocalizedDefaultReservationContent(locale: ContentLocale): Pro
 async function getReservationContent(locale: ContentLocale) {
   const db = await getDb();
   const contents = db.collection<ContentEntry<ReservationCmsContent>>('content_entries');
-  await contents.createIndex({ key: 1, locale: 1 }, { unique: true });
   const localizedFallback = await getLocalizedDefaultReservationContent(locale);
 
   const content = await contents.findOne({ key: 'page.reservation', locale });
@@ -363,7 +357,6 @@ async function getLocalizedDefaultContactContent(locale: ContentLocale): Promise
 async function getContactContent(locale: ContentLocale) {
   const db = await getDb();
   const contents = db.collection<ContentEntry<ContactCmsContent>>('content_entries');
-  await contents.createIndex({ key: 1, locale: 1 }, { unique: true });
   const localizedFallback = await getLocalizedDefaultContactContent(locale);
 
   const content = await contents.findOne({ key: 'page.contact', locale });
@@ -388,9 +381,6 @@ async function getContactContent(locale: ContentLocale) {
 async function getContactSubmissionsCollection() {
   const db = await getDb();
   const submissions = db.collection<ContactSubmission>('contact_submissions');
-  await submissions.createIndex({ createdAt: -1 });
-  await submissions.createIndex({ status: 1, createdAt: -1 });
-  await submissions.createIndex({ email: 1 });
   return submissions;
 }
 
@@ -427,6 +417,18 @@ async function ensureChatIndexes() {
     events.createIndex({ sessionId: 1, createdAt: -1 }),
     events.createIndex({ event: 1, createdAt: -1 }),
     events.createIndex({ locale: 1, createdAt: -1 }),
+  ]);
+}
+
+async function ensureContentIndexes() {
+  const db = await getDb();
+  const contents = db.collection('content_entries');
+  const submissions = db.collection('contact_submissions');
+  await Promise.all([
+    contents.createIndex({ key: 1, locale: 1 }, { unique: true }),
+    submissions.createIndex({ createdAt: -1 }),
+    submissions.createIndex({ status: 1, createdAt: -1 }),
+    submissions.createIndex({ email: 1 }),
   ]);
 }
 
@@ -611,6 +613,7 @@ async function getRequestAdmin(authorization?: string) {
     resolveContactNotificationRecipients,
     ensureAdminIndexes,
     ensureChatIndexes,
+    ensureContentIndexes,
     seedHeaderContents,
     seedHomeContents,
     seedServicesContents,
