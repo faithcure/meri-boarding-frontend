@@ -110,8 +110,11 @@ const chatEventsApiUrl = withPublicApiBaseIfNeeded("/api/v1/chat/events");
 const chatSessionsApiUrl = withPublicApiBaseIfNeeded("/api/v1/chat/sessions");
 const hotelsApiBaseUrl = withPublicApiBaseIfNeeded("/api/v1/public/hotels");
 const quoteFormApiUrl = withPublicApiBaseIfNeeded("/api/v1/public/forms/request");
-const minAssistantDelayMs = 1000;
-const maxAssistantDelayMs = 2000;
+const minAssistantDelayMs = 650;
+const maxAssistantDelayMs = 1900;
+const baseAssistantDelayMs = 520;
+const perCharacterDelayMs = 12;
+const assistantDelayJitterMs = 120;
 
 function getChatErrorText(locale: Locale) {
   if (locale === "tr") return "Mesaj gonderilemedi. Lutfen tekrar deneyin.";
@@ -130,8 +133,8 @@ function getUiLabels(locale: Locale) {
       reservationCardTitle: "Hizli Rezervasyon Akisi",
       checkinAsk: "Lutfen giris tarihini YYYY-MM-DD formatinda yazin.",
       checkoutAsk: "Lutfen cikis tarihini YYYY-MM-DD formatinda yazin.",
-      guestsAsk: "Lutfen misafir bilgilerini asagidan secin.",
-      phoneAsk: "Son adim olarak telefon numaranizi paylasin.",
+      guestsAsk: "Harika, misafir bilgilerini asagidan secelim.",
+      phoneAsk: "Son adim: telefon numaranizi alayim.",
       badDate: "Tarih formati gecersiz. Ornekler: 2026-03-15, 15.03.2026, yarin",
       badCheckout: "Cikis tarihi, giris tarihinden once olamaz.",
       badGuests: "Misafir sayisi 1 ile 20 arasinda olmalidir.",
@@ -153,7 +156,7 @@ function getUiLabels(locale: Locale) {
       hotelPickerContinue: "Secimle devam et",
       hotelPickerUnavailable: "Dolu",
       hotelPickerSelected: (names: string) => `Secilen oteller: ${names}`,
-      contactAsk: "Daha iyi hizmet icin lutfen ad soyad ve e-posta adresinizi paylasin.",
+      contactAsk: "Sizi daha iyi yonlendirebilmem icin ad soyad ve e-posta adresinizi paylasir misiniz?",
       contactPending: "Devam edebilmek icin lutfen asagidaki bilgileri doldurun.",
       contactNameLabel: "Ad Soyad",
       contactEmailLabel: "E-posta",
@@ -161,7 +164,7 @@ function getUiLabels(locale: Locale) {
       contactEmailPlaceholder: "ornek@email.com",
       contactSubmit: "Bilgileri gonder",
       contactValidation: "Lutfen gecerli bir ad soyad ve e-posta girin.",
-      contactThanks: "Tesekkurler, bilgilerinizi aldim.",
+      contactThanks: "Super, bilgileri aldim.",
       datePickerTitleCheckin: "Giris tarihi secin",
       datePickerTitleCheckout: "Cikis tarihi secin",
       datePickerContinue: "Tarihle devam et",
@@ -180,8 +183,8 @@ function getUiLabels(locale: Locale) {
       reservationCardTitle: "Schneller Reservierungsablauf",
       checkinAsk: "Bitte geben Sie das Check-in Datum im Format YYYY-MM-DD ein.",
       checkoutAsk: "Bitte geben Sie das Check-out Datum im Format YYYY-MM-DD ein.",
-      guestsAsk: "Bitte waehlen Sie die Gaestedaten unten aus.",
-      phoneAsk: "Als letzten Schritt teilen Sie bitte Ihre Telefonnummer mit.",
+      guestsAsk: "Super, waehlen Sie bitte unten die Gaestedaten aus.",
+      phoneAsk: "Letzter Schritt: Ihre Telefonnummer bitte.",
       badDate: "Ungueltiges Datumsformat. Beispiele: 2026-03-15, 15.03.2026, morgen",
       badCheckout: "Check-out darf nicht vor Check-in liegen.",
       badGuests: "Die Gaestezahl muss zwischen 1 und 20 liegen.",
@@ -203,7 +206,7 @@ function getUiLabels(locale: Locale) {
       hotelPickerContinue: "Mit Auswahl fortfahren",
       hotelPickerUnavailable: "Ausgebucht",
       hotelPickerSelected: (names: string) => `Ausgewaehlte Hotels: ${names}`,
-      contactAsk: "Fuer besseren Service teilen Sie bitte Ihren Vor- und Nachnamen sowie Ihre E-Mail-Adresse mit.",
+      contactAsk: "Damit ich besser helfen kann, teilen Sie bitte Ihren Namen und Ihre E-Mail-Adresse mit.",
       contactPending: "Bitte fuellen Sie die folgenden Angaben aus, um fortzufahren.",
       contactNameLabel: "Vor- und Nachname",
       contactEmailLabel: "E-Mail",
@@ -211,7 +214,7 @@ function getUiLabels(locale: Locale) {
       contactEmailPlaceholder: "beispiel@email.com",
       contactSubmit: "Daten senden",
       contactValidation: "Bitte geben Sie einen gueltigen Namen und eine gueltige E-Mail ein.",
-      contactThanks: "Danke, ich habe Ihre Angaben erhalten.",
+      contactThanks: "Perfekt, ich habe Ihre Angaben erhalten.",
       datePickerTitleCheckin: "Check-in Datum waehlen",
       datePickerTitleCheckout: "Check-out Datum waehlen",
       datePickerContinue: "Mit Datum fortfahren",
@@ -229,8 +232,8 @@ function getUiLabels(locale: Locale) {
     reservationCardTitle: "Quick Reservation Flow",
     checkinAsk: "Please enter check-in date in YYYY-MM-DD format.",
     checkoutAsk: "Please enter check-out date in YYYY-MM-DD format.",
-    guestsAsk: "Please select guest details below.",
-    phoneAsk: "As a final step, please share your phone number.",
+    guestsAsk: "Great, please pick guest details below.",
+    phoneAsk: "Last step: may I have your phone number?",
     badDate: "Invalid date format. Examples: 2026-03-15, 15/03/2026, tomorrow",
     badCheckout: "Check-out cannot be before check-in.",
     badGuests: "Guest count must be between 1 and 20.",
@@ -252,7 +255,7 @@ function getUiLabels(locale: Locale) {
     hotelPickerContinue: "Continue with selection",
     hotelPickerUnavailable: "Full",
     hotelPickerSelected: (names: string) => `Selected hotels: ${names}`,
-    contactAsk: "For better service, please share your full name and email address.",
+    contactAsk: "To help you better, could you share your full name and email address?",
     contactPending: "Please complete the details below to continue.",
     contactNameLabel: "Full name",
     contactEmailLabel: "Email",
@@ -260,7 +263,7 @@ function getUiLabels(locale: Locale) {
     contactEmailPlaceholder: "example@email.com",
     contactSubmit: "Submit details",
     contactValidation: "Please enter a valid full name and email.",
-    contactThanks: "Thanks, I received your details.",
+    contactThanks: "Perfect, I got your details.",
     datePickerTitleCheckin: "Select check-in date",
     datePickerTitleCheckout: "Select check-out date",
     datePickerContinue: "Continue with date",
@@ -551,8 +554,15 @@ function getTodayIsoDate() {
 }
 
 const wait = (ms: number) => new Promise<void>((resolve) => window.setTimeout(resolve, ms));
-const getAssistantDelayMs = () =>
-  minAssistantDelayMs + Math.floor(Math.random() * (maxAssistantDelayMs - minAssistantDelayMs + 1));
+const getAssistantDelayMs = (next: Message | Message[]) => {
+  const rows = Array.isArray(next) ? next : [next];
+  const assistantLength = rows
+    .filter((item) => item?.role === "assistant")
+    .reduce((sum, item) => sum + String(item?.text || "").length, 0);
+  const jitter = Math.floor(Math.random() * (assistantDelayJitterMs * 2 + 1)) - assistantDelayJitterMs;
+  const target = baseAssistantDelayMs + assistantLength * perCharacterDelayMs + jitter;
+  return Math.max(minAssistantDelayMs, Math.min(maxAssistantDelayMs, target));
+};
 
 export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
   const activeLocale = useLocale();
@@ -866,7 +876,7 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
       item.role === "assistant" ? { ...item, text: personalizeAssistantText(item.text, item.variant) } : item,
     );
     setIsTyping(true);
-    await wait(getAssistantDelayMs());
+    await wait(getAssistantDelayMs(personalizedRows));
     setMessages((prev) => [...prev, ...personalizedRows]);
     setIsTyping(false);
   };
@@ -1311,19 +1321,17 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
         nextMessages.push({ role: "assistant", text: `${labels.policy}: ${labels.handoff}`, variant: "meta" });
       }
 
-      await wait(getAssistantDelayMs());
+      await wait(getAssistantDelayMs(nextMessages));
       setMessages((prev) => [...prev, ...nextMessages]);
       trackEvent("chat_response", { intent: "qa", model, latencyMs: elapsed });
     } catch (_error) {
-      await wait(getAssistantDelayMs());
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          text: getChatErrorText(locale),
-          variant: "error",
-        },
-      ]);
+      const errorMessage: Message = {
+        role: "assistant",
+        text: getChatErrorText(locale),
+        variant: "error",
+      };
+      await wait(getAssistantDelayMs(errorMessage));
+      setMessages((prev) => [...prev, errorMessage]);
     } finally {
       window.clearTimeout(timeoutId);
       setIsTyping(false);
@@ -1723,7 +1731,7 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
               <button
                 key={action}
                 type="button"
-                className="chat-quick-chip"
+                className="chat-quick-chip chat-quick-chip-minimal"
                 onClick={() => handleQuickAction(action)}
                 disabled={isTyping || needsContactInfo}
               >

@@ -2537,7 +2537,8 @@ header .menu_side_area {
   grid-area: actions;
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 4px;
+  align-items: center;
 }
 
 .chat-quick-chip {
@@ -2560,6 +2561,26 @@ header .menu_side_area {
   border-color: #bcc3cd;
   color: #111827;
   transform: translateY(-0.5px);
+}
+
+.chat-quick-chip-minimal {
+  border: 0;
+  background: transparent;
+  border-radius: 8px;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: 500;
+  color: rgba(26, 22, 19, 0.58);
+  box-shadow: none;
+  transform: none;
+}
+
+.chat-quick-chip-minimal:hover,
+.chat-quick-chip-minimal:focus-visible {
+  background: rgba(26, 22, 19, 0.06);
+  border-color: transparent;
+  color: rgba(26, 22, 19, 0.86);
+  transform: none;
 }
 
 .chat-title-row {
