@@ -109,6 +109,7 @@ const chatApiUrl = withPublicApiBaseIfNeeded("/api/v1/chat");
 const chatEventsApiUrl = withPublicApiBaseIfNeeded("/api/v1/chat/events");
 const chatSessionsApiUrl = withPublicApiBaseIfNeeded("/api/v1/chat/sessions");
 const hotelsApiBaseUrl = withPublicApiBaseIfNeeded("/api/v1/public/hotels");
+const quoteFormApiUrl = withPublicApiBaseIfNeeded("/api/v1/public/forms/request");
 const minAssistantDelayMs = 1000;
 const maxAssistantDelayMs = 2000;
 
@@ -528,6 +529,16 @@ function isValidPhoneNumber(input: string) {
   return digits.length >= 8 && digits.length <= 15;
 }
 
+function splitFullName(value: string) {
+  const parts = String(value || "")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+  if (!parts.length) return { firstName: "", lastName: "" };
+  if (parts.length === 1) return { firstName: parts[0], lastName: parts[0] };
+  return { firstName: parts[0], lastName: parts.slice(1).join(" ") };
+}
+
 function toLocalIsoDate(date: Date) {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -877,6 +888,74 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
     return typeof window !== "undefined" ? `${window.location.origin}${path}` : path;
   };
 
+  const sendChatQuoteRequest = (draft: ReservationDraft, normalizedPhone: string) => {
+    const email = String(contactEmail || "").trim();
+    if (!isValidFullName(contactFullName) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      trackEvent("chat_quote_request_mail", { intent: "skipped_missing_contact" });
+      return;
+    }
+
+    const { firstName, lastName } = splitFullName(contactFullName);
+    const selectedHotelNames = Array.from(
+      new Set(
+        draft.hotelSlugs
+          .map((slug) => findReservationHotel(slug)?.name || slug)
+          .map((item) => String(item || "").trim())
+          .filter(Boolean),
+      ),
+    );
+    const totalGuests = Math.max(1, (Number.parseInt(draft.guests || "1", 10) || 1) + (Number.parseInt(draft.children || "0", 10) || 0));
+    const suggestedRooms = String(Math.max(1, Math.ceil(totalGuests / 2)));
+    const purposeByLocale =
+      locale === "tr"
+        ? "Meri Chat uzerinden rezervasyon talebi"
+        : locale === "de"
+          ? "Reservierungsanfrage ueber Meri Chat"
+          : "Reservation request via Meri Chat";
+    const chatMessageHeader =
+      locale === "tr"
+        ? "Bu talep Meri AI Chat panelinden gonderildi."
+        : locale === "de"
+          ? "Diese Anfrage wurde ueber das Meri AI Chat-Panel gesendet."
+          : "This inquiry was submitted via the Meri AI chat panel.";
+    const quotePayload = {
+      locale,
+      sourcePage: "/chat-widget",
+      firstName,
+      lastName,
+      company: "-",
+      email,
+      phone: normalizedPhone,
+      purpose: purposeByLocale,
+      nationality: "-",
+      guests: draft.guests || "1",
+      children: draft.children || "0",
+      rooms: suggestedRooms,
+      boarding: selectedHotelNames.join(", ") || "Meri Boarding",
+      moveIn: draft.checkin || "",
+      message: [
+        chatMessageHeader,
+        `Check-in: ${draft.checkin || "-"}`,
+        `Check-out: ${draft.checkout || "-"}`,
+        `Accessible guest request: ${draft.accessible ? "Yes" : "No"}`,
+      ].join("\n"),
+    };
+
+    fetch(quoteFormApiUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(quotePayload),
+    })
+      .then((response) => {
+        trackEvent("chat_quote_request_mail", { intent: response.ok ? "sent" : "failed" });
+        return null;
+      })
+      .catch(() => {
+        trackEvent("chat_quote_request_mail", { intent: "failed" });
+        return null;
+      });
+  };
+
   const handleHotelCheckboxToggle = (slug: string) => {
     if (isTyping || reservationStep !== "hotel") return;
     setReservationDraft((prev) => {
@@ -995,6 +1074,7 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
     const draft = { ...reservationDraft, phone: normalizedPhone };
     setReservationDraft(draft);
     setReservationStep("idle");
+    sendChatQuoteRequest(draft, normalizedPhone);
     await pushAssistantMessagesWithDelay({ role: "assistant", text: labels.complete(createReservationLink(draft)), variant: "action" });
     trackEvent("reservation_flow_complete", { intent: "reservation_prefill_ready" });
   };
@@ -1140,6 +1220,7 @@ export default function ChatWidget({ locale: localeProp }: ChatWidgetProps) {
       setReservationDraft(draft);
       setPhoneValue(normalizedPhone);
       setReservationStep("idle");
+      sendChatQuoteRequest(draft, normalizedPhone);
       await pushAssistantMessagesWithDelay({ role: "assistant", text: labels.complete(createReservationLink(draft)), variant: "action" });
       trackEvent("reservation_flow_complete", { intent: "reservation_prefill_ready" });
       return;
