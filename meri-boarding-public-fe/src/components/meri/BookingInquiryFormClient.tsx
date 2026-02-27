@@ -54,7 +54,8 @@ export default function BookingInquiryFormClient({ locale, privacyHref, copy }: 
         modalBody: 'Ekibimiz en kısa sürede sizinle iletişime geçecek.',
         modalClose: 'Kapat',
         submitError: 'Talep gönderilemedi. Lütfen tekrar deneyin.',
-        childrenLabel: 'Number of Child'
+        childrenLabel: 'Number of Child',
+        guestGroupLabel: '5+ (Ekip ya da coklu misafir)'
       }
     }
     if (locale === 'en') {
@@ -64,7 +65,8 @@ export default function BookingInquiryFormClient({ locale, privacyHref, copy }: 
         modalBody: 'Our team will contact you shortly.',
         modalClose: 'Close',
         submitError: 'Request could not be sent. Please try again.',
-        childrenLabel: 'Number of Child'
+        childrenLabel: 'Number of Child',
+        guestGroupLabel: '5+ (Team or group guests)'
       }
     }
     return {
@@ -73,10 +75,41 @@ export default function BookingInquiryFormClient({ locale, privacyHref, copy }: 
       modalBody: 'Unser Team wird sich in Kürze bei Ihnen melden.',
       modalClose: 'Schließen',
       submitError: 'Anfrage konnte nicht gesendet werden. Bitte versuchen Sie es erneut.',
-      childrenLabel: 'Number of Child'
+      childrenLabel: 'Number of Child',
+      guestGroupLabel: '5+ (Team oder Gruppenreisende)'
     }
   }, [locale])
-  const adultOptions = Array.from({ length: 10 }, (_, i) => String(i + 1))
+  const guestOptions = useMemo(
+    () => [...Array.from({ length: 5 }, (_, i) => ({ value: String(i + 1), label: String(i + 1) })), { value: '5+', label: ui.guestGroupLabel }],
+    [ui.guestGroupLabel]
+  )
+  const nationalityOptions = useMemo(
+    () => [
+      'Germany',
+      'Turkey',
+      'Austria',
+      'Switzerland',
+      'Netherlands',
+      'Belgium',
+      'France',
+      'Italy',
+      'Spain',
+      'United Kingdom',
+      'United States',
+      'Canada',
+      'Poland',
+      'Romania',
+      'Bulgaria',
+      'Greece',
+      'Russia',
+      'Ukraine',
+      'India',
+      'China',
+      'Japan',
+      'Other'
+    ],
+    []
+  )
   const childOptions = Array.from({ length: 11 }, (_, i) => String(i))
   const minMoveInDate = useMemo(() => new Date().toISOString().slice(0, 10), [])
 
@@ -212,8 +245,15 @@ export default function BookingInquiryFormClient({ locale, privacyHref, copy }: 
                   </div>
 
                   <div className='col-md-6'>
-                    <div className='modern-contact-field'>
-                      <input id='inquiry_nationality' type='text' name='nationalitat' className='bg-white form-control modern-contact-input' placeholder=' ' />
+                    <div className='modern-contact-field select-field'>
+                      <select id='inquiry_nationality' name='nationalitat' className='bg-white form-control modern-contact-input'>
+                        <option value=''>{copy.select}</option>
+                        {nationalityOptions.map(option => (
+                          <option key={option} value={option}>
+                            {option}
+                          </option>
+                        ))}
+                      </select>
                       <label htmlFor='inquiry_nationality' className='modern-contact-label'>
                         {copy.nationality}
                       </label>
@@ -224,9 +264,9 @@ export default function BookingInquiryFormClient({ locale, privacyHref, copy }: 
                     <div className='modern-contact-field select-field'>
                       <select id='inquiry_guests' name='anzahl_personen' className='bg-white form-control modern-contact-input' required>
                         <option value=''>{copy.select}</option>
-                        {adultOptions.map(option => (
-                          <option key={option} value={option}>
-                            {option}
+                        {guestOptions.map(option => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
                           </option>
                         ))}
                       </select>

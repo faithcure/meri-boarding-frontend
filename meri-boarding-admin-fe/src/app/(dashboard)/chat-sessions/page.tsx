@@ -14,17 +14,21 @@ import DialogTitle from '@mui/material/DialogTitle'
 import Grid from '@mui/material/Grid'
 import IconButton from '@mui/material/IconButton'
 import MenuItem from '@mui/material/MenuItem'
+import Tab from '@mui/material/Tab'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
+import Tabs from '@mui/material/Tabs'
 import Typography from '@mui/material/Typography'
+import { alpha, useTheme } from '@mui/material/styles'
 
 import CustomTextField from '@core/components/mui/TextField'
 
 type LocaleFilter = 'all' | 'de' | 'en' | 'tr'
+type ChatSessionsTab = 'quality' | 'messages'
 
 type ChatSession = {
   id: string
@@ -79,6 +83,7 @@ type ChatQuality = {
 }
 
 export default function ChatSessionsPage() {
+  const theme = useTheme()
   const configuredApiBaseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL ?? '').trim()
   const apiBaseUrl = configuredApiBaseUrl.startsWith('http://localhost') || configuredApiBaseUrl.startsWith('https://localhost')
     ? ''
@@ -100,6 +105,7 @@ export default function ChatSessionsPage() {
   const [limit] = useState(25)
   const [total, setTotal] = useState(0)
   const [quality, setQuality] = useState<ChatQuality | null>(null)
+  const [activeTab, setActiveTab] = useState<ChatSessionsTab>('quality')
 
   const totalPages = useMemo(() => Math.max(1, Math.ceil(total / limit)), [limit, total])
 
@@ -292,165 +298,171 @@ export default function ChatSessionsPage() {
         {success ? <Alert severity='success'>{success}</Alert> : null}
       </Grid>
 
-      {quality ? (
-        <Grid size={{ xs: 12 }}>
-          <Card>
-            <CardContent className='flex flex-col gap-3'>
-              <Typography variant='h6'>Quality Snapshot ({quality.periodDays} days)</Typography>
-              <Grid container spacing={2}>
-                <Grid size={{ xs: 12, md: 3 }}>
-                  <Chip color='primary' label={`Auto-resolve rate: ${quality.totals.autoResolveRate}%`} />
-                </Grid>
-                <Grid size={{ xs: 12, md: 3 }}>
-                  <Chip color='warning' label={`Handoff rate: ${quality.totals.handoffRate}%`} />
-                </Grid>
-                <Grid size={{ xs: 12, md: 3 }}>
-                  <Chip color='error' label={`Wrong-answer reports: ${quality.feedback.incorrect}`} />
-                </Grid>
-                <Grid size={{ xs: 12, md: 3 }}>
-                  <Chip label={`Wrong-answer rate: ${quality.feedback.incorrectRate}%`} />
-                </Grid>
-              </Grid>
-              <Typography variant='body2' color='text.secondary'>
-                Top asked questions (normalized from user messages)
-              </Typography>
-              {quality.topQuestions.length < 1 ? (
-                <Typography color='text.secondary'>No question trend data for selected period.</Typography>
-              ) : (
-                <TableContainer>
-                  <Table size='small'>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Question</TableCell>
-                        <TableCell align='right'>Count</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {quality.topQuestions.map((row, index) => (
-                        <TableRow key={`${row.text}-${index}`}>
-                          <TableCell sx={{ maxWidth: 800 }}>
-                            <Typography variant='body2'>{row.text}</Typography>
-                          </TableCell>
-                          <TableCell align='right'>{row.count}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              )}
-            </CardContent>
-          </Card>
-        </Grid>
-      ) : null}
-
       <Grid size={{ xs: 12 }}>
         <Card>
           <CardContent className='flex flex-col gap-3'>
-            <Grid container spacing={3}>
-              <Grid size={{ xs: 12, md: 2 }}>
-                <CustomTextField
-                  select
-                  label='Locale'
-                  value={localeFilter}
-                  onChange={event => {
-                    setLocaleFilter(event.target.value as LocaleFilter)
-                    setPage(1)
-                  }}
-                  fullWidth
-                >
-                  <MenuItem value='all'>All</MenuItem>
-                  <MenuItem value='de'>DE</MenuItem>
-                  <MenuItem value='en'>EN</MenuItem>
-                  <MenuItem value='tr'>TR</MenuItem>
-                </CustomTextField>
-              </Grid>
-              <Grid size={{ xs: 12, md: 6 }}>
-                <CustomTextField
-                  label='Search (name, email, last message)'
-                  value={search}
-                  onChange={event => setSearch(event.target.value)}
-                  fullWidth
-                />
-              </Grid>
-              <Grid size={{ xs: 12, md: 2 }} className='flex items-end'>
-                <Button
-                  variant='outlined'
-                  fullWidth
-                  onClick={() => {
-                    setQuerySearch(search.trim())
-                    setPage(1)
-                  }}
-                >
-                  Apply
-                </Button>
-              </Grid>
-              <Grid size={{ xs: 12, md: 2 }} className='flex items-end'>
-                <Button variant='contained' fullWidth onClick={() => void exportCsv()}>
-                  Export CSV
-                </Button>
-              </Grid>
-            </Grid>
+            <Tabs value={activeTab} onChange={(_, value: ChatSessionsTab) => setActiveTab(value)}>
+              <Tab value='quality' label='Quality Snapshot (30 days)' />
+              <Tab value='messages' label='Mesajlar' />
+            </Tabs>
 
-            {items.length < 1 ? (
-              <Typography color='text.secondary'>No chat session found.</Typography>
+            {activeTab === 'quality' ? (
+              quality ? (
+                <>
+                  <Grid container spacing={2}>
+                    <Grid size={{ xs: 12, md: 3 }}>
+                      <Chip color='primary' label={`Auto-resolve rate: ${quality.totals.autoResolveRate}%`} />
+                    </Grid>
+                    <Grid size={{ xs: 12, md: 3 }}>
+                      <Chip color='warning' label={`Handoff rate: ${quality.totals.handoffRate}%`} />
+                    </Grid>
+                    <Grid size={{ xs: 12, md: 3 }}>
+                      <Chip color='error' label={`Wrong-answer reports: ${quality.feedback.incorrect}`} />
+                    </Grid>
+                    <Grid size={{ xs: 12, md: 3 }}>
+                      <Chip label={`Wrong-answer rate: ${quality.feedback.incorrectRate}%`} />
+                    </Grid>
+                  </Grid>
+                  <Typography variant='body2' color='text.secondary'>
+                    Top asked questions (normalized from user messages)
+                  </Typography>
+                  {quality.topQuestions.length < 1 ? (
+                    <Typography color='text.secondary'>No question trend data for selected period.</Typography>
+                  ) : (
+                    <TableContainer>
+                      <Table size='small'>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>Question</TableCell>
+                            <TableCell align='right'>Count</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {quality.topQuestions.map((row, index) => (
+                            <TableRow key={`${row.text}-${index}`}>
+                              <TableCell sx={{ maxWidth: 800 }}>
+                                <Typography variant='body2'>{row.text}</Typography>
+                              </TableCell>
+                              <TableCell align='right'>{row.count}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  )}
+                </>
+              ) : (
+                <Typography color='text.secondary'>No quality snapshot data found.</Typography>
+              )
             ) : (
-              <TableContainer>
-                <Table size='small'>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Date</TableCell>
-                      <TableCell>Name</TableCell>
-                      <TableCell>Email</TableCell>
-                      <TableCell>Locale</TableCell>
-                      <TableCell>Messages</TableCell>
-                      <TableCell>Last Message</TableCell>
-                      <TableCell align='right'>Actions</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {items.map(item => (
-                      <TableRow key={item.id} hover sx={{ cursor: 'pointer' }} onClick={() => void openDetail(item)}>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>{new Date(item.createdAt).toLocaleString()}</TableCell>
-                        <TableCell>{item.name}</TableCell>
-                        <TableCell>{item.email}</TableCell>
-                        <TableCell>{item.locale.toUpperCase()}</TableCell>
-                        <TableCell>{item.messageCount}</TableCell>
-                        <TableCell sx={{ maxWidth: 520 }}>
-                          <Typography variant='body2'>{item.lastPreview || '-'}</Typography>
-                        </TableCell>
-                        <TableCell align='right'>
-                          <IconButton
-                            size='small'
-                            color='error'
-                            disabled={deletingId === item.id}
-                            onClick={event => {
-                              event.stopPropagation()
-                              void deleteSession(item)
-                            }}
-                          >
-                            <i className='bx-trash' />
-                          </IconButton>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            )}
+              <>
+                <Grid container spacing={3}>
+                  <Grid size={{ xs: 12, md: 2 }}>
+                    <CustomTextField
+                      select
+                      label='Locale'
+                      value={localeFilter}
+                      onChange={event => {
+                        setLocaleFilter(event.target.value as LocaleFilter)
+                        setPage(1)
+                      }}
+                      fullWidth
+                    >
+                      <MenuItem value='all'>All</MenuItem>
+                      <MenuItem value='de'>DE</MenuItem>
+                      <MenuItem value='en'>EN</MenuItem>
+                      <MenuItem value='tr'>TR</MenuItem>
+                    </CustomTextField>
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <CustomTextField
+                      label='Search (name, email, last message)'
+                      value={search}
+                      onChange={event => setSearch(event.target.value)}
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 2 }} className='flex items-end'>
+                    <Button
+                      variant='outlined'
+                      fullWidth
+                      onClick={() => {
+                        setQuerySearch(search.trim())
+                        setPage(1)
+                      }}
+                    >
+                      Apply
+                    </Button>
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 2 }} className='flex items-end'>
+                    <Button variant='contained' fullWidth onClick={() => void exportCsv()}>
+                      Export CSV
+                    </Button>
+                  </Grid>
+                </Grid>
 
-            <div className='flex items-center justify-between'>
-              <Typography color='text.secondary'>
-                Page {page} / {totalPages} | Total {total}
-              </Typography>
-              <div className='flex items-center gap-2'>
-                <Button size='small' variant='outlined' disabled={page <= 1} onClick={() => setPage(prev => Math.max(1, prev - 1))}>
-                  Previous
-                </Button>
-                <Button size='small' variant='outlined' disabled={page >= totalPages} onClick={() => setPage(prev => Math.min(totalPages, prev + 1))}>
-                  Next
-                </Button>
-              </div>
-            </div>
+                {items.length < 1 ? (
+                  <Typography color='text.secondary'>No chat session found.</Typography>
+                ) : (
+                  <TableContainer>
+                    <Table size='small'>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>Date</TableCell>
+                          <TableCell>Name</TableCell>
+                          <TableCell>Email</TableCell>
+                          <TableCell>Locale</TableCell>
+                          <TableCell>Messages</TableCell>
+                          <TableCell>Last Message</TableCell>
+                          <TableCell align='right'>Actions</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {items.map(item => (
+                          <TableRow key={item.id} hover sx={{ cursor: 'pointer' }} onClick={() => void openDetail(item)}>
+                            <TableCell sx={{ whiteSpace: 'nowrap' }}>{new Date(item.createdAt).toLocaleString()}</TableCell>
+                            <TableCell>{item.name}</TableCell>
+                            <TableCell>{item.email}</TableCell>
+                            <TableCell>{item.locale.toUpperCase()}</TableCell>
+                            <TableCell>{item.messageCount}</TableCell>
+                            <TableCell sx={{ maxWidth: 520 }}>
+                              <Typography variant='body2'>{item.lastPreview || '-'}</Typography>
+                            </TableCell>
+                            <TableCell align='right'>
+                              <IconButton
+                                size='small'
+                                color='error'
+                                disabled={deletingId === item.id}
+                                onClick={event => {
+                                  event.stopPropagation()
+                                  void deleteSession(item)
+                                }}
+                              >
+                                <i className='bx-trash' />
+                              </IconButton>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                )}
+
+                <div className='flex items-center justify-between'>
+                  <Typography color='text.secondary'>
+                    Page {page} / {totalPages} | Total {total}
+                  </Typography>
+                  <div className='flex items-center gap-2'>
+                    <Button size='small' variant='outlined' disabled={page <= 1} onClick={() => setPage(prev => Math.max(1, prev - 1))}>
+                      Previous
+                    </Button>
+                    <Button size='small' variant='outlined' disabled={page >= totalPages} onClick={() => setPage(prev => Math.min(totalPages, prev + 1))}>
+                      Next
+                    </Button>
+                  </div>
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
       </Grid>
@@ -467,31 +479,40 @@ export default function ChatSessionsPage() {
                 <Chip size='small' label={`Source: ${detail.session.sourcePage}`} />
               </div>
               <Typography variant='body2'><strong>Name:</strong> {detail.session.name}</Typography>
-              <Typography variant='body2'><strong>Email:</strong> {detail.session.email}</Typography>
-              <Typography variant='body2'><strong>Date:</strong> {new Date(detail.session.createdAt).toLocaleString()}</Typography>
-              <div className='flex flex-col gap-2'>
-                {detail.messages.map(message => (
-                  <div
-                    key={message.id}
-                    style={{
-                      alignSelf: message.role === 'user' ? 'flex-end' : 'flex-start',
-                      maxWidth: '84%',
-                      border: '1px solid rgba(0,0,0,0.14)',
-                      borderRadius: 12,
-                      padding: '8px 10px',
-                      background: message.role === 'user' ? 'rgba(202,160,92,0.18)' : '#fff'
-                    }}
-                  >
-                    <Typography variant='caption' color='text.secondary'>
-                      {message.role.toUpperCase()} • {new Date(message.createdAt).toLocaleString()}
-                    </Typography>
-                    <Typography variant='body2' sx={{ whiteSpace: 'pre-wrap' }}>
-                      {message.text}
-                    </Typography>
-                  </div>
-                ))}
+                <Typography variant='body2'><strong>Email:</strong> {detail.session.email}</Typography>
+                <Typography variant='body2'><strong>Date:</strong> {new Date(detail.session.createdAt).toLocaleString()}</Typography>
+                <div className='flex flex-col gap-2'>
+                  {detail.messages.map(message => {
+                    const isUser = message.role === 'user'
+                    const bubbleBackground = isUser
+                      ? alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.26 : 0.16)
+                      : theme.palette.mode === 'dark'
+                        ? alpha(theme.palette.common.white, 0.06)
+                        : theme.palette.background.paper
+
+                    return (
+                      <div
+                        key={message.id}
+                        style={{
+                          alignSelf: isUser ? 'flex-end' : 'flex-start',
+                          maxWidth: '84%',
+                          border: `1px solid ${alpha(theme.palette.divider, 0.9)}`,
+                          borderRadius: 12,
+                          padding: '8px 10px',
+                          background: bubbleBackground
+                        }}
+                      >
+                        <Typography variant='caption' color='text.secondary'>
+                          {message.role.toUpperCase()} • {new Date(message.createdAt).toLocaleString()}
+                        </Typography>
+                        <Typography variant='body2' sx={{ whiteSpace: 'pre-wrap', color: 'text.primary' }}>
+                          {message.text}
+                        </Typography>
+                      </div>
+                    )
+                  })}
+                </div>
               </div>
-            </div>
           ) : null}
         </DialogContent>
         <DialogActions>

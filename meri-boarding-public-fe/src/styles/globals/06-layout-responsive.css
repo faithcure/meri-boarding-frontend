@@ -177,7 +177,7 @@
 }
 
 .hero-copy-shell {
-  width: min(640px, 100%);
+  width: min(760px, 100%);
   margin-top: 14px;
   padding: 0;
   border-radius: 0;
@@ -186,7 +186,7 @@
 }
 
 .hero-copy {
-  max-width: 46ch;
+  max-width: 58ch;
   color: rgba(255, 255, 255, 0.95);
   line-height: 1.6;
 }
@@ -268,4 +268,3 @@
 .home-booking-partner-card:focus-visible img {
   filter: grayscale(0%);
 }
-

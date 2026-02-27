@@ -409,11 +409,13 @@ export default async function HotelDynamicPage({ params }: HotelDynamicPageProps
             )}
           </div>
         </section>
-        <BookingPartnersSection
-          partners={homeContent.hero.bookingPartners}
-          title={homeContent.hero.bookingPartnersTitle}
-          description={homeContent.hero.bookingPartnersDescription}
-        />
+        {homeContent.hero.bookingPartnersVisibility.hotelDetailPage ? (
+          <BookingPartnersSection
+            partners={homeContent.hero.bookingPartners}
+            title={homeContent.hero.bookingPartnersTitle}
+            description={homeContent.hero.bookingPartnersDescription}
+          />
+        ) : null}
       </main>
       <Footer locale={locale} />
       <BuyNow />

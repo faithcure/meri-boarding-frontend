@@ -3,11 +3,16 @@
 import { useEffect, useState } from 'react'
 
 import Alert from '@mui/material/Alert'
+import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
+import Checkbox from '@mui/material/Checkbox'
+import FormControlLabel from '@mui/material/FormControlLabel'
 import Grid from '@mui/material/Grid'
 import MenuItem from '@mui/material/MenuItem'
+import Tab from '@mui/material/Tab'
+import Tabs from '@mui/material/Tabs'
 import Typography from '@mui/material/Typography'
 
 import CustomTextField from '@core/components/mui/TextField'
@@ -31,6 +36,7 @@ export default function HeroSettingsPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [locale, setLocale] = useState<Locale>('en')
+  const [activeTab, setActiveTab] = useState<'hero' | 'partners'>('hero')
   const [hero, setHero] = useState<HeroContent>({
     titleLead: '',
     titleHighlight: '',
@@ -40,6 +46,10 @@ export default function HeroSettingsPage() {
     ctaLocationsHref: '/hotels',
     ctaQuote: '',
     ctaQuoteHref: '/contact',
+    bookingPartnersVisibility: {
+      hotelsPage: true,
+      hotelDetailPage: true
+    },
     bookingPartners: [],
     slides: []
   })
@@ -266,44 +276,88 @@ export default function HeroSettingsPage() {
       <Grid size={{ xs: 12 }}>
         <Card>
           <CardContent className='flex flex-col gap-4'>
-            <HeroMainFields hero={hero} onChange={updater => setHero(prev => updater(prev))} />
+            <Tabs value={activeTab} onChange={(_, value: 'hero' | 'partners') => setActiveTab(value)}>
+              <Tab value='hero' label='Hero Content' />
+              <Tab value='partners' label='Booking Partners' />
+            </Tabs>
 
-            <Typography variant='h6'>Slides</Typography>
-            <HeroSlidesEditor
-              hero={hero}
-              uploadingTarget={uploadingTarget}
-              positionPresets={positionPresets}
-              resolvePreviewUrl={rawUrl => resolvePreviewUrl(rawUrl, apiBaseUrl, publicBaseUrl)}
-              onChange={updater => setHero(prev => updater(prev))}
-              onUpload={uploadHeroImage}
-              onRemove={index => setHero(prev => ({ ...prev, slides: prev.slides.filter((_, i) => i !== index) }))}
-            />
+            {activeTab === 'hero' ? (
+              <Box className='flex flex-col gap-4'>
+                <HeroMainFields hero={hero} onChange={updater => setHero(prev => updater(prev))} />
 
-            <Typography variant='h6'>Booking Partners</Typography>
-            <HeroPartnersEditor
-              hero={hero}
-              uploadingTarget={uploadingTarget}
-              resolvePreviewUrl={rawUrl => resolvePreviewUrl(rawUrl, apiBaseUrl, publicBaseUrl)}
-              onChange={updater => setHero(prev => updater(prev))}
-              onUpload={uploadBookingPartnerLogo}
-              onRemove={index => setHero(prev => ({ ...prev, bookingPartners: prev.bookingPartners.filter((_, i) => i !== index) }))}
-            />
+                <Typography variant='h6'>Slides</Typography>
+                <HeroSlidesEditor
+                  hero={hero}
+                  uploadingTarget={uploadingTarget}
+                  positionPresets={positionPresets}
+                  resolvePreviewUrl={rawUrl => resolvePreviewUrl(rawUrl, apiBaseUrl, publicBaseUrl)}
+                  onChange={updater => setHero(prev => updater(prev))}
+                  onUpload={uploadHeroImage}
+                  onRemove={index => setHero(prev => ({ ...prev, slides: prev.slides.filter((_, i) => i !== index) }))}
+                />
+              </Box>
+            ) : (
+              <Box className='flex flex-col gap-4'>
+                <Typography variant='h6'>Booking Partners</Typography>
+                <Box className='flex flex-col'>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={hero.bookingPartnersVisibility.hotelsPage}
+                        onChange={(_, checked) =>
+                          setHero(prev => ({
+                            ...prev,
+                            bookingPartnersVisibility: { ...prev.bookingPartnersVisibility, hotelsPage: checked }
+                          }))
+                        }
+                      />
+                    }
+                    label='Show on Hotels page (/hotels)'
+                  />
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={hero.bookingPartnersVisibility.hotelDetailPage}
+                        onChange={(_, checked) =>
+                          setHero(prev => ({
+                            ...prev,
+                            bookingPartnersVisibility: { ...prev.bookingPartnersVisibility, hotelDetailPage: checked }
+                          }))
+                        }
+                      />
+                    }
+                    label='Show on Hotel Detail pages (/hotels/:slug)'
+                  />
+                </Box>
+                <HeroPartnersEditor
+                  hero={hero}
+                  uploadingTarget={uploadingTarget}
+                  resolvePreviewUrl={rawUrl => resolvePreviewUrl(rawUrl, apiBaseUrl, publicBaseUrl)}
+                  onChange={updater => setHero(prev => updater(prev))}
+                  onUpload={uploadBookingPartnerLogo}
+                  onRemove={index => setHero(prev => ({ ...prev, bookingPartners: prev.bookingPartners.filter((_, i) => i !== index) }))}
+                />
+              </Box>
+            )}
 
             <div className='flex gap-2'>
-              <Button
-                variant='outlined'
-                disabled={hero.slides.length >= maxSlides}
-                onClick={() => setHero(prev => ({ ...prev, slides: [...prev.slides, { image: '', position: 'center center' }] }))}
-              >
-                Add Slide
-              </Button>
-              <Button
-                variant='outlined'
-                disabled={hero.bookingPartners.length >= maxPartners}
-                onClick={() => setHero(prev => ({ ...prev, bookingPartners: [...prev.bookingPartners, { name: '', logo: '', url: '', description: '' }] }))}
-              >
-                Add Booking Partner
-              </Button>
+              {activeTab === 'hero' ? (
+                <Button
+                  variant='outlined'
+                  disabled={hero.slides.length >= maxSlides}
+                  onClick={() => setHero(prev => ({ ...prev, slides: [...prev.slides, { image: '', position: 'center center' }] }))}
+                >
+                  Add Slide
+                </Button>
+              ) : (
+                <Button
+                  variant='outlined'
+                  disabled={hero.bookingPartners.length >= maxPartners}
+                  onClick={() => setHero(prev => ({ ...prev, bookingPartners: [...prev.bookingPartners, { name: '', logo: '', url: '', description: '' }] }))}
+                >
+                  Add Booking Partner
+                </Button>
+              )}
               <Button variant='contained' onClick={() => void handleSave()} disabled={saving}>
                 {saving ? 'Saving...' : 'Save Hero Settings'}
               </Button>

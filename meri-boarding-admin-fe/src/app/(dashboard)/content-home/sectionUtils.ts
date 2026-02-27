@@ -1,4 +1,4 @@
-export type SectionKey = 'hero' | 'bookingPartners' | 'rooms' | 'testimonials' | 'facilities' | 'gallery' | 'offers' | 'faq'
+export type SectionKey = 'hero' | 'bookingPartners' | 'rooms' | 'testimonials' | 'facilities' | 'gallery' | 'offers' | 'faq' | 'videoCta'
 
 export type HomeSectionState = {
   enabled: boolean
@@ -9,7 +9,7 @@ export type HomeContent = {
   sections: Record<SectionKey, HomeSectionState>
 }
 
-export const sectionKeys: SectionKey[] = ['hero', 'bookingPartners', 'rooms', 'testimonials', 'facilities', 'gallery', 'offers', 'faq']
+export const sectionKeys: SectionKey[] = ['hero', 'bookingPartners', 'rooms', 'testimonials', 'facilities', 'gallery', 'offers', 'faq', 'videoCta']
 
 export const defaultSections = (): Record<SectionKey, HomeSectionState> => ({
   hero: { enabled: true, order: 1 },
@@ -19,7 +19,8 @@ export const defaultSections = (): Record<SectionKey, HomeSectionState> => ({
   facilities: { enabled: true, order: 5 },
   gallery: { enabled: true, order: 6 },
   offers: { enabled: true, order: 7 },
-  faq: { enabled: true, order: 8 }
+  faq: { enabled: true, order: 8 },
+  videoCta: { enabled: true, order: 9 }
 })
 
 export const normalizeSections = (input: unknown): Record<SectionKey, HomeSectionState> => {

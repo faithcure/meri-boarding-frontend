@@ -6,6 +6,7 @@ import HeaderScrollState from "@/components/meri/HeaderScrollState";
 import LegacyScripts from "@/components/meri/LegacyScripts";
 import RouteEffects from "@/components/meri/RouteEffects";
 import RouteTransitionOverlay from "@/components/meri/RouteTransitionOverlay";
+import SiteAnalyticsTracker from "@/components/meri/SiteAnalyticsTracker";
 import type { Locale } from "@/i18n/getLocale";
 import { getLocale } from "@/i18n/getLocale";
 import { fetchSiteIconUrl } from "@/lib/siteSettingsApi";
@@ -82,6 +83,7 @@ export default async function RootLayout({
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {children}
+        <SiteAnalyticsTracker locale={locale as "de" | "en" | "tr"} />
         <RouteTransitionOverlay />
         <HeaderScrollState />
         <ChatWidget locale={locale as "de" | "en" | "tr"} />

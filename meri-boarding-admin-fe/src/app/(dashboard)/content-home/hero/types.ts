@@ -12,6 +12,11 @@ export type BookingPartner = {
   description: string
 }
 
+export type BookingPartnersVisibility = {
+  hotelsPage: boolean
+  hotelDetailPage: boolean
+}
+
 export type HeroContent = {
   titleLead: string
   titleHighlight: string
@@ -21,6 +26,7 @@ export type HeroContent = {
   ctaLocationsHref: string
   ctaQuote: string
   ctaQuoteHref: string
+  bookingPartnersVisibility: BookingPartnersVisibility
   bookingPartners: BookingPartner[]
   slides: HeroSlide[]
 }

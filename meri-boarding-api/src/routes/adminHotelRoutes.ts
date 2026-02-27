@@ -152,6 +152,9 @@ server.patch('/api/v1/admin/hotels/:hotelId', async (request, reply) => {
   const locale = parseLocale(body?.locale);
   const currentLocale = normalizeHotelLocaleContent(locale, row.locales?.[locale], row.locales?.en);
   const nextLocale = normalizeHotelLocaleContent(locale, body?.content, currentLocale);
+  if (!nextLocale.name || !nextLocale.shortDescription) {
+    return reply.code(400).send({ error: 'Name and short description are required' });
+  }
 
   const nextSlug =
     body?.slug === undefined

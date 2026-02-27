@@ -258,11 +258,13 @@ export default async function HotelsPage({ params }: HotelsPageProps = {}) {
             </div>
           </div>
         </section>
-        <BookingPartnersSection
-          partners={homeContent.hero.bookingPartners}
-          title={homeContent.hero.bookingPartnersTitle}
-          description={homeContent.hero.bookingPartnersDescription}
-        />
+        {homeContent.hero.bookingPartnersVisibility.hotelsPage ? (
+          <BookingPartnersSection
+            partners={homeContent.hero.bookingPartners}
+            title={homeContent.hero.bookingPartnersTitle}
+            description={homeContent.hero.bookingPartnersDescription}
+          />
+        ) : null}
       </main>
       <Footer locale={locale} />
       <BuyNow />

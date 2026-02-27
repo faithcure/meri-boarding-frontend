@@ -122,7 +122,7 @@ export type HotelEntity = {
   updatedBy?: ObjectId;
 };
 
-export type HomeSectionKey = 'hero' | 'bookingPartners' | 'rooms' | 'testimonials' | 'facilities' | 'gallery' | 'offers' | 'faq';
+export type HomeSectionKey = 'hero' | 'bookingPartners' | 'rooms' | 'testimonials' | 'facilities' | 'gallery' | 'offers' | 'faq' | 'videoCta';
 
 export type HomeSectionState = {
   enabled: boolean;
@@ -139,6 +139,11 @@ export type HomeBookingPartner = {
   logo: string;
   url: string;
   description: string;
+};
+
+export type HomeBookingPartnersVisibility = {
+  hotelsPage: boolean;
+  hotelDetailPage: boolean;
 };
 
 export type HomeGalleryItem = {
@@ -254,6 +259,7 @@ export type HomeCmsContent = {
     ctaQuoteHref: string;
     bookingPartnersTitle: string;
     bookingPartnersDescription: string;
+    bookingPartnersVisibility: HomeBookingPartnersVisibility;
     slides: HomeHeroSlide[];
     bookingPartners: HomeBookingPartner[];
   };
@@ -310,6 +316,9 @@ export type HomeCmsContent = {
     title: string;
     cta: string;
     items: HomeFaqItem[];
+  };
+  videoCta: {
+    videoUrl: string;
   };
 };
 
@@ -495,7 +504,7 @@ export const allowedSocialPlatforms = [
   'medium',
   'vimeo',
 ] as const;
-export const homeSectionKeys: HomeSectionKey[] = ['hero', 'bookingPartners', 'rooms', 'testimonials', 'facilities', 'gallery', 'offers', 'faq'];
+export const homeSectionKeys: HomeSectionKey[] = ['hero', 'bookingPartners', 'rooms', 'testimonials', 'facilities', 'gallery', 'offers', 'faq', 'videoCta'];
 export const defaultHomeContent: HomeCmsContent = {
   sections: {
     hero: { enabled: true, order: 1 },
@@ -506,6 +515,7 @@ export const defaultHomeContent: HomeCmsContent = {
     gallery: { enabled: true, order: 6 },
     offers: { enabled: true, order: 7 },
     faq: { enabled: true, order: 8 },
+    videoCta: { enabled: true, order: 9 },
   },
   hero: {
     titleLead: 'In Stuttgart,',
@@ -519,6 +529,10 @@ export const defaultHomeContent: HomeCmsContent = {
     ctaQuoteHref: '/contact',
     bookingPartnersTitle: 'Booking Partners',
     bookingPartnersDescription: 'Reserve through our trusted platforms and partners.',
+    bookingPartnersVisibility: {
+      hotelsPage: true,
+      hotelDetailPage: true,
+    },
     bookingPartners: [],
     slides: [
       { image: '/images/Europaplatz_Fotos/Selection_Auswahl/_DSC6821-Bearbeitet.jpg', position: 'center 13%' },
@@ -703,6 +717,9 @@ export const defaultHomeContent: HomeCmsContent = {
         body: 'If preferred, you can opt for disturbance-free living without additional services.',
       },
     ],
+  },
+  videoCta: {
+    videoUrl: 'https://www.youtube.com/watch?v=L4rcnTwr2Ek&t=77s',
   },
 };
 export const defaultServicesContent: ServicesCmsContent = {

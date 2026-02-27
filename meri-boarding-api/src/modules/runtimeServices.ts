@@ -214,6 +214,7 @@ async function getHomeContent(locale: ContentLocale) {
       return {
         ...normalized,
         sections: enNormalized.sections,
+        videoCta: enNormalized.videoCta,
         rooms: {
           ...normalized.rooms,
           cards: mergedCards,
@@ -420,6 +421,19 @@ async function ensureChatIndexes() {
   ]);
 }
 
+async function ensureAnalyticsIndexes() {
+  const db = await getDb();
+  const analytics = db.collection('analytics_events');
+  await Promise.all([
+    analytics.createIndex({ createdAt: -1 }),
+    analytics.createIndex({ eventType: 1, createdAt: -1 }),
+    analytics.createIndex({ pagePath: 1, createdAt: -1 }),
+    analytics.createIndex({ sessionId: 1, createdAt: -1 }),
+    analytics.createIndex({ locale: 1, createdAt: -1 }),
+    analytics.createIndex({ country: 1, createdAt: -1 }),
+  ]);
+}
+
 async function ensureContentIndexes() {
   const db = await getDb();
   const contents = db.collection('content_entries');
@@ -613,6 +627,7 @@ async function getRequestAdmin(authorization?: string) {
     resolveContactNotificationRecipients,
     ensureAdminIndexes,
     ensureChatIndexes,
+    ensureAnalyticsIndexes,
     ensureContentIndexes,
     seedHeaderContents,
     seedHomeContents,

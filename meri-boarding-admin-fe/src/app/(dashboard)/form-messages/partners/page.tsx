@@ -6,6 +6,8 @@ import Alert from '@mui/material/Alert'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
+import Checkbox from '@mui/material/Checkbox'
+import FormControlLabel from '@mui/material/FormControlLabel'
 import Grid from '@mui/material/Grid'
 import IconButton from '@mui/material/IconButton'
 import MenuItem from '@mui/material/MenuItem'
@@ -27,6 +29,10 @@ type BookingPartner = {
 type HomeHeroPayload = {
   bookingPartnersTitle?: string
   bookingPartnersDescription?: string
+  bookingPartnersVisibility?: {
+    hotelsPage?: boolean
+    hotelDetailPage?: boolean
+  }
   bookingPartners?: Array<Partial<BookingPartner>>
 }
 
@@ -68,6 +74,10 @@ export default function PartnerLogosPage() {
   const [locale, setLocale] = useState<Locale>('en')
   const [sectionTitle, setSectionTitle] = useState(defaultSectionTitle)
   const [sectionDescription, setSectionDescription] = useState(defaultSectionDescription)
+  const [bookingPartnersVisibility, setBookingPartnersVisibility] = useState({
+    hotelsPage: true,
+    hotelDetailPage: true
+  })
   const [partners, setPartners] = useState<BookingPartner[]>([])
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
@@ -131,6 +141,10 @@ export default function PartnerLogosPage() {
       const hero = (data?.content?.hero || {}) as HomeHeroPayload
       setSectionTitle(String(hero.bookingPartnersTitle || defaultSectionTitle).trim() || defaultSectionTitle)
       setSectionDescription(String(hero.bookingPartnersDescription || defaultSectionDescription).trim() || defaultSectionDescription)
+      setBookingPartnersVisibility({
+        hotelsPage: Boolean(hero.bookingPartnersVisibility?.hotelsPage ?? true),
+        hotelDetailPage: Boolean(hero.bookingPartnersVisibility?.hotelDetailPage ?? true)
+      })
       setPartners(normalizePartners(hero))
     } catch {
       setError('API connection failed.')
@@ -239,6 +253,7 @@ export default function PartnerLogosPage() {
             hero: {
               bookingPartnersTitle: sectionTitle.trim(),
               bookingPartnersDescription: sectionDescription.trim(),
+              bookingPartnersVisibility,
               bookingPartners: partners
             }
           }
@@ -308,6 +323,30 @@ export default function PartnerLogosPage() {
                   onChange={e => setSectionDescription(e.target.value)}
                   helperText='Max 320 characters'
                   fullWidth
+                />
+              </Grid>
+              <Grid size={{ xs: 12 }}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={bookingPartnersVisibility.hotelsPage}
+                      onChange={(_, checked) =>
+                        setBookingPartnersVisibility(prev => ({ ...prev, hotelsPage: checked }))
+                      }
+                    />
+                  }
+                  label='Show on Hotels page (/hotels)'
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={bookingPartnersVisibility.hotelDetailPage}
+                      onChange={(_, checked) =>
+                        setBookingPartnersVisibility(prev => ({ ...prev, hotelDetailPage: checked }))
+                      }
+                    />
+                  }
+                  label='Show on Hotel Detail pages (/hotels/:slug)'
                 />
               </Grid>
             </Grid>

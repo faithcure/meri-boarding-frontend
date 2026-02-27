@@ -43,6 +43,7 @@ export default async function HomePage({ locale }: HomePageProps) {
     if (sectionKey === "gallery") return <Gallery content={content.gallery} />;
     if (sectionKey === "offers") return <Offers locale={locale} content={content.offers} />;
     if (sectionKey === "faq") return <Faq locale={locale} content={content.faq} />;
+    if (sectionKey === "videoCta") return <VideoCta videoUrl={content.videoCta.videoUrl} />;
     return null;
   };
 
@@ -54,7 +55,6 @@ export default async function HomePage({ locale }: HomePageProps) {
         {orderedSections.map((sectionKey) => (
           <Fragment key={sectionKey}>{sectionNode(sectionKey)}</Fragment>
         ))}
-        <VideoCta />
       </main>
       <Footer locale={locale} />
       <BuyNow />

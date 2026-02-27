@@ -577,6 +577,235 @@ server.delete('/api/v1/admin/contact-submissions/:submissionId', async (request,
   return reply.send({ ok: true });
 });
 
+server.get('/api/v1/admin/analytics/overview', async (request, reply) => {
+  const admin = await getRequestAdmin(request.headers.authorization);
+  if (!canManageContent(admin)) {
+    return reply.code(403).send({ error: 'Only super_admin or moderator can access this route' });
+  }
+
+  const query = request.query as { locale?: string; days?: string | number } | undefined;
+  const locale = String(query?.locale || 'all').trim().toLowerCase();
+  const days = Math.min(365, Math.max(7, Number(query?.days || 30)));
+  const now = new Date();
+  const since = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+  const daySince = new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000);
+  const weekSince = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const monthSince = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+  const db = await getDb();
+  const events = db.collection('analytics_events');
+
+  const localeFilter: Record<string, unknown> = {};
+  if (locale === 'de' || locale === 'en' || locale === 'tr') {
+    localeFilter.locale = locale;
+  }
+
+  const periodMatch: Record<string, unknown> = {
+    ...localeFilter,
+    createdAt: { $gte: since },
+  };
+
+  const uniqueVisitorCount = async (match: Record<string, unknown>) => {
+    const rows = await events
+      .aggregate([
+        {
+          $match: {
+            ...match,
+            sessionId: { $nin: [null, ''] },
+          },
+        },
+        { $group: { _id: '$sessionId' } },
+        { $count: 'count' },
+      ])
+      .toArray();
+
+    return Number(rows[0]?.count || 0);
+  };
+
+  const [pageViews, clicks, visitorsDay, visitorsWeek, visitorsMonth, visitorsInPeriod] = await Promise.all([
+    events.countDocuments({ ...periodMatch, eventType: 'page_view' }),
+    events.countDocuments({ ...periodMatch, eventType: 'click' }),
+    uniqueVisitorCount({ ...localeFilter, createdAt: { $gte: daySince } }),
+    uniqueVisitorCount({ ...localeFilter, createdAt: { $gte: weekSince } }),
+    uniqueVisitorCount({ ...localeFilter, createdAt: { $gte: monthSince } }),
+    uniqueVisitorCount(periodMatch),
+  ]);
+
+  const [avgDurationRows, avgPagesRows, topPagesRows, pageDurationRows, topClicksRows, countryRows, dailyRows] = await Promise.all([
+    events
+      .aggregate([
+        {
+          $match: {
+            ...periodMatch,
+            eventType: 'page_leave',
+            durationMs: { $gt: 0 },
+            sessionId: { $nin: [null, ''] },
+          },
+        },
+        { $group: { _id: '$sessionId', durationMs: { $sum: '$durationMs' } } },
+        { $group: { _id: null, avgDurationMs: { $avg: '$durationMs' } } },
+      ])
+      .toArray(),
+    events
+      .aggregate([
+        {
+          $match: {
+            ...periodMatch,
+            eventType: 'page_view',
+            sessionId: { $nin: [null, ''] },
+          },
+        },
+        { $group: { _id: '$sessionId', pageViews: { $sum: 1 } } },
+        { $group: { _id: null, avgPages: { $avg: '$pageViews' } } },
+      ])
+      .toArray(),
+    events
+      .aggregate([
+        { $match: { ...periodMatch, eventType: 'page_view' } },
+        {
+          $group: {
+            _id: '$pagePath',
+            views: { $sum: 1 },
+            visitorsSet: {
+              $addToSet: {
+                $cond: [{ $and: [{ $ne: ['$sessionId', null] }, { $ne: ['$sessionId', ''] }] }, '$sessionId', null],
+              },
+            },
+          },
+        },
+        { $sort: { views: -1 } },
+        { $limit: 25 },
+      ])
+      .toArray(),
+    events
+      .aggregate([
+        { $match: { ...periodMatch, eventType: 'page_leave', durationMs: { $gt: 0 } } },
+        { $group: { _id: '$pagePath', avgDurationMs: { $avg: '$durationMs' } } },
+      ])
+      .toArray(),
+    events
+      .aggregate([
+        { $match: { ...periodMatch, eventType: 'click' } },
+        {
+          $group: {
+            _id: {
+              label: '$clickLabel',
+              href: '$clickHref',
+              tag: '$clickTag',
+            },
+            count: { $sum: 1 },
+          },
+        },
+        { $sort: { count: -1 } },
+        { $limit: 25 },
+      ])
+      .toArray(),
+    events
+      .aggregate([
+        { $match: { ...periodMatch, eventType: 'page_view' } },
+        {
+          $group: {
+            _id: '$country',
+            pageViews: { $sum: 1 },
+            visitorsSet: {
+              $addToSet: {
+                $cond: [{ $and: [{ $ne: ['$sessionId', null] }, { $ne: ['$sessionId', ''] }] }, '$sessionId', null],
+              },
+            },
+          },
+        },
+        { $sort: { pageViews: -1 } },
+        { $limit: 25 },
+      ])
+      .toArray(),
+    events
+      .aggregate([
+        { $match: periodMatch },
+        {
+          $group: {
+            _id: {
+              $dateToString: {
+                date: '$createdAt',
+                format: '%Y-%m-%d',
+                timezone: 'UTC',
+              },
+            },
+            pageViews: { $sum: { $cond: [{ $eq: ['$eventType', 'page_view'] }, 1, 0] } },
+            clicks: { $sum: { $cond: [{ $eq: ['$eventType', 'click'] }, 1, 0] } },
+            visitorsSet: {
+              $addToSet: {
+                $cond: [{ $and: [{ $ne: ['$sessionId', null] }, { $ne: ['$sessionId', ''] }] }, '$sessionId', null],
+              },
+            },
+          },
+        },
+        { $sort: { _id: 1 } },
+        { $limit: 120 },
+      ])
+      .toArray(),
+  ]);
+
+  const avgDurationMs = Number(avgDurationRows[0]?.avgDurationMs || 0);
+  const avgPagesPerVisit = Number(avgPagesRows[0]?.avgPages || 0);
+
+  const pageDurationMap = new Map<string, number>();
+  pageDurationRows.forEach((row: any) => {
+    const key = String(row?._id || '/');
+    const value = Number(row?.avgDurationMs || 0);
+    pageDurationMap.set(key, value);
+  });
+
+  return reply.send({
+    periodDays: days,
+    locale,
+    generatedAt: now.toISOString(),
+    totals: {
+      pageViews: Number(pageViews || 0),
+      clicks: Number(clicks || 0),
+      visitorsInPeriod: Number(visitorsInPeriod || 0),
+      visitorsDaily: Number(visitorsDay || 0),
+      visitorsWeekly: Number(visitorsWeek || 0),
+      visitorsMonthly: Number(visitorsMonth || 0),
+      avgVisitDurationSeconds: Number((avgDurationMs / 1000).toFixed(1)),
+      avgPagesPerVisit: Number(avgPagesPerVisit.toFixed(2)),
+    },
+    topPages: topPagesRows.map((row: any) => {
+      const path = String(row?._id || '/');
+      const avgDurationForPath = Number(pageDurationMap.get(path) || 0);
+      const visitors = Array.isArray(row?.visitorsSet)
+        ? row.visitorsSet.filter((item: unknown) => typeof item === 'string' && item).length
+        : 0;
+      return {
+        path,
+        views: Number(row?.views || 0),
+        visitors,
+        avgDurationSeconds: Number((avgDurationForPath / 1000).toFixed(1)),
+      };
+    }),
+    topClicks: topClicksRows.map((row: any) => ({
+      label: String(row?._id?.label || '(no label)'),
+      href: String(row?._id?.href || ''),
+      tag: String(row?._id?.tag || ''),
+      count: Number(row?.count || 0),
+    })),
+    countries: countryRows.map((row: any) => ({
+      country: String(row?._id || 'UNKNOWN'),
+      pageViews: Number(row?.pageViews || 0),
+      visitors: Array.isArray(row?.visitorsSet)
+        ? row.visitorsSet.filter((item: unknown) => typeof item === 'string' && item).length
+        : 0,
+    })),
+    daily: dailyRows.map((row: any) => ({
+      date: String(row?._id || ''),
+      pageViews: Number(row?.pageViews || 0),
+      clicks: Number(row?.clicks || 0),
+      visitors: Array.isArray(row?.visitorsSet)
+        ? row.visitorsSet.filter((item: unknown) => typeof item === 'string' && item).length
+        : 0,
+    })),
+  });
+});
+
 server.get('/api/v1/admin/chat-quality', async (request, reply) => {
   const admin = await getRequestAdmin(request.headers.authorization);
   if (!canManageContent(admin)) {
@@ -933,8 +1162,47 @@ server.put('/api/v1/admin/content/home', async (request, reply) => {
     }
   }
 
-  // Keep booking partners shared for all locales.
-  if (Array.isArray(body?.content?.hero?.bookingPartners)) {
+  // Keep home video CTA shared for all locales.
+  if (body?.content?.videoCta) {
+    for (const localeKey of allowedLocales) {
+      if (localeKey === locale) continue;
+      const row = await contents.findOne({ key: 'page.home', locale: localeKey });
+      const current = row ? normalizeHomeContent(row.value, defaultHomeContent) : defaultHomeContent;
+      const patched = normalizeHomeContent(
+        {
+          ...current,
+          videoCta: {
+            ...current.videoCta,
+            videoUrl: nextContent.videoCta.videoUrl,
+          },
+        },
+        current,
+      );
+      await contents.updateOne(
+        { key: 'page.home', locale: localeKey },
+        {
+          $set: {
+            value: patched,
+            updatedAt: now,
+            updatedBy: admin._id,
+          },
+          $setOnInsert: {
+            _id: new ObjectId(),
+            key: 'page.home',
+            locale: localeKey,
+            createdAt: now,
+          },
+        },
+        { upsert: true },
+      );
+    }
+  }
+
+  // Keep booking partner data shared for all locales.
+  const hasBookingPartnersPayload = Array.isArray(body?.content?.hero?.bookingPartners);
+  const hasBookingPartnersVisibilityPayload =
+    typeof body?.content?.hero?.bookingPartnersVisibility === 'object' && body?.content?.hero?.bookingPartnersVisibility !== null;
+  if (hasBookingPartnersPayload || hasBookingPartnersVisibilityPayload) {
     for (const localeKey of allowedLocales) {
       if (localeKey === locale) continue;
       const row = await contents.findOne({ key: 'page.home', locale: localeKey });
@@ -944,7 +1212,8 @@ server.put('/api/v1/admin/content/home', async (request, reply) => {
           ...current,
           hero: {
             ...current.hero,
-            bookingPartners: nextContent.hero.bookingPartners,
+            ...(hasBookingPartnersPayload ? { bookingPartners: nextContent.hero.bookingPartners } : {}),
+            ...(hasBookingPartnersVisibilityPayload ? { bookingPartnersVisibility: nextContent.hero.bookingPartnersVisibility } : {}),
           },
         },
         current,

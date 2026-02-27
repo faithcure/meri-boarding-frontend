@@ -2,7 +2,7 @@ import type { Locale } from '@/i18n/getLocale'
 import { getMessages } from '@/i18n/messages'
 import { getServerApiBaseUrl, withAssetImageParams, withPublicApiBaseIfNeeded } from '@/lib/apiBaseUrl'
 
-type SectionKey = 'hero' | 'bookingPartners' | 'rooms' | 'testimonials' | 'facilities' | 'gallery' | 'offers' | 'faq'
+type SectionKey = 'hero' | 'bookingPartners' | 'rooms' | 'testimonials' | 'facilities' | 'gallery' | 'offers' | 'faq' | 'videoCta'
 
 type CmsHomeContent = {
   sections?: Partial<Record<SectionKey, { enabled?: boolean; order?: number }>>
@@ -17,6 +17,10 @@ type CmsHomeContent = {
     ctaQuoteHref?: string
     bookingPartnersTitle?: string
     bookingPartnersDescription?: string
+    bookingPartnersVisibility?: {
+      hotelsPage?: boolean
+      hotelDetailPage?: boolean
+    }
     bookingPartners?: Array<{ name?: string; logo?: string; url?: string; description?: string }>
     slides?: Array<{ image?: string; position?: string }>
   }
@@ -71,6 +75,9 @@ type CmsHomeContent = {
     cta?: string
     items?: Array<{ title?: string; body?: string }>
   }
+  videoCta?: {
+    videoUrl?: string
+  }
 }
 
 export type HomeResolvedContent = {
@@ -80,6 +87,10 @@ export type HomeResolvedContent = {
     ctaQuoteHref: string
     bookingPartnersTitle: string
     bookingPartnersDescription: string
+    bookingPartnersVisibility: {
+      hotelsPage: boolean
+      hotelDetailPage: boolean
+    }
     bookingPartners: Array<{ name: string; logo: string; url: string; description: string }>
     slides: Array<{ image: string; position: string }>
   }
@@ -129,9 +140,12 @@ export type HomeResolvedContent = {
     cta: string
     items: Array<{ title: string; body: string }>
   }
+  videoCta: {
+    videoUrl: string
+  }
 }
 
-const sectionKeys: SectionKey[] = ['hero', 'bookingPartners', 'rooms', 'testimonials', 'facilities', 'gallery', 'offers', 'faq']
+const sectionKeys: SectionKey[] = ['hero', 'bookingPartners', 'rooms', 'testimonials', 'facilities', 'gallery', 'offers', 'faq', 'videoCta']
 const apiBaseUrl = getServerApiBaseUrl()
 
 function withApiBaseIfNeeded(url: string) {
@@ -226,6 +240,10 @@ function resolveContent(locale: Locale, cms?: CmsHomeContent): HomeResolvedConte
       ctaQuoteHref: String(cms?.hero?.ctaQuoteHref || '/contact'),
       bookingPartnersTitle: String(cms?.hero?.bookingPartnersTitle || 'Booking Partners').trim(),
       bookingPartnersDescription: String(cms?.hero?.bookingPartnersDescription || 'Reserve through our trusted platforms and partners.').trim(),
+      bookingPartnersVisibility: {
+        hotelsPage: Boolean(cms?.hero?.bookingPartnersVisibility?.hotelsPage ?? true),
+        hotelDetailPage: Boolean(cms?.hero?.bookingPartnersVisibility?.hotelDetailPage ?? true)
+      },
       bookingPartners: bookingPartnersSource
         .map(item => ({
           name: String(item?.name || '').trim(),
@@ -316,6 +334,9 @@ function resolveContent(locale: Locale, cms?: CmsHomeContent): HomeResolvedConte
         }))
         .filter(item => Boolean(item.title) && Boolean(item.body))
         .slice(0, 20)
+    },
+    videoCta: {
+      videoUrl: String(cms?.videoCta?.videoUrl || 'https://www.youtube.com/watch?v=L4rcnTwr2Ek&t=77s').trim()
     }
   }
 }

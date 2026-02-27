@@ -221,12 +221,14 @@ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const collapseWhitespace = (value: string) => String(value || '').replace(/\s+/g, ' ').trim();
 const maxChatHistoryItems = 12;
 const maxChatHistoryTextLen = 600;
+const maxAnalyticsTextLen = 240;
 const isMeaningfulMessage = (value: string) => {
   const normalized = collapseWhitespace(value);
   if (normalized.length < 10) return false;
   return normalized.split(' ').filter(Boolean).length >= 2;
 };
 const chatRateLimitStore = new Map<string, { count: number; resetAt: number }>();
+const analyticsRateLimitStore = new Map<string, { count: number; resetAt: number }>();
 
 function isChatRateLimited(key: string, max: number, windowMs: number) {
   const now = Date.now();
@@ -255,6 +257,100 @@ function enforceChatRateLimit(options: {
   if (!limited) return false;
   options.reply.code(429).send({ error: 'Too many requests. Please slow down.' });
   return true;
+}
+
+function isRateLimited(
+  store: Map<string, { count: number; resetAt: number }>,
+  key: string,
+  max: number,
+  windowMs: number,
+) {
+  const now = Date.now();
+  const existing = store.get(key);
+  if (!existing || existing.resetAt <= now) {
+    store.set(key, { count: 1, resetAt: now + windowMs });
+    return false;
+  }
+  if (existing.count >= max) return true;
+  existing.count += 1;
+  store.set(key, existing);
+  return false;
+}
+
+function resolveRequestIp(request: FastifyRequest) {
+  const forwardedFor = String(request.headers['x-forwarded-for'] || '')
+    .split(',')[0]
+    .trim();
+  return (forwardedFor || request.ip || 'unknown').slice(0, 120);
+}
+
+function enforceAnalyticsRateLimit(options: {
+  scope: string;
+  request: FastifyRequest;
+  reply: FastifyReply;
+  max: number;
+  windowMs: number;
+}) {
+  const ip = resolveRequestIp(options.request);
+  const key = `${options.scope}:${ip}`;
+  const limited = isRateLimited(analyticsRateLimitStore, key, options.max, options.windowMs);
+  if (!limited) return false;
+  options.reply.code(429).send({ error: 'Too many analytics events. Please slow down.' });
+  return true;
+}
+
+function parseCountryCode(value: unknown) {
+  const country = String(value || '')
+    .trim()
+    .toUpperCase();
+  return /^[A-Z]{2}$/.test(country) ? country : '';
+}
+
+function resolveRequestCountry(request: FastifyRequest) {
+  const headerCandidates = [
+    request.headers['cf-ipcountry'],
+    request.headers['x-vercel-ip-country'],
+    request.headers['x-country-code'],
+    request.headers['x-geo-country'],
+    request.headers['x-appengine-country'],
+  ];
+
+  for (const candidate of headerCandidates) {
+    const parsed = parseCountryCode(candidate);
+    if (parsed) return parsed;
+  }
+
+  return 'UNKNOWN';
+}
+
+function normalizeAnalyticsPath(value: unknown) {
+  const raw = String(value || '').trim().slice(0, 320);
+  if (!raw) return '/';
+  if (raw.startsWith('http://') || raw.startsWith('https://')) {
+    try {
+      const parsed = new URL(raw);
+      return `${parsed.pathname || '/'}${parsed.search || ''}`.slice(0, 320);
+    } catch {
+      return '/';
+    }
+  }
+  return raw.startsWith('/') ? raw : `/${raw}`;
+}
+
+function normalizeAnalyticsHref(value: unknown) {
+  const raw = String(value || '').trim().slice(0, 400);
+  if (!raw) return '';
+  if (raw.startsWith('http://') || raw.startsWith('https://')) {
+    return raw;
+  }
+  return raw.startsWith('/') ? raw : `/${raw}`;
+}
+
+function normalizeAnalyticsText(value: unknown, max = maxAnalyticsTextLen) {
+  return String(value || '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, max);
 }
 
 const toObjectId = (value: string) => (ObjectId.isValid(value) ? new ObjectId(value) : null);
@@ -350,6 +446,78 @@ server.get('/api/v1/public/settings/general', async (_request, reply) => {
     },
   };
   return reply.send({ key: 'shared.general_settings', content: publicContent });
+});
+
+server.post('/api/v1/public/analytics/events', async (request, reply) => {
+  if (enforceAnalyticsRateLimit({ scope: 'analytics:event', request, reply, max: 300, windowMs: 60_000 })) return;
+
+  const body = request.body as
+    | {
+        eventType?: string;
+        sessionId?: string;
+        locale?: string;
+        pagePath?: string;
+        pageTitle?: string;
+        referrerPath?: string;
+        durationMs?: number;
+        clickLabel?: string;
+        clickHref?: string;
+        clickTag?: string;
+      }
+    | undefined;
+
+  const eventType = String(body?.eventType || '')
+    .trim()
+    .toLowerCase();
+  if (!['page_view', 'page_leave', 'click'].includes(eventType)) {
+    return reply.code(400).send({ error: 'Invalid analytics event type' });
+  }
+
+  const sessionId = normalizeAnalyticsText(body?.sessionId, 120);
+  if (!sessionId) {
+    return reply.code(400).send({ error: 'sessionId is required' });
+  }
+
+  const locale = parseLocale(body?.locale);
+  const pagePath = normalizeAnalyticsPath(body?.pagePath);
+  const referrerPath = normalizeAnalyticsPath(body?.referrerPath);
+  const pageTitle = normalizeAnalyticsText(body?.pageTitle, 180);
+  const clickLabel = normalizeAnalyticsText(body?.clickLabel, 160);
+  const clickHref = normalizeAnalyticsHref(body?.clickHref);
+  const clickTag = normalizeAnalyticsText(body?.clickTag, 32).toLowerCase();
+  const durationRaw = Number(body?.durationMs);
+  const durationMs =
+    Number.isFinite(durationRaw) && durationRaw >= 0 && durationRaw <= 4 * 60 * 60 * 1000
+      ? Math.round(durationRaw)
+      : null;
+
+  const country = resolveRequestCountry(request);
+  const userAgent = normalizeAnalyticsText(request.headers['user-agent'] || '', 260);
+
+  try {
+    const db = await getDb();
+    await db.collection('analytics_events').insertOne({
+      _id: new ObjectId(),
+      eventType,
+      sessionId,
+      locale,
+      pagePath,
+      pageTitle: pageTitle || null,
+      referrerPath: referrerPath || null,
+      durationMs,
+      clickLabel: clickLabel || null,
+      clickHref: clickHref || null,
+      clickTag: clickTag || null,
+      country,
+      userAgent: userAgent || null,
+      createdAt: new Date(),
+    });
+
+    return reply.send({ ok: true });
+  } catch (error) {
+    request.log.error(error, 'analytics event insert failed');
+    return reply.code(202).send({ ok: false });
+  }
 });
 
 server.get('/api/v1/public/content/home', async (request, reply) => {
@@ -797,7 +965,10 @@ server.post('/api/v1/public/forms/request', async (request, reply) => {
   const purpose = String(body?.purpose || '').trim();
   const nationality = String(body?.nationality || '').trim();
   const guestsRaw = String(body?.guests || '').trim();
+  const guestsNormalized = guestsRaw.replace(/\s+/g, '').toLowerCase();
+  const guestsIsGroup = guestsNormalized === '5+' || guestsNormalized.startsWith('5+');
   const guests = Number(guestsRaw);
+  const guestsValue = guestsIsGroup ? '5+ (Team or group guests)' : String(guests || '');
   const childrenRaw = String(body?.children || '0').trim();
   const children = Number(childrenRaw);
   const accessibleRaw = body?.accessible;
@@ -829,8 +1000,8 @@ server.post('/api/v1/public/forms/request', async (request, reply) => {
   if (!purpose || purpose.length < 2) {
     return reply.code(400).send({ error: 'Purpose is required.' });
   }
-  if (!Number.isFinite(guests) || guests < 1) {
-    return reply.code(400).send({ error: 'Number of guests is required.' });
+  if (!(guestsIsGroup || (Number.isFinite(guests) && guests >= 1 && guests <= 5))) {
+    return reply.code(400).send({ error: 'Number of guests must be between 1 and 5, or 5+ for group requests.' });
   }
   if (!Number.isFinite(children) || children < 0) {
     return reply.code(400).send({ error: 'Number of child is invalid.' });
@@ -865,7 +1036,7 @@ server.post('/api/v1/public/forms/request', async (request, reply) => {
         `Phone: ${phone}`,
         `Purpose: ${purpose}`,
         `Nationality: ${nationality || '-'}`,
-        `Guests: ${guests}`,
+        `Guests: ${guestsValue}`,
         `Children: ${children}`,
         `Accessibility need: ${accessibilityValue}`,
         `Rooms: ${rooms}`,
@@ -889,7 +1060,7 @@ server.post('/api/v1/public/forms/request', async (request, reply) => {
           { label: 'Phone', value: phone },
           { label: 'Purpose', value: purpose },
           { label: 'Nationality', value: nationality || '-' },
-          { label: 'Guests', value: String(guests) },
+          { label: 'Guests', value: guestsValue },
           { label: 'Children', value: String(children) },
           { label: 'Accessibility Need', value: accessibilityValue },
           { label: 'Rooms', value: rooms },

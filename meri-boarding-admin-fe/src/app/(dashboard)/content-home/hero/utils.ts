@@ -47,6 +47,12 @@ export const normalizeHero = (input: unknown): HeroContent => {
     ctaLocationsHref: String(value.ctaLocationsHref || '/hotels').trim(),
     ctaQuote: String(value.ctaQuote || '').trim(),
     ctaQuoteHref: String(value.ctaQuoteHref || '/contact').trim(),
+    bookingPartnersVisibility: {
+      hotelsPage: Boolean((value as { bookingPartnersVisibility?: { hotelsPage?: unknown } }).bookingPartnersVisibility?.hotelsPage ?? true),
+      hotelDetailPage: Boolean(
+        (value as { bookingPartnersVisibility?: { hotelDetailPage?: unknown } }).bookingPartnersVisibility?.hotelDetailPage ?? true
+      )
+    },
     bookingPartners,
     slides
   }

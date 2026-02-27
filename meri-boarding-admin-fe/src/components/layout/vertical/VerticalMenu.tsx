@@ -123,6 +123,9 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             <MenuItem href='/content-home/faq' icon={<i className='bx-help-circle' />}>
               FAQ Settings
             </MenuItem>
+            <MenuItem href='/content-home/video' icon={<i className='bx-play-circle' />}>
+              Video Settings
+            </MenuItem>
           </SubMenu>
           <MenuItem href='/content-services' icon={<i className='bx-briefcase-alt-2' />}>
             Services Content

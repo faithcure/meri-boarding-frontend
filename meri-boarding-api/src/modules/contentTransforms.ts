@@ -86,6 +86,7 @@ function normalizeHomeContent(input: Partial<HomeCmsContent> | undefined, fallba
   const bookingPartnersSource = Array.isArray(input?.hero?.bookingPartners)
     ? input?.hero?.bookingPartners
     : fallback.hero.bookingPartners;
+  const bookingPartnersVisibilitySource = input?.hero?.bookingPartnersVisibility;
   const gallerySource = Array.isArray(input?.gallery?.items) ? input?.gallery?.items : fallback.gallery.items;
   const galleryCategoriesSource = Array.isArray(input?.gallery?.categories) ? input?.gallery?.categories : fallback.gallery.categories;
   const offersSource = Array.isArray(input?.offers?.cards) ? input?.offers?.cards : fallback.offers.cards;
@@ -151,6 +152,12 @@ function normalizeHomeContent(input: Partial<HomeCmsContent> | undefined, fallba
       bookingPartnersDescription: String(input?.hero?.bookingPartnersDescription ?? fallback.hero.bookingPartnersDescription ?? '')
         .trim()
         .slice(0, 320),
+      bookingPartnersVisibility: {
+        hotelsPage: Boolean(bookingPartnersVisibilitySource?.hotelsPage ?? fallback.hero.bookingPartnersVisibility?.hotelsPage ?? true),
+        hotelDetailPage: Boolean(
+          bookingPartnersVisibilitySource?.hotelDetailPage ?? fallback.hero.bookingPartnersVisibility?.hotelDetailPage ?? true,
+        ),
+      },
       bookingPartners: bookingPartnersSource
         .map((item) => ({
           name: String(item?.name || '').trim(),
@@ -245,10 +252,31 @@ function normalizeHomeContent(input: Partial<HomeCmsContent> | undefined, fallba
         .filter((item) => Boolean(item.title) || Boolean(item.body))
         .slice(0, 20),
     },
+    videoCta: {
+      videoUrl: String(input?.videoCta?.videoUrl ?? fallback.videoCta?.videoUrl ?? '').trim(),
+    },
   };
 }
 
 function validateHomeContent(input: HomeCmsContent) {
+  const isSupportedVideoUrl = (value: string) => {
+    const raw = String(value || '').trim();
+    if (!raw) return false;
+    try {
+      const url = new URL(raw);
+      const host = url.hostname.toLowerCase();
+      return (
+        host === 'youtube.com' ||
+        host === 'www.youtube.com' ||
+        host === 'youtu.be' ||
+        host === 'vimeo.com' ||
+        host === 'www.vimeo.com' ||
+        host === 'player.vimeo.com'
+      );
+    } catch {
+      return false;
+    }
+  };
   if (!input.hero.titleLead || !input.hero.titleHighlight || !input.hero.titleTail) {
     return 'Hero title fields are required';
   }
@@ -429,6 +457,11 @@ function validateHomeContent(input: HomeCmsContent) {
       return `FAQ item ${index + 1}: title and body are required`;
     }
   }
+
+  if (!input.videoCta.videoUrl || !isSupportedVideoUrl(input.videoCta.videoUrl)) {
+    return 'Video CTA URL must be a valid YouTube or Vimeo link';
+  }
+
   return null;
 }
 

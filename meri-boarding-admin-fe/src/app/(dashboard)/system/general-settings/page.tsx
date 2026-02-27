@@ -17,6 +17,10 @@ import Tabs from '@mui/material/Tabs'
 import Typography from '@mui/material/Typography'
 
 import CustomTextField from '@core/components/mui/TextField'
+import AnalyticsOverviewPanel from '@/components/analytics/AnalyticsOverviewPanel'
+import type { AnalyticsOverview } from '@/types/analytics'
+import { defaultAnalyticsOverview } from '@/types/analytics'
+import { fetchAnalyticsOverview, resolveApiBaseUrl } from '@/utils/analytics'
 
 type SocialPlatform =
   | 'instagram'
@@ -118,7 +122,6 @@ const defaultSettings: GeneralSettingsContent = {
 }
 
 const previewFallbackIcon = '/images/branding/meri-logo-mark.svg'
-
 function toDataUrl(file: File) {
   return new Promise<string>((resolve, reject) => {
     const reader = new FileReader()
@@ -214,12 +217,9 @@ function normalizeSmtpSettings(input: unknown): SmtpSettings {
 
 export default function GeneralSettingsPage() {
   const configuredApiBaseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL ?? '').trim()
+  const apiBaseUrl = resolveApiBaseUrl(configuredApiBaseUrl)
 
-  const apiBaseUrl = configuredApiBaseUrl.startsWith('http://localhost') || configuredApiBaseUrl.startsWith('https://localhost')
-    ? ''
-    : configuredApiBaseUrl
-
-  const [tab, setTab] = useState<'icon' | 'socials' | 'forms'>('icon')
+  const [tab, setTab] = useState<'icon' | 'socials' | 'forms' | 'analytics'>('icon')
   const [allowed, setAllowed] = useState(false)
   const [loading, setLoading] = useState(true)
   const [savingSocials, setSavingSocials] = useState(false)
@@ -230,6 +230,28 @@ export default function GeneralSettingsPage() {
   const [fieldError, setFieldError] = useState('')
   const [settings, setSettings] = useState<GeneralSettingsContent>(defaultSettings)
   const [contactEmailText, setContactEmailText] = useState('')
+  const [analyticsLoading, setAnalyticsLoading] = useState(false)
+  const [analyticsError, setAnalyticsError] = useState('')
+  const [analytics, setAnalytics] = useState<AnalyticsOverview>(defaultAnalyticsOverview)
+
+  const loadAnalytics = useCallback(
+    async (tokenOverride?: string) => {
+      const token = tokenOverride || window.localStorage.getItem('admin_token')
+      if (!token) return
+
+      setAnalyticsLoading(true)
+      setAnalyticsError('')
+      try {
+        const next = await fetchAnalyticsOverview(apiBaseUrl, token, { days: 30 })
+        setAnalytics(next)
+      } catch (loadError) {
+        setAnalyticsError(String((loadError as Error)?.message || 'Analytics data could not be loaded.'))
+      } finally {
+        setAnalyticsLoading(false)
+      }
+    },
+    [apiBaseUrl]
+  )
 
   const loadSettings = useCallback(async () => {
     const token = window.localStorage.getItem('admin_token')
@@ -290,12 +312,13 @@ return
       setContactEmailText(
         normalizeFormDelivery(data?.content?.formDelivery).contactNotificationEmails.join('\n')
       )
+      await loadAnalytics(token)
     } catch {
       setError('API connection failed.')
     } finally {
       setLoading(false)
     }
-  }, [apiBaseUrl])
+  }, [apiBaseUrl, loadAnalytics])
 
   useEffect(() => {
     void loadSettings()
@@ -588,6 +611,7 @@ return
               <Tab value='icon' label='Site Icon' />
               <Tab value='socials' label='Social Media' />
               <Tab value='forms' label='Form Settings' />
+              <Tab value='analytics' label='Analytics' />
             </Tabs>
 
             {tab === 'icon' ? (
@@ -726,7 +750,7 @@ return
                   </div>
                 ))}
               </Box>
-            ) : (
+            ) : tab === 'forms' ? (
               <Box className='flex flex-col gap-4'>
                 <div className='flex flex-wrap items-center gap-3'>
                   <Button variant='contained' onClick={saveFormSettings} disabled={savingForms}>
@@ -837,6 +861,24 @@ return
                     </Typography>
                   </Grid>
                 </Grid>
+              </Box>
+            ) : (
+              <Box className='flex flex-col gap-4'>
+                {analyticsError ? <Alert severity='error'>{analyticsError}</Alert> : null}
+
+                <div className='flex flex-wrap items-center gap-3'>
+                  <Button variant='contained' onClick={() => void loadAnalytics()} disabled={analyticsLoading}>
+                    {analyticsLoading ? 'Refreshing...' : 'Refresh Analytics'}
+                  </Button>
+                  <Typography color='text.secondary'>
+                    Period: last {analytics.periodDays} days
+                  </Typography>
+                  <Typography color='text.secondary'>
+                    {analytics.generatedAt ? `Updated: ${new Date(analytics.generatedAt).toLocaleString()}` : ''}
+                  </Typography>
+                </div>
+
+                <AnalyticsOverviewPanel analytics={analytics} topLimit={12} />
               </Box>
             )}
           </CardContent>

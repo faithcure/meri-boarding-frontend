@@ -330,6 +330,7 @@ const {
   resolveContactNotificationRecipients,
   ensureAdminIndexes,
   ensureChatIndexes,
+  ensureAnalyticsIndexes,
   ensureContentIndexes,
   seedHeaderContents,
   seedHomeContents,
@@ -469,6 +470,7 @@ const start = async () => {
     await ensureStorageFolders();
     await ensureAdminIndexes();
     await ensureChatIndexes();
+    await ensureAnalyticsIndexes();
     await ensureContentIndexes();
     await seedHeaderContents();
     await seedHomeContents();
