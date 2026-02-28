@@ -2,6 +2,7 @@
 
 // React Imports
 import { useState } from 'react'
+import { useEffect } from 'react'
 
 // Next Imports
 import { useRouter } from 'next/navigation'
@@ -46,6 +47,15 @@ const LoginView = () => {
   }
 
   const handleClickShowPassword = () => setIsPasswordShown(show => !show)
+
+  useEffect(() => {
+    const token = window.localStorage.getItem('admin_token')
+    const nextPath = new URLSearchParams(window.location.search).get('next') || '/home'
+
+    if (token) {
+      router.replace(nextPath)
+    }
+  }, [router])
 
   return (
     <Box className='relative flex min-bs-[100dvh] items-center justify-center p-6 pt-40 sm:p-10 sm:pt-44 bg-backgroundDefault'>
@@ -121,7 +131,10 @@ const LoginView = () => {
                   localStorage.setItem('admin_profile', JSON.stringify(profile))
                 }
 
-                router.push('/home')
+                const nextPath =
+                  (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('next')) || '/home'
+
+                router.push(nextPath)
               } catch {
                 setError('API connection failed. Check API server and URL.')
               } finally {

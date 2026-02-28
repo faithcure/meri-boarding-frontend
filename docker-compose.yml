@@ -1,6 +1,25 @@
 name: meri_boarding
 
 services:
+  caddy:
+    image: caddy:2
+    container_name: meri_caddy
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+      public-fe:
+        condition: service_healthy
+      admin-fe:
+        condition: service_healthy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
   mongo:
     image: mongo:7
     container_name: meri_mongo
@@ -109,5 +128,7 @@ services:
       start_period: 20s
 
 volumes:
+  caddy_data:
+  caddy_config:
   mongo_data:
   qdrant_data:

@@ -11,6 +11,7 @@ import HorizontalLayout from '@layouts/HorizontalLayout'
 
 // Component Imports
 import Providers from '@components/Providers'
+import AdminAuthGuard from '@components/auth/AdminAuthGuard'
 import Navigation from '@components/layout/vertical/Navigation'
 import Header from '@components/layout/horizontal/Header'
 import Navbar from '@components/layout/vertical/Navbar'
@@ -33,24 +34,26 @@ const Layout = async (props: ChildrenType) => {
 
   return (
     <Providers direction={direction}>
-      <LayoutWrapper
-        systemMode={systemMode}
-        verticalLayout={
-          <VerticalLayout navigation={<Navigation mode={mode} />} navbar={<Navbar />} footer={<VerticalFooter />}>
-            {children}
-          </VerticalLayout>
-        }
-        horizontalLayout={
-          <HorizontalLayout header={<Header />} footer={<HorizontalFooter />}>
-            {children}
-          </HorizontalLayout>
-        }
-      />
-      <ScrollToTop className='mui-fixed'>
-        <Button variant='contained' className='is-10 bs-10 rounded-full p-0 min-is-0 flex items-center justify-center'>
-          <i className='bx-up-arrow-alt' />
-        </Button>
-      </ScrollToTop>
+      <AdminAuthGuard>
+        <LayoutWrapper
+          systemMode={systemMode}
+          verticalLayout={
+            <VerticalLayout navigation={<Navigation mode={mode} />} navbar={<Navbar />} footer={<VerticalFooter />}>
+              {children}
+            </VerticalLayout>
+          }
+          horizontalLayout={
+            <HorizontalLayout header={<Header />} footer={<HorizontalFooter />}>
+              {children}
+            </HorizontalLayout>
+          }
+        />
+        <ScrollToTop className='mui-fixed'>
+          <Button variant='contained' className='is-10 bs-10 rounded-full p-0 min-is-0 flex items-center justify-center'>
+            <i className='bx-up-arrow-alt' />
+          </Button>
+        </ScrollToTop>
+      </AdminAuthGuard>
     </Providers>
   )
 }

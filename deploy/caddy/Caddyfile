@@ -1,0 +1,15 @@
+meri-boarding.de {
+  redir https://www.meri-boarding.de{uri} permanent
+}
+
+www.meri-boarding.de {
+  reverse_proxy public-fe:3000
+}
+
+api.meri-boarding.de {
+  reverse_proxy api:4000
+}
+
+hq.meri-boarding.de {
+  reverse_proxy admin-fe:3001
+}

@@ -10,6 +10,7 @@ import SiteAnalyticsTracker from "@/components/meri/SiteAnalyticsTracker";
 import type { Locale } from "@/i18n/getLocale";
 import { getLocale } from "@/i18n/getLocale";
 import { fetchSiteIconUrl } from "@/lib/siteSettingsApi";
+import { getSiteUrl } from "@/lib/siteUrl";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -21,10 +22,59 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Meri Boarding Group",
-  description: "Serviced apartments and boarding houses.",
-};
+const siteTitle = "Meri Boarding Group";
+const siteDescription = "Serviced apartments and boarding houses.";
+
+function toAbsoluteUrl(url: string, siteUrl: string) {
+  if (!url) return siteUrl;
+  if (/^https?:\/\//i.test(url)) return url;
+  if (url.startsWith("/")) return `${siteUrl}${url}`;
+  return `${siteUrl}/${url.replace(/^\/+/, "")}`;
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const siteUrl = getSiteUrl();
+  const siteIconUrl = await fetchSiteIconUrl();
+  const absoluteSiteIconUrl = toAbsoluteUrl(siteIconUrl, siteUrl);
+  const absoluteShareImageUrl = toAbsoluteUrl("/api/og/site-icon.png", siteUrl);
+
+  return {
+    metadataBase: new URL(siteUrl),
+    title: siteTitle,
+    description: siteDescription,
+    applicationName: siteTitle,
+    alternates: {
+      canonical: siteUrl,
+    },
+    icons: {
+      icon: [{ url: absoluteSiteIconUrl }],
+      shortcut: [{ url: absoluteSiteIconUrl }],
+      apple: [{ url: absoluteSiteIconUrl }],
+    },
+    openGraph: {
+      type: "website",
+      url: siteUrl,
+      siteName: siteTitle,
+      title: siteTitle,
+      description: siteDescription,
+      images: [
+        {
+          url: absoluteShareImageUrl,
+          type: "image/png",
+          width: 1200,
+          height: 630,
+          alt: "Meri Boarding Group site icon",
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: siteTitle,
+      description: siteDescription,
+      images: [absoluteShareImageUrl],
+    },
+  };
+}
 
 const deferredStylesheets = ["/css/daterangepicker.css"] as const;
 
@@ -56,14 +106,10 @@ export default async function RootLayout({
 }>) {
   const resolvedParams = await params;
   const locale = resolvedParams?.locale ?? (await getLocale());
-  const siteIconUrl = await fetchSiteIconUrl();
 
   return (
     <html lang={locale}>
       <head>
-        <link rel="icon" href={siteIconUrl} sizes="32x32" />
-        <link rel="shortcut icon" href={siteIconUrl} />
-        <link rel="apple-touch-icon" href={siteIconUrl} />
         <link rel="stylesheet" href="/css/bootstrap.min.css" />
         <link rel="stylesheet" href="/css/plugins.css" />
         <link rel="stylesheet" href="/fonts/fontawesome6/css/fontawesome.css" />

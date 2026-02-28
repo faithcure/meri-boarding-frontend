@@ -1,4 +1,4 @@
-const DEFAULT_SITE_URL = "https://meri-boarding.de";
+const DEFAULT_SITE_URL = "https://www.meri-boarding.de";
 
 function normalizeAbsoluteUrl(value: string) {
   const trimmed = value.trim();
