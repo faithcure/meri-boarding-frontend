@@ -2,6 +2,7 @@ import BookingInquiryForm from "@/components/meri/BookingInquiryForm";
 import BuyNow from "@/components/meri/BuyNow";
 import Footer from "@/components/meri/Footer";
 import Header from "@/components/meri/Header";
+import ShortStayFormClient from "@/components/meri/ShortStayFormClient";
 import type { Locale } from "@/i18n/getLocale";
 import { getLocale } from "@/i18n/getLocale";
 import { localePath } from "@/i18n/localePath";
@@ -10,13 +11,39 @@ import Link from "next/link";
 
 type ReservationPageProps = {
   params?: { locale?: Locale } | Promise<{ locale?: Locale }>;
+  searchParams?:
+    | Record<string, string | string[] | undefined>
+    | Promise<Record<string, string | string[] | undefined>>;
 };
 
-export default async function ReservationPage({ params }: ReservationPageProps = {}) {
+const firstSearchValue = (searchParams: Record<string, string | string[] | undefined>, key: string) => {
+  const value = searchParams[key];
+  if (Array.isArray(value)) return String(value[0] || "").trim();
+  return String(value || "").trim();
+};
+
+const parseBooleanSearchValue = (value: string) => {
+  const normalized = String(value || "").trim().toLowerCase();
+  return normalized === "1" || normalized === "true" || normalized === "yes" || normalized === "on";
+};
+
+export default async function ReservationPage({ params, searchParams }: ReservationPageProps = {}) {
   const resolvedParams = await params;
+  const resolvedSearchParams = (await searchParams) || {};
   const locale = resolvedParams?.locale ?? (await getLocale());
   const t = await fetchReservationResolvedContent(locale);
   const withLocale = (path: string) => localePath(locale, path);
+  const prefill = {
+    source: firstSearchValue(resolvedSearchParams, "prefill"),
+    checkIn: firstSearchValue(resolvedSearchParams, "checkIn"),
+    checkOut: firstSearchValue(resolvedSearchParams, "checkOut"),
+    boarding: firstSearchValue(resolvedSearchParams, "boarding"),
+    boardingSlug: firstSearchValue(resolvedSearchParams, "boardingSlug"),
+    rooms: firstSearchValue(resolvedSearchParams, "rooms"),
+    guests: firstSearchValue(resolvedSearchParams, "guests"),
+    children: firstSearchValue(resolvedSearchParams, "children"),
+    accessible: parseBooleanSearchValue(firstSearchValue(resolvedSearchParams, "accessible")),
+  };
   const renderLines = (value: string) => {
     const lines = String(value || "").split("\n");
     return lines.map((line, index) => (
@@ -71,68 +98,11 @@ export default async function ReservationPage({ params }: ReservationPageProps =
           <div className="container">
             <div className="row g-4 gx-5">
               <div className="col-lg-7">
-                <div className="p-40 bg-white rounded-1 shadow-soft">
+                <div id="instant-reservation" className="p-40 bg-white rounded-1 shadow-soft instant-reservation-target">
                   <div className="subtitle id-color">{t.shortStay.subtitle}</div>
                   <h3 className="mt-2 mb-3">{t.shortStay.title}</h3>
                   <p className="mb-4">{t.shortStay.description}</p>
-                  <form name="shortStayForm" id="short_stay_form" method="post" action={t.form.action}>
-                    <div className="row g-4 align-items-end">
-                      <div className="col-md-6">
-                        <div className="fs-18 text-dark fw-500 mb-10">{t.form.checkIn}</div>
-                        <input type="text" id="checkin" className="form-control" required />
-                      </div>
-
-                      <div className="col-md-6">
-                        <div className="fs-18 text-dark fw-500 mb-10">{t.form.checkOut}</div>
-                        <input type="text" id="checkout" className="form-control" required />
-                      </div>
-
-                      <div className="col-md-6">
-                        <div className="fs-18 text-dark fw-500 mb-10">{t.form.boarding}</div>
-                        <select name="boarding_house" className="form-control" required>
-                          <option value="">{t.form.select}</option>
-                          {t.form.boardingOptions.map((option) => (
-                            <option key={option} value={option}>
-                              {option}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-
-                      <div className="col-md-3">
-                        <div className="fs-18 text-dark fw-500 mb-10">{t.form.rooms}</div>
-                        <select name="rooms" className="form-control" required>
-                          {t.form.roomOptions.map((option) => (
-                            <option key={option} value={option}>
-                              {option}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-
-                      <div className="col-md-3">
-                        <div className="fs-18 text-dark fw-500 mb-10">{t.form.guests}</div>
-                        <select name="guests" className="form-control" required>
-                          {t.form.guestOptions.map((option) => (
-                            <option key={option} value={option}>
-                              {option}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-
-                      <div className="col-md-12">
-                        <div id="submit">
-                          <input
-                            type="submit"
-                            id="send_message"
-                            value={t.form.availability}
-                            className="btn-main w-100"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </form>
+                  <ShortStayFormClient locale={locale} copy={t.form} prefill={prefill} />
                   <div className="mt-3">
                     <small>{t.shortStay.helper}</small>
                   </div>

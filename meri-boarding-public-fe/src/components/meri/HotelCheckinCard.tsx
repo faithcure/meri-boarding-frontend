@@ -11,6 +11,9 @@ type HotelCheckinCopy = {
 
 type HotelCheckinCardProps = {
   copy: HotelCheckinCopy
+  reservationPath: string
+  boardingValue?: string
+  boardingSlug?: string
 }
 
 const baseFieldStyle = {
@@ -40,9 +43,10 @@ const getChildrenLabel = (copy: HotelCheckinCopy) => {
   return 'Children'
 }
 
-export default function HotelCheckinCard({ copy }: HotelCheckinCardProps) {
+export default function HotelCheckinCard({ copy, reservationPath, boardingValue, boardingSlug }: HotelCheckinCardProps) {
   const childrenLabel = getChildrenLabel(copy)
   const title = copy.title?.trim() || 'Make a Reservation'
+  const reservationAction = reservationPath
 
   return (
     <div style={{ position: 'relative' }}>
@@ -114,7 +118,10 @@ export default function HotelCheckinCard({ copy }: HotelCheckinCardProps) {
           />
         </div>
 
-        <form name='hotelCheckinForm' method='post' action='#' style={{ position: 'relative', zIndex: 1 }}>
+        <form name='hotelCheckinForm' method='get' action={reservationAction} style={{ position: 'relative', zIndex: 1 }}>
+          <input type='hidden' name='prefill' value='hotel-card' />
+          {boardingValue?.trim() ? <input type='hidden' name='boarding' value={boardingValue.trim()} /> : null}
+          {boardingSlug?.trim() ? <input type='hidden' name='boardingSlug' value={boardingSlug.trim()} /> : null}
           <div className='d-flex align-items-center gap-2 mb-3'>
             <i className='fa fa-calendar-check-o' aria-hidden='true'></i>
             <div className='fw-bold fs-20'>{title}</div>
@@ -122,17 +129,17 @@ export default function HotelCheckinCard({ copy }: HotelCheckinCardProps) {
           <div className='row g-3'>
             <div className='col-md-6'>
               <div className='fs-18 fw-500 mb-10'>{copy.checkIn}</div>
-              <input type='text' id='checkin' className='form-control' required style={baseFieldStyle} />
+              <input type='text' id='checkin' name='checkIn' className='form-control' required style={baseFieldStyle} />
             </div>
 
             <div className='col-md-6'>
               <div className='fs-18 fw-500 mb-10'>{copy.checkOut}</div>
-              <input type='text' id='checkout' className='form-control' required style={baseFieldStyle} />
+              <input type='text' id='checkout' name='checkOut' className='form-control' required style={baseFieldStyle} />
             </div>
 
             <div className='col-md-4'>
               <div className='fs-18 fw-500 mb-10'>{copy.rooms}</div>
-              <select className='form-control' style={selectFieldStyle}>
+              <select name='rooms' className='form-control' style={selectFieldStyle} required>
                 {[1, 2, 3].map(count => (
                   <option key={count} value={count}>
                     {count}
@@ -143,7 +150,7 @@ export default function HotelCheckinCard({ copy }: HotelCheckinCardProps) {
 
             <div className='col-md-4'>
               <div className='fs-18 fw-500 mb-10'>{copy.guests}</div>
-              <select className='form-control' style={selectFieldStyle}>
+              <select name='guests' className='form-control' style={selectFieldStyle} required>
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(count => (
                   <option key={count} value={count}>
                     {count}
@@ -154,7 +161,7 @@ export default function HotelCheckinCard({ copy }: HotelCheckinCardProps) {
 
             <div className='col-md-4'>
               <div className='fs-18 fw-500 mb-10'>{childrenLabel}</div>
-              <select className='form-control' style={selectFieldStyle}>
+              <select name='children' className='form-control' style={selectFieldStyle}>
                 {[0, 1, 2, 3, 4, 5, 6].map(count => (
                   <option key={count} value={count}>
                     {count}

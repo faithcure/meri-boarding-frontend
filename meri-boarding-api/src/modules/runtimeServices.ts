@@ -46,9 +46,6 @@ type CreateRuntimeServicesOptions = {
     fallback?: HotelLocaleContent
   ) => HotelLocaleContent
   getLocalizedGenericRoomsCards: (locale: ContentLocale) => HomeCmsContent['rooms']['cards']
-  parseEmailList: (input: string) => string[]
-  extractEmailsFromText: (input: string) => string[]
-  contactNotifyToRaw: string
   avatarUploadDir: string
   hotelUploadDir: string
   homeUploadDir: string
@@ -79,9 +76,6 @@ export function createRuntimeServices(options: CreateRuntimeServicesOptions) {
     mergeRoomsCardsWithSharedMedia,
     normalizeHotelLocaleContent,
     getLocalizedGenericRoomsCards,
-    parseEmailList,
-    extractEmailsFromText,
-    contactNotifyToRaw,
     avatarUploadDir,
     hotelUploadDir,
     homeUploadDir,
@@ -385,16 +379,19 @@ async function getContactSubmissionsCollection() {
   return submissions;
 }
 
-async function resolveContactNotificationRecipients(locale: ContentLocale) {
-  const envRecipients = parseEmailList(contactNotifyToRaw);
-  if (envRecipients.length > 0) return envRecipients;
+async function resolveContactNotificationRecipients(_locale: ContentLocale) {
+  const content = await getGeneralSettingsContent();
+  const recipients = Array.isArray(content?.formDelivery?.contactNotificationEmails)
+    ? content.formDelivery.contactNotificationEmails
+    : [];
 
-  const content = await getContactContent(locale);
-  const itemEmails = (content.details.items || [])
-    .flatMap((item) => extractEmailsFromText(String(item?.value || '')))
-    .filter(Boolean);
-
-  return Array.from(new Set(itemEmails));
+  return Array.from(
+    new Set(
+      recipients
+        .map((item) => String(item || '').trim().toLowerCase())
+        .filter(Boolean),
+    ),
+  );
 }
 
 async function ensureAdminIndexes() {
@@ -429,8 +426,13 @@ async function ensureAnalyticsIndexes() {
     analytics.createIndex({ eventType: 1, createdAt: -1 }),
     analytics.createIndex({ pagePath: 1, createdAt: -1 }),
     analytics.createIndex({ sessionId: 1, createdAt: -1 }),
+    analytics.createIndex({ visitorId: 1, createdAt: -1 }),
+    analytics.createIndex({ visitId: 1, createdAt: -1 }),
     analytics.createIndex({ locale: 1, createdAt: -1 }),
     analytics.createIndex({ country: 1, createdAt: -1 }),
+    analytics.createIndex({ referrerHost: 1, createdAt: -1 }),
+    analytics.createIndex({ deviceType: 1, createdAt: -1 }),
+    analytics.createIndex({ isEntrance: 1, createdAt: -1 }),
   ]);
 }
 

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { headers } from "next/headers";
 import "./globals.css";
 import ChatWidget from "@/components/meri/ChatWidget";
 import HeaderScrollState from "@/components/meri/HeaderScrollState";
@@ -9,7 +10,7 @@ import RouteTransitionOverlay from "@/components/meri/RouteTransitionOverlay";
 import SiteAnalyticsTracker from "@/components/meri/SiteAnalyticsTracker";
 import type { Locale } from "@/i18n/getLocale";
 import { getLocale } from "@/i18n/getLocale";
-import { fetchSiteIconUrl } from "@/lib/siteSettingsApi";
+import { fetchGeneralSocialLinks, fetchSiteIconUrl } from "@/lib/siteSettingsApi";
 import { getSiteUrl } from "@/lib/siteUrl";
 
 const geistSans = Geist({
@@ -24,6 +25,28 @@ const geistMono = Geist_Mono({
 
 const siteTitle = "Meri Boarding Group";
 const siteDescription = "Serviced apartments and boarding houses.";
+const localeList: Locale[] = ["de", "en", "tr"];
+
+function normalizePathname(pathname: string) {
+  const raw = String(pathname || "").trim();
+  if (!raw) return "/";
+  const pathOnly = raw.split("?")[0].split("#")[0];
+  if (!pathOnly.startsWith("/")) return `/${pathOnly}`;
+  return pathOnly;
+}
+
+function buildLocalizedPath(pathname: string, locale: Locale) {
+  const normalizedPath = normalizePathname(pathname);
+  const segments = normalizedPath.split("/");
+  const maybeLocale = segments[1] as Locale | undefined;
+
+  if (maybeLocale && localeList.includes(maybeLocale)) {
+    segments[1] = locale;
+    return segments.join("/") || `/${locale}`;
+  }
+
+  return `/${locale}${normalizedPath === "/" ? "" : normalizedPath}`;
+}
 
 function toAbsoluteUrl(url: string, siteUrl: string) {
   if (!url) return siteUrl;
@@ -34,9 +57,15 @@ function toAbsoluteUrl(url: string, siteUrl: string) {
 
 export async function generateMetadata(): Promise<Metadata> {
   const siteUrl = getSiteUrl();
+  const headerStore = await headers();
+  const requestPathname = normalizePathname(headerStore.get("x-pathname") || "/");
   const siteIconUrl = await fetchSiteIconUrl();
   const absoluteSiteIconUrl = toAbsoluteUrl(siteIconUrl, siteUrl);
   const absoluteShareImageUrl = toAbsoluteUrl("/api/og/site-icon.png", siteUrl);
+  const canonicalUrl = toAbsoluteUrl(requestPathname, siteUrl);
+  const languageAlternates = Object.fromEntries(
+    localeList.map((locale) => [locale, toAbsoluteUrl(buildLocalizedPath(requestPathname, locale), siteUrl)]),
+  ) as Record<Locale, string>;
 
   return {
     metadataBase: new URL(siteUrl),
@@ -44,16 +73,20 @@ export async function generateMetadata(): Promise<Metadata> {
     description: siteDescription,
     applicationName: siteTitle,
     alternates: {
-      canonical: siteUrl,
+      canonical: canonicalUrl,
+      languages: {
+        ...languageAlternates,
+        "x-default": languageAlternates.de,
+      },
     },
     icons: {
-      icon: [{ url: absoluteSiteIconUrl }],
-      shortcut: [{ url: absoluteSiteIconUrl }],
+      icon: [{ url: "/favicon.ico" }, { url: absoluteSiteIconUrl }],
+      shortcut: [{ url: "/favicon.ico" }],
       apple: [{ url: absoluteSiteIconUrl }],
     },
     openGraph: {
       type: "website",
-      url: siteUrl,
+      url: canonicalUrl,
       siteName: siteTitle,
       title: siteTitle,
       description: siteDescription,
@@ -106,10 +139,29 @@ export default async function RootLayout({
 }>) {
   const resolvedParams = await params;
   const locale = resolvedParams?.locale ?? (await getLocale());
+  const siteUrl = getSiteUrl();
+  const socialLinks = await fetchGeneralSocialLinks().catch(() => []);
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "LodgingBusiness",
+    name: siteTitle,
+    url: siteUrl,
+    logo: `${siteUrl}/favicon.ico`,
+    image: [`${siteUrl}/api/og/site-icon.png`],
+    sameAs: socialLinks.map((item) => item.url).filter(Boolean),
+    email: "info@meri-boarding.de",
+    telephone: "+49 711 5489840",
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "Stuttgart",
+      addressCountry: "DE",
+    },
+  };
 
   return (
     <html lang={locale}>
       <head>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
         <link rel="stylesheet" href="/css/bootstrap.min.css" />
         <link rel="stylesheet" href="/css/plugins.css" />
         <link rel="stylesheet" href="/fonts/fontawesome6/css/fontawesome.css" />

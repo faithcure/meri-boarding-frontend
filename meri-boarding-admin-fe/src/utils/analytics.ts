@@ -1,9 +1,12 @@
 import type {
   AnalyticsCountry,
   AnalyticsDaily,
+  AnalyticsDevice,
+  AnalyticsLandingPage,
   AnalyticsOverview,
   AnalyticsTopClick,
-  AnalyticsTopPage
+  AnalyticsTopPage,
+  AnalyticsTopReferrer
 } from '@/types/analytics'
 import { defaultAnalyticsOverview } from '@/types/analytics'
 
@@ -44,8 +47,11 @@ export function normalizeAnalyticsOverview(input: unknown): AnalyticsOverview {
     generatedAt?: unknown
     totals?: Record<string, unknown>
     topPages?: unknown[]
+    landingPages?: unknown[]
     topClicks?: unknown[]
+    topReferrers?: unknown[]
     countries?: unknown[]
+    devices?: unknown[]
     daily?: unknown[]
   }
 
@@ -75,6 +81,28 @@ export function normalizeAnalyticsOverview(input: unknown): AnalyticsOverview {
       })
     : []
 
+  const landingPages: AnalyticsLandingPage[] = Array.isArray(data.landingPages)
+    ? data.landingPages.map(item => {
+        const value = (item || {}) as Record<string, unknown>
+
+        return {
+          path: toString(value.path, '/'),
+          visits: toNumber(value.visits)
+        }
+      })
+    : []
+
+  const topReferrers: AnalyticsTopReferrer[] = Array.isArray(data.topReferrers)
+    ? data.topReferrers.map(item => {
+        const value = (item || {}) as Record<string, unknown>
+
+        return {
+          source: toString(value.source, 'Direct'),
+          visits: toNumber(value.visits)
+        }
+      })
+    : []
+
   const countries: AnalyticsCountry[] = Array.isArray(data.countries)
     ? data.countries.map(item => {
         const value = (item || {}) as Record<string, unknown>
@@ -83,6 +111,17 @@ export function normalizeAnalyticsOverview(input: unknown): AnalyticsOverview {
           country: toString(value.country, 'UNKNOWN'),
           pageViews: toNumber(value.pageViews),
           visitors: toNumber(value.visitors)
+        }
+      })
+    : []
+
+  const devices: AnalyticsDevice[] = Array.isArray(data.devices)
+    ? data.devices.map(item => {
+        const value = (item || {}) as Record<string, unknown>
+
+        return {
+          deviceType: toString(value.deviceType, 'unknown'),
+          visits: toNumber(value.visits)
         }
       })
     : []
@@ -105,18 +144,25 @@ export function normalizeAnalyticsOverview(input: unknown): AnalyticsOverview {
     locale: toString(data.locale, defaultAnalyticsOverview.locale),
     generatedAt: toString(data.generatedAt),
     totals: {
+      visitsInPeriod: toNumber(data.totals?.visitsInPeriod),
       pageViews: toNumber(data.totals?.pageViews),
       clicks: toNumber(data.totals?.clicks),
       visitorsInPeriod: toNumber(data.totals?.visitorsInPeriod),
+      newVisitorsInPeriod: toNumber(data.totals?.newVisitorsInPeriod),
+      returningVisitorsInPeriod: toNumber(data.totals?.returningVisitorsInPeriod),
       visitorsDaily: toNumber(data.totals?.visitorsDaily),
       visitorsWeekly: toNumber(data.totals?.visitorsWeekly),
       visitorsMonthly: toNumber(data.totals?.visitorsMonthly),
+      bounceRate: toNumber(data.totals?.bounceRate),
       avgVisitDurationSeconds: toNumber(data.totals?.avgVisitDurationSeconds),
       avgPagesPerVisit: toNumber(data.totals?.avgPagesPerVisit)
     },
     topPages,
+    landingPages,
     topClicks,
+    topReferrers,
     countries,
+    devices,
     daily
   }
 }

@@ -320,7 +320,12 @@ export default async function HotelDynamicPage({ params }: HotelDynamicPageProps
               <div className='col-lg-4'>
                 <div className='mb-4' id='booking'>
                   {isAvailable ? (
-                    <HotelCheckinCard copy={{ ...detail.form, children: childrenLabel, title: reservationTitle }} />
+                    <HotelCheckinCard
+                      copy={{ ...detail.form, children: childrenLabel, title: reservationTitle }}
+                      reservationPath={withLocale('/reservation')}
+                      boardingValue={hotel.name}
+                      boardingSlug={hotel.slug || slug}
+                    />
                   ) : (
                     <HotelWaitlistCard copy={noRoomCopy} />
                   )}

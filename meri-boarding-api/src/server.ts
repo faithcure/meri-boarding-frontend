@@ -75,7 +75,6 @@ const tokenHours = Number(process.env.ADMIN_TOKEN_HOURS || 12);
 const seedHotelsOnStart = String(process.env.SEED_HOTELS_ON_START || '').trim().toLowerCase() === 'true';
 const defaultSmtpPort = 465;
 const smtpStartTls = String(process.env.SMTP_STARTTLS || '').trim().toLowerCase() === 'true';
-const contactNotifyToRaw = String(process.env.CONTACT_FORM_TO || process.env.CONTACT_NOTIFY_TO || '').trim();
 const ragServiceUrl = String(process.env.RAG_SERVICE_URL || 'http://rag-service:4100').trim().replace(/\/+$/, '');
 const ragRequestTimeoutMs = Number(process.env.RAG_REQUEST_TIMEOUT_MS || 10000);
 const smtpHost = String(process.env.SMTP_HOST || '').trim();
@@ -252,7 +251,7 @@ const mailUtils = createMailUtils({
   smtpFrom,
 });
 
-const { parseEmailList, extractEmailsFromText, sendSmtpMail: sendSmtpMailRaw, setSmtpConfig, formatContactSubmission } = mailUtils;
+const { parseEmailList, sendSmtpMail: sendSmtpMailRaw, setSmtpConfig, formatContactSubmission } = mailUtils;
 
 const contentTransforms = createContentTransforms({
   defaultHomeContent,
@@ -307,9 +306,6 @@ const runtimeServices = createRuntimeServices({
   mergeRoomsCardsWithSharedMedia,
   normalizeHotelLocaleContent,
   getLocalizedGenericRoomsCards,
-  parseEmailList,
-  extractEmailsFromText,
-  contactNotifyToRaw,
   avatarUploadDir,
   hotelUploadDir,
   homeUploadDir,

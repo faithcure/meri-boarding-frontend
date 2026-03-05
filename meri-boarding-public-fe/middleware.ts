@@ -22,6 +22,7 @@ export function middleware(request: NextRequest) {
     const locale = maybeLocale;
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set("x-locale", locale);
+    requestHeaders.set("x-pathname", pathname);
 
     const response = NextResponse.next({ request: { headers: requestHeaders } });
     response.cookies.set("LOCALE", locale, { path: "/", maxAge: 60 * 60 * 24 * 365 });

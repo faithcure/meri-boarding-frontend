@@ -219,6 +219,7 @@ export async function registerPublicRoutes(ctx: RouteContext) {
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const collapseWhitespace = (value: string) => String(value || '').replace(/\s+/g, ' ').trim();
+const oneDayMs = 24 * 60 * 60 * 1000;
 const maxChatHistoryItems = 12;
 const maxChatHistoryTextLen = 600;
 const maxAnalyticsTextLen = 240;
@@ -229,6 +230,7 @@ const isMeaningfulMessage = (value: string) => {
 };
 const chatRateLimitStore = new Map<string, { count: number; resetAt: number }>();
 const analyticsRateLimitStore = new Map<string, { count: number; resetAt: number }>();
+const analyticsDedupeStore = new Map<string, number>();
 
 function isChatRateLimited(key: string, max: number, windowMs: number) {
   const now = Date.now();
@@ -337,6 +339,18 @@ function normalizeAnalyticsPath(value: unknown) {
   return raw.startsWith('/') ? raw : `/${raw}`;
 }
 
+function parseShortStayDate(value: string) {
+  const raw = String(value || '').trim();
+  if (!raw) return null;
+
+  const normalized = raw.replace(/\s+/g, ' ');
+  const parsed = new Date(normalized);
+  if (Number.isNaN(parsed.getTime())) return null;
+
+  // Normalize to date-only UTC to avoid timezone drift in night calculations.
+  return new Date(Date.UTC(parsed.getUTCFullYear(), parsed.getUTCMonth(), parsed.getUTCDate()));
+}
+
 function normalizeAnalyticsHref(value: unknown) {
   const raw = String(value || '').trim().slice(0, 400);
   if (!raw) return '';
@@ -351,6 +365,82 @@ function normalizeAnalyticsText(value: unknown, max = maxAnalyticsTextLen) {
     .replace(/\s+/g, ' ')
     .trim()
     .slice(0, max);
+}
+
+function normalizeAnalyticsHost(value: unknown) {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/:\d+$/, '')
+    .slice(0, 160);
+}
+
+function extractUrlHost(value: unknown) {
+  const raw = String(value || '').trim();
+  if (!raw) return '';
+  try {
+    return normalizeAnalyticsHost(new URL(raw).host);
+  } catch {
+    return '';
+  }
+}
+
+function isAllowedAnalyticsSource(request: FastifyRequest) {
+  const allowedHosts = new Set<string>();
+  const requestHosts = [request.headers.host, request.headers['x-forwarded-host']];
+
+  requestHosts.forEach((value) => {
+    const normalized = normalizeAnalyticsHost(Array.isArray(value) ? value[0] : value);
+    if (!normalized) return;
+    allowedHosts.add(normalized);
+    const withoutWww = normalized.replace(/^www\./, '');
+    if (withoutWww) {
+      allowedHosts.add(withoutWww);
+      allowedHosts.add(`www.${withoutWww}`);
+    }
+  });
+
+  if (allowedHosts.size < 1) return true;
+
+  const originHost = extractUrlHost(request.headers.origin);
+  const refererHost = extractUrlHost(request.headers.referer);
+  if (originHost && !allowedHosts.has(originHost)) return false;
+  if (!originHost && refererHost && !allowedHosts.has(refererHost)) return false;
+  return true;
+}
+
+function isLikelyBotUserAgent(userAgent: string) {
+  return /(bot|crawler|spider|preview|headless|curl|wget|python|node-fetch|go-http-client|axios)/i.test(userAgent);
+}
+
+function normalizeAnalyticsDeviceType(value: unknown) {
+  const normalized = String(value || '').trim().toLowerCase();
+  if (normalized === 'mobile' || normalized === 'tablet') return normalized;
+  return 'desktop';
+}
+
+function normalizeAnalyticsScreenCategory(value: unknown) {
+  const normalized = String(value || '').trim().toLowerCase();
+  if (normalized === 'sm' || normalized === 'md' || normalized === 'lg') return normalized;
+  return 'xl';
+}
+
+function rememberAnalyticsSignature(signature: string, windowMs: number) {
+  const now = Date.now();
+  const existing = analyticsDedupeStore.get(signature);
+  analyticsDedupeStore.set(signature, now + windowMs);
+
+  if (existing && existing > now) {
+    return true;
+  }
+
+  if (analyticsDedupeStore.size > 5000) {
+    for (const [key, expiresAt] of analyticsDedupeStore.entries()) {
+      if (expiresAt <= now) analyticsDedupeStore.delete(key);
+    }
+  }
+
+  return false;
 }
 
 const toObjectId = (value: string) => (ObjectId.isValid(value) ? new ObjectId(value) : null);
@@ -454,15 +544,27 @@ server.post('/api/v1/public/analytics/events', async (request, reply) => {
   const body = request.body as
     | {
         eventType?: string;
+        visitorId?: string;
+        visitId?: string;
         sessionId?: string;
         locale?: string;
         pagePath?: string;
         pageTitle?: string;
         referrerPath?: string;
+        referrerHost?: string;
         durationMs?: number;
         clickLabel?: string;
         clickHref?: string;
         clickTag?: string;
+        deviceType?: string;
+        browser?: string;
+        screenCategory?: string;
+        isEntrance?: boolean | string | number;
+        source?: string;
+        medium?: string;
+        campaign?: string;
+        term?: string;
+        content?: string;
       }
     | undefined;
 
@@ -473,42 +575,94 @@ server.post('/api/v1/public/analytics/events', async (request, reply) => {
     return reply.code(400).send({ error: 'Invalid analytics event type' });
   }
 
-  const sessionId = normalizeAnalyticsText(body?.sessionId, 120);
-  if (!sessionId) {
-    return reply.code(400).send({ error: 'sessionId is required' });
+  const legacySessionId = normalizeAnalyticsText(body?.sessionId, 120);
+  const visitorId = normalizeAnalyticsText(body?.visitorId, 120) || legacySessionId;
+  const visitId = normalizeAnalyticsText(body?.visitId, 120) || legacySessionId;
+  if (!visitorId || !visitId) {
+    return reply.code(400).send({ error: 'visitorId and visitId are required' });
   }
 
   const locale = parseLocale(body?.locale);
   const pagePath = normalizeAnalyticsPath(body?.pagePath);
   const referrerPath = normalizeAnalyticsPath(body?.referrerPath);
+  const referrerHost = normalizeAnalyticsHost(body?.referrerHost);
   const pageTitle = normalizeAnalyticsText(body?.pageTitle, 180);
   const clickLabel = normalizeAnalyticsText(body?.clickLabel, 160);
   const clickHref = normalizeAnalyticsHref(body?.clickHref);
   const clickTag = normalizeAnalyticsText(body?.clickTag, 32).toLowerCase();
+  const deviceType = normalizeAnalyticsDeviceType(body?.deviceType);
+  const browser = normalizeAnalyticsText(body?.browser, 48).toLowerCase() || 'unknown';
+  const screenCategory = normalizeAnalyticsScreenCategory(body?.screenCategory);
+  const isEntrance = body?.isEntrance === true || String(body?.isEntrance || '').trim().toLowerCase() === 'true';
+  const source = normalizeAnalyticsText(body?.source, 120).toLowerCase();
+  const medium = normalizeAnalyticsText(body?.medium, 120).toLowerCase();
+  const campaign = normalizeAnalyticsText(body?.campaign, 160);
+  const term = normalizeAnalyticsText(body?.term, 160);
+  const content = normalizeAnalyticsText(body?.content, 160);
   const durationRaw = Number(body?.durationMs);
   const durationMs =
     Number.isFinite(durationRaw) && durationRaw >= 0 && durationRaw <= 4 * 60 * 60 * 1000
       ? Math.round(durationRaw)
       : null;
 
+  if (!isAllowedAnalyticsSource(request)) {
+    return reply.code(403).send({ error: 'Analytics source is not allowed' });
+  }
+
+  if (isRateLimited(analyticsRateLimitStore, `analytics:visit:${visitId}`, 180, 60_000)) {
+    return reply.code(429).send({ error: 'Too many analytics events for this visit. Please slow down.' });
+  }
+
+  const dedupeWindowMs = eventType === 'click' ? 800 : eventType === 'page_view' ? 1500 : 2000;
+  const dedupeSignature = [
+    visitorId,
+    visitId,
+    eventType,
+    pagePath,
+    clickLabel,
+    clickHref,
+    clickTag,
+    durationMs ? Math.round(durationMs / 1000) : 0,
+  ].join('|');
+  if (rememberAnalyticsSignature(dedupeSignature, dedupeWindowMs)) {
+    return reply.send({ ok: true, deduped: true });
+  }
+
   const country = resolveRequestCountry(request);
+  const ip = resolveRequestIp(request);
   const userAgent = normalizeAnalyticsText(request.headers['user-agent'] || '', 260);
+  if (isLikelyBotUserAgent(userAgent)) {
+    return reply.code(202).send({ ok: false, ignored: 'bot' });
+  }
 
   try {
     const db = await getDb();
     await db.collection('analytics_events').insertOne({
       _id: new ObjectId(),
       eventType,
-      sessionId,
+      sessionId: legacySessionId || visitorId,
+      visitorId,
+      visitId,
       locale,
       pagePath,
       pageTitle: pageTitle || null,
       referrerPath: referrerPath || null,
+      referrerHost: referrerHost || null,
       durationMs,
       clickLabel: clickLabel || null,
       clickHref: clickHref || null,
       clickTag: clickTag || null,
+      deviceType,
+      browser,
+      screenCategory,
+      isEntrance,
+      source: source || null,
+      medium: medium || null,
+      campaign: campaign || null,
+      term: term || null,
+      content: content || null,
       country,
+      ip,
       userAgent: userAgent || null,
       createdAt: new Date(),
     });
@@ -1097,6 +1251,162 @@ server.post('/api/v1/public/forms/request', async (request, reply) => {
       ok: true,
       mailSent: false,
       warning: 'Inquiry received but email notification failed.',
+    });
+  }
+});
+
+server.post('/api/v1/public/forms/short-stay', async (request, reply) => {
+  const body = request.body as
+    | {
+        locale?: string;
+        sourcePage?: string;
+        checkIn?: string;
+        checkOut?: string;
+        boarding?: string;
+        rooms?: string | number;
+        guests?: string | number;
+        children?: string | number;
+        accessible?: string | number | boolean;
+        firstName?: string;
+        lastName?: string;
+        email?: string;
+        phone?: string;
+      }
+    | undefined;
+
+  const locale = parseLocale(body?.locale);
+  const sourcePage = String(body?.sourcePage || '/reservation').trim().slice(0, 120) || '/reservation';
+  const checkInRaw = String(body?.checkIn || '').trim();
+  const checkOutRaw = String(body?.checkOut || '').trim();
+  const boarding = String(body?.boarding || '').trim();
+  const roomsRaw = String(body?.rooms || '').trim();
+  const guestsRaw = String(body?.guests || '').trim();
+  const childrenRaw = String(body?.children || '0').trim();
+  const children = Number(childrenRaw);
+  const accessibleRaw = body?.accessible;
+  const accessibleProvided = accessibleRaw !== undefined && String(accessibleRaw).trim() !== '';
+  const accessibleNormalized = String(accessibleRaw ?? '').trim().toLowerCase();
+  const accessible =
+    accessibleRaw === true ||
+    accessibleRaw === 1 ||
+    ['1', 'true', 'yes', 'ja', 'evet', 'on'].includes(accessibleNormalized);
+  const accessibilityValue = accessibleProvided ? (accessible ? 'Yes' : 'No') : '-';
+  const firstName = String(body?.firstName || '').trim();
+  const lastName = String(body?.lastName || '').trim();
+  const email = String(body?.email || '').trim().toLowerCase();
+  const phone = String(body?.phone || '').trim();
+
+  if (!checkInRaw) return reply.code(400).send({ error: 'Check-in is required.' });
+  if (!checkOutRaw) return reply.code(400).send({ error: 'Check-out is required.' });
+  if (!boarding) return reply.code(400).send({ error: 'Boarding house is required.' });
+  if (!roomsRaw) return reply.code(400).send({ error: 'Number of rooms is required.' });
+  if (!guestsRaw) return reply.code(400).send({ error: 'Number of guests is required.' });
+  if (!firstName || firstName.length < 2) return reply.code(400).send({ error: 'First name is required.' });
+  if (!lastName || lastName.length < 2) return reply.code(400).send({ error: 'Last name is required.' });
+  if (!emailRegex.test(email)) return reply.code(400).send({ error: 'Valid email is required.' });
+  if (!phone || phone.length < 5) return reply.code(400).send({ error: 'Phone is required.' });
+
+  const checkInDate = parseShortStayDate(checkInRaw);
+  const checkOutDate = parseShortStayDate(checkOutRaw);
+  if (!checkInDate) return reply.code(400).send({ error: 'Check-in date is invalid.' });
+  if (!checkOutDate) return reply.code(400).send({ error: 'Check-out date is invalid.' });
+
+  const nights = Math.round((checkOutDate.getTime() - checkInDate.getTime()) / oneDayMs);
+  if (nights < 1) {
+    return reply.code(400).send({ error: 'Check-out must be after check-in.' });
+  }
+  if (nights > 30) {
+    return reply.code(400).send({ error: 'Short-stay request cannot exceed 30 nights.' });
+  }
+
+  const rooms = Number(roomsRaw);
+  const guests = Number(guestsRaw);
+  if (!Number.isFinite(rooms) || rooms < 1 || rooms > 20) {
+    return reply.code(400).send({ error: 'Number of rooms is invalid.' });
+  }
+  if (!Number.isFinite(guests) || guests < 1 || guests > 30) {
+    return reply.code(400).send({ error: 'Number of guests is invalid.' });
+  }
+  if (!Number.isFinite(children) || children < 0 || children > 10) {
+    return reply.code(400).send({ error: 'Number of child is invalid.' });
+  }
+
+  const submittedAt = new Date();
+  try {
+    const recipients = await resolveContactNotificationRecipients(locale);
+    const logoAttachment = await getMailLogoAttachment();
+    const subject = `Short Stay Availability: ${boarding}`;
+    const mailResult = await sendSmtpMail({
+      to: recipients,
+      subject,
+      text: [
+        'A new short-stay availability request has been received.',
+        '',
+        `Date: ${submittedAt.toISOString()}`,
+        `Locale: ${locale}`,
+        `Source: ${sourcePage}`,
+        `First name: ${firstName}`,
+        `Last name: ${lastName}`,
+        `Email: ${email}`,
+        `Phone: ${phone}`,
+        `Check-in: ${checkInRaw}`,
+        `Check-out: ${checkOutRaw}`,
+        `Nights: ${nights}`,
+        `Boarding house: ${boarding}`,
+        `Rooms: ${rooms}`,
+        `Guests: ${guests}`,
+        `Children: ${children}`,
+        `Accessibility need: ${accessibilityValue}`,
+      ].join('\n'),
+      html: renderBrandedMailHtml({
+        title: subject,
+        subtitle: 'Short-Stay Availability Request',
+        rows: [
+          { label: 'Date', value: formatMailDate(submittedAt, locale) },
+          { label: 'Locale', value: locale },
+          { label: 'Source', value: sourcePage },
+          { label: 'First Name', value: firstName },
+          { label: 'Last Name', value: lastName },
+          { label: 'Email', value: email },
+          { label: 'Phone', value: phone },
+          { label: 'Check-In', value: checkInRaw },
+          { label: 'Check-Out', value: checkOutRaw },
+          { label: 'Nights', value: String(nights) },
+          { label: 'Boarding House', value: boarding },
+          { label: 'Rooms', value: String(rooms) },
+          { label: 'Guests', value: String(guests) },
+          { label: 'Children', value: String(children) },
+          { label: 'Accessibility Need', value: accessibilityValue },
+        ],
+        locale,
+        generatedAt: submittedAt,
+      }),
+      replyTo: email,
+      attachments: logoAttachment ? [logoAttachment] : undefined,
+    });
+
+    if (mailResult.sent) {
+      await sendAutoReplyEmail({
+        sendSmtpMail,
+        locale,
+        to: email,
+        type: 'request',
+        boarding,
+        logoAttachment,
+      }).catch(() => undefined);
+      return reply.code(201).send({ ok: true, mailSent: true });
+    }
+
+    return reply.code(202).send({
+      ok: true,
+      mailSent: false,
+      warning: 'Request received but email notification failed.',
+    });
+  } catch {
+    return reply.code(202).send({
+      ok: true,
+      mailSent: false,
+      warning: 'Request received but email notification failed.',
     });
   }
 });

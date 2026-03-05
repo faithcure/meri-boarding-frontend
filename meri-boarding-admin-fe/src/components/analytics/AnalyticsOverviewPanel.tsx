@@ -44,6 +44,18 @@ function formatShortDate(value: string) {
   return parsed.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })
 }
 
+function formatPercent(value: number) {
+  return `${Math.max(0, Number(value || 0)).toFixed(1)}%`
+}
+
+function formatDeviceLabel(value: string) {
+  const normalized = String(value || '').trim().toLowerCase()
+  if (normalized === 'mobile') return 'Mobile'
+  if (normalized === 'tablet') return 'Tablet'
+  if (normalized === 'desktop') return 'Desktop'
+  return normalized || 'Unknown'
+}
+
 function MetricCard({ label, value }: { label: string; value: string }) {
   return (
     <Card variant='outlined'>
@@ -230,11 +242,32 @@ export default function AnalyticsOverviewPanel({ analytics, topLimit = 10 }: Ana
     helper: [item.tag, item.href].filter(Boolean).join(' | ')
   }))
 
+  const landingPages = analytics.landingPages.slice(0, topLimit).map(item => ({
+    id: `landing-${item.path}`,
+    label: item.path,
+    value: item.visits,
+    helper: 'Visit entrances'
+  }))
+
+  const referrers = analytics.topReferrers.slice(0, topLimit).map(item => ({
+    id: `referrer-${item.source}`,
+    label: item.source === 'direct' ? 'Direct' : item.source,
+    value: item.visits,
+    helper: 'Visit source'
+  }))
+
   const countries = analytics.countries.slice(0, topLimit).map(item => ({
     id: `country-${item.country}`,
     label: item.country,
     value: item.visitors,
     helper: `Page views: ${formatInteger(item.pageViews)}`
+  }))
+
+  const devices = analytics.devices.slice(0, topLimit).map(item => ({
+    id: `device-${item.deviceType}`,
+    label: formatDeviceLabel(item.deviceType),
+    value: item.visits,
+    helper: 'Visit share'
   }))
 
   return (
@@ -253,6 +286,15 @@ export default function AnalyticsOverviewPanel({ analytics, topLimit = 10 }: Ana
           <MetricCard label='Visitors (Period)' value={formatInteger(analytics.totals.visitorsInPeriod)} />
         </Grid>
         <Grid size={{ xs: 12, md: 3 }}>
+          <MetricCard label='Visits (Period)' value={formatInteger(analytics.totals.visitsInPeriod)} />
+        </Grid>
+        <Grid size={{ xs: 12, md: 3 }}>
+          <MetricCard label='New Visitors' value={formatInteger(analytics.totals.newVisitorsInPeriod)} />
+        </Grid>
+        <Grid size={{ xs: 12, md: 3 }}>
+          <MetricCard label='Returning Visitors' value={formatInteger(analytics.totals.returningVisitorsInPeriod)} />
+        </Grid>
+        <Grid size={{ xs: 12, md: 3 }}>
           <MetricCard label='Page Views' value={formatInteger(analytics.totals.pageViews)} />
         </Grid>
         <Grid size={{ xs: 12, md: 3 }}>
@@ -264,6 +306,9 @@ export default function AnalyticsOverviewPanel({ analytics, topLimit = 10 }: Ana
         <Grid size={{ xs: 12, md: 3 }}>
           <MetricCard label='Avg Pages / Visit' value={analytics.totals.avgPagesPerVisit.toFixed(2)} />
         </Grid>
+        <Grid size={{ xs: 12, md: 3 }}>
+          <MetricCard label='Bounce Rate' value={formatPercent(analytics.totals.bounceRate)} />
+        </Grid>
         <Grid size={{ xs: 12 }}>
           <TrendChart daily={analytics.daily} />
         </Grid>
@@ -271,10 +316,19 @@ export default function AnalyticsOverviewPanel({ analytics, topLimit = 10 }: Ana
           <HorizontalBarsCard title='Top Pages (Views)' items={topPages} barColor='#2563eb' />
         </Grid>
         <Grid size={{ xs: 12, lg: 6 }}>
+          <HorizontalBarsCard title='Landing Pages' items={landingPages} barColor='#0f766e' />
+        </Grid>
+        <Grid size={{ xs: 12, lg: 6 }}>
           <HorizontalBarsCard title='Top Click Targets' items={topClicks} barColor='#16a34a' />
         </Grid>
         <Grid size={{ xs: 12, lg: 6 }}>
+          <HorizontalBarsCard title='Top Referrers' items={referrers} barColor='#9333ea' />
+        </Grid>
+        <Grid size={{ xs: 12, lg: 6 }}>
           <HorizontalBarsCard title='Countries (Visitors)' items={countries} barColor='#f97316' />
+        </Grid>
+        <Grid size={{ xs: 12, lg: 6 }}>
+          <HorizontalBarsCard title='Devices (Visits)' items={devices} barColor='#dc2626' />
         </Grid>
       </Grid>
     </Box>

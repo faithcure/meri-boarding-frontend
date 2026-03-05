@@ -605,16 +605,16 @@ server.get('/api/v1/admin/analytics/overview', async (request, reply) => {
     createdAt: { $gte: since },
   };
 
-  const uniqueVisitorCount = async (match: Record<string, unknown>) => {
+  const uniqueValueCount = async (match: Record<string, unknown>, field: 'visitorId' | 'visitId') => {
     const rows = await events
       .aggregate([
         {
           $match: {
             ...match,
-            sessionId: { $nin: [null, ''] },
+            [field]: { $nin: [null, ''] },
           },
         },
-        { $group: { _id: '$sessionId' } },
+        { $group: { _id: `$${field}` } },
         { $count: 'count' },
       ])
       .toArray();
@@ -622,16 +622,80 @@ server.get('/api/v1/admin/analytics/overview', async (request, reply) => {
     return Number(rows[0]?.count || 0);
   };
 
-  const [pageViews, clicks, visitorsDay, visitorsWeek, visitorsMonth, visitorsInPeriod] = await Promise.all([
+  const [
+    pageViews,
+    clicks,
+    visitsInPeriod,
+    visitorsDay,
+    visitorsWeek,
+    visitorsMonth,
+    visitorsInPeriod,
+    visitorLifecycleRows,
+  ] = await Promise.all([
     events.countDocuments({ ...periodMatch, eventType: 'page_view' }),
     events.countDocuments({ ...periodMatch, eventType: 'click' }),
-    uniqueVisitorCount({ ...localeFilter, createdAt: { $gte: daySince } }),
-    uniqueVisitorCount({ ...localeFilter, createdAt: { $gte: weekSince } }),
-    uniqueVisitorCount({ ...localeFilter, createdAt: { $gte: monthSince } }),
-    uniqueVisitorCount(periodMatch),
+    uniqueValueCount(periodMatch, 'visitId'),
+    uniqueValueCount({ ...localeFilter, createdAt: { $gte: daySince } }, 'visitorId'),
+    uniqueValueCount({ ...localeFilter, createdAt: { $gte: weekSince } }, 'visitorId'),
+    uniqueValueCount({ ...localeFilter, createdAt: { $gte: monthSince } }, 'visitorId'),
+    uniqueValueCount(periodMatch, 'visitorId'),
+    events
+      .aggregate([
+        {
+          $match: {
+            ...localeFilter,
+            eventType: 'page_view',
+            visitorId: { $nin: [null, ''] },
+          },
+        },
+        {
+          $group: {
+            _id: '$visitorId',
+            firstSeenAt: { $min: '$createdAt' },
+            lastSeenAt: { $max: '$createdAt' },
+          },
+        },
+        {
+          $match: {
+            lastSeenAt: { $gte: since },
+          },
+        },
+      ])
+      .toArray(),
   ]);
 
-  const [avgDurationRows, avgPagesRows, topPagesRows, pageDurationRows, topClicksRows, countryRows, dailyRows] = await Promise.all([
+  const [
+    bounceRows,
+    avgDurationRows,
+    avgPagesRows,
+    topPagesRows,
+    landingPagesRows,
+    pageDurationRows,
+    topClicksRows,
+    referrerRows,
+    countryRows,
+    deviceRows,
+    dailyRows,
+  ] = await Promise.all([
+    events
+      .aggregate([
+        {
+          $match: {
+            ...periodMatch,
+            eventType: 'page_view',
+            visitId: { $nin: [null, ''] },
+          },
+        },
+        { $group: { _id: '$visitId', pageViews: { $sum: 1 } } },
+        {
+          $group: {
+            _id: null,
+            totalVisits: { $sum: 1 },
+            bouncedVisits: { $sum: { $cond: [{ $lte: ['$pageViews', 1] }, 1, 0] } },
+          },
+        },
+      ])
+      .toArray(),
     events
       .aggregate([
         {
@@ -639,10 +703,10 @@ server.get('/api/v1/admin/analytics/overview', async (request, reply) => {
             ...periodMatch,
             eventType: 'page_leave',
             durationMs: { $gt: 0 },
-            sessionId: { $nin: [null, ''] },
+            visitId: { $nin: [null, ''] },
           },
         },
-        { $group: { _id: '$sessionId', durationMs: { $sum: '$durationMs' } } },
+        { $group: { _id: '$visitId', durationMs: { $sum: '$durationMs' } } },
         { $group: { _id: null, avgDurationMs: { $avg: '$durationMs' } } },
       ])
       .toArray(),
@@ -652,10 +716,10 @@ server.get('/api/v1/admin/analytics/overview', async (request, reply) => {
           $match: {
             ...periodMatch,
             eventType: 'page_view',
-            sessionId: { $nin: [null, ''] },
+            visitId: { $nin: [null, ''] },
           },
         },
-        { $group: { _id: '$sessionId', pageViews: { $sum: 1 } } },
+        { $group: { _id: '$visitId', pageViews: { $sum: 1 } } },
         { $group: { _id: null, avgPages: { $avg: '$pageViews' } } },
       ])
       .toArray(),
@@ -668,12 +732,37 @@ server.get('/api/v1/admin/analytics/overview', async (request, reply) => {
             views: { $sum: 1 },
             visitorsSet: {
               $addToSet: {
-                $cond: [{ $and: [{ $ne: ['$sessionId', null] }, { $ne: ['$sessionId', ''] }] }, '$sessionId', null],
+                $cond: [{ $and: [{ $ne: ['$visitorId', null] }, { $ne: ['$visitorId', ''] }] }, '$visitorId', null],
               },
             },
           },
         },
         { $sort: { views: -1 } },
+        { $limit: 25 },
+      ])
+      .toArray(),
+    events
+      .aggregate([
+        {
+          $match: {
+            ...periodMatch,
+            eventType: 'page_view',
+            isEntrance: true,
+            visitId: { $nin: [null, ''] },
+          },
+        },
+        {
+          $group: {
+            _id: '$pagePath',
+            visitsSet: { $addToSet: '$visitId' },
+          },
+        },
+        {
+          $project: {
+            visits: { $size: '$visitsSet' },
+          },
+        },
+        { $sort: { visits: -1 } },
         { $limit: 25 },
       ])
       .toArray(),
@@ -702,6 +791,33 @@ server.get('/api/v1/admin/analytics/overview', async (request, reply) => {
       .toArray(),
     events
       .aggregate([
+        {
+          $match: {
+            ...periodMatch,
+            eventType: 'page_view',
+            isEntrance: true,
+            visitId: { $nin: [null, ''] },
+          },
+        },
+        {
+          $group: {
+            _id: {
+              $cond: [{ $and: [{ $ne: ['$referrerHost', null] }, { $ne: ['$referrerHost', ''] }] }, '$referrerHost', 'direct'],
+            },
+            visitsSet: { $addToSet: '$visitId' },
+          },
+        },
+        {
+          $project: {
+            visits: { $size: '$visitsSet' },
+          },
+        },
+        { $sort: { visits: -1 } },
+        { $limit: 25 },
+      ])
+      .toArray(),
+    events
+      .aggregate([
         { $match: { ...periodMatch, eventType: 'page_view' } },
         {
           $group: {
@@ -709,13 +825,38 @@ server.get('/api/v1/admin/analytics/overview', async (request, reply) => {
             pageViews: { $sum: 1 },
             visitorsSet: {
               $addToSet: {
-                $cond: [{ $and: [{ $ne: ['$sessionId', null] }, { $ne: ['$sessionId', ''] }] }, '$sessionId', null],
+                $cond: [{ $and: [{ $ne: ['$visitorId', null] }, { $ne: ['$visitorId', ''] }] }, '$visitorId', null],
               },
             },
           },
         },
         { $sort: { pageViews: -1 } },
         { $limit: 25 },
+      ])
+      .toArray(),
+    events
+      .aggregate([
+        {
+          $match: {
+            ...periodMatch,
+            eventType: 'page_view',
+            isEntrance: true,
+            visitId: { $nin: [null, ''] },
+          },
+        },
+        {
+          $group: {
+            _id: '$deviceType',
+            visitsSet: { $addToSet: '$visitId' },
+          },
+        },
+        {
+          $project: {
+            visits: { $size: '$visitsSet' },
+          },
+        },
+        { $sort: { visits: -1 } },
+        { $limit: 12 },
       ])
       .toArray(),
     events
@@ -734,7 +875,7 @@ server.get('/api/v1/admin/analytics/overview', async (request, reply) => {
             clicks: { $sum: { $cond: [{ $eq: ['$eventType', 'click'] }, 1, 0] } },
             visitorsSet: {
               $addToSet: {
-                $cond: [{ $and: [{ $ne: ['$sessionId', null] }, { $ne: ['$sessionId', ''] }] }, '$sessionId', null],
+                $cond: [{ $and: [{ $ne: ['$visitorId', null] }, { $ne: ['$visitorId', ''] }] }, '$visitorId', null],
               },
             },
           },
@@ -745,8 +886,13 @@ server.get('/api/v1/admin/analytics/overview', async (request, reply) => {
       .toArray(),
   ]);
 
+  const bounceSummary = bounceRows[0] || {};
+  const totalVisitsForBounce = Number(bounceSummary?.totalVisits || 0);
+  const bouncedVisits = Number(bounceSummary?.bouncedVisits || 0);
   const avgDurationMs = Number(avgDurationRows[0]?.avgDurationMs || 0);
   const avgPagesPerVisit = Number(avgPagesRows[0]?.avgPages || 0);
+  const newVisitorsInPeriod = visitorLifecycleRows.filter((row: any) => row?.firstSeenAt instanceof Date && row.firstSeenAt >= since).length;
+  const returningVisitorsInPeriod = Math.max(0, Number(visitorsInPeriod || 0) - newVisitorsInPeriod);
 
   const pageDurationMap = new Map<string, number>();
   pageDurationRows.forEach((row: any) => {
@@ -760,12 +906,16 @@ server.get('/api/v1/admin/analytics/overview', async (request, reply) => {
     locale,
     generatedAt: now.toISOString(),
     totals: {
+      visitsInPeriod: Number(visitsInPeriod || 0),
       pageViews: Number(pageViews || 0),
       clicks: Number(clicks || 0),
       visitorsInPeriod: Number(visitorsInPeriod || 0),
+      newVisitorsInPeriod,
+      returningVisitorsInPeriod,
       visitorsDaily: Number(visitorsDay || 0),
       visitorsWeekly: Number(visitorsWeek || 0),
       visitorsMonthly: Number(visitorsMonth || 0),
+      bounceRate: totalVisitsForBounce > 0 ? Number(((bouncedVisits / totalVisitsForBounce) * 100).toFixed(1)) : 0,
       avgVisitDurationSeconds: Number((avgDurationMs / 1000).toFixed(1)),
       avgPagesPerVisit: Number(avgPagesPerVisit.toFixed(2)),
     },
@@ -782,11 +932,19 @@ server.get('/api/v1/admin/analytics/overview', async (request, reply) => {
         avgDurationSeconds: Number((avgDurationForPath / 1000).toFixed(1)),
       };
     }),
+    landingPages: landingPagesRows.map((row: any) => ({
+      path: String(row?._id || '/'),
+      visits: Number(row?.visits || 0),
+    })),
     topClicks: topClicksRows.map((row: any) => ({
       label: String(row?._id?.label || '(no label)'),
       href: String(row?._id?.href || ''),
       tag: String(row?._id?.tag || ''),
       count: Number(row?.count || 0),
+    })),
+    topReferrers: referrerRows.map((row: any) => ({
+      source: String(row?._id || 'direct'),
+      visits: Number(row?.visits || 0),
     })),
     countries: countryRows.map((row: any) => ({
       country: String(row?._id || 'UNKNOWN'),
@@ -794,6 +952,10 @@ server.get('/api/v1/admin/analytics/overview', async (request, reply) => {
       visitors: Array.isArray(row?.visitorsSet)
         ? row.visitorsSet.filter((item: unknown) => typeof item === 'string' && item).length
         : 0,
+    })),
+    devices: deviceRows.map((row: any) => ({
+      deviceType: String(row?._id || 'unknown'),
+      visits: Number(row?.visits || 0),
     })),
     daily: dailyRows.map((row: any) => ({
       date: String(row?._id || ''),
