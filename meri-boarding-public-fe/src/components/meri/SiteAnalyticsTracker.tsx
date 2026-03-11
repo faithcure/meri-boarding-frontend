@@ -50,8 +50,10 @@ type VisitContext = {
 
 const analyticsEndpoint = withPublicApiBaseIfNeeded("/api/v1/public/analytics/events");
 const analyticsVisitorStorageKey = "meri_analytics_visitor_id";
+const analyticsVisitorCookieKey = "meri_analytics_visitor_id";
 const analyticsVisitStorageKey = "meri_analytics_visit";
 const analyticsVisitTimeoutMs = 30 * 60 * 1000;
+const analyticsVisitorCookieMaxAgeSeconds = 60 * 60 * 24 * 365;
 
 function normalizeLocale(input: string | undefined): AnalyticsLocale {
   const value = String(input || "").trim().toLowerCase();
@@ -99,12 +101,39 @@ function createClientId() {
     : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
+function readCookieValue(name: string) {
+  if (typeof document === "undefined") return "";
+  const pattern = `${encodeURIComponent(name)}=`;
+  const cookie = document.cookie
+    .split(";")
+    .map((item) => item.trim())
+    .find((item) => item.startsWith(pattern));
+  if (!cookie) return "";
+  return decodeURIComponent(cookie.slice(pattern.length)).trim();
+}
+
+function writeCookieValue(name: string, value: string, maxAgeSeconds: number) {
+  if (typeof document === "undefined" || !value) return;
+  document.cookie = `${encodeURIComponent(name)}=${encodeURIComponent(value)}; Max-Age=${Math.max(0, Math.round(maxAgeSeconds))}; Path=/; SameSite=Lax`;
+}
+
 function getOrCreateAnalyticsVisitorId() {
   if (typeof window === "undefined") return "";
-  const existing = String(window.localStorage.getItem(analyticsVisitorStorageKey) || "").trim();
-  if (existing) return existing;
+  const existingStorage = String(window.localStorage.getItem(analyticsVisitorStorageKey) || "").trim();
+  const existingCookie = readCookieValue(analyticsVisitorCookieKey);
+  const existing = existingStorage || existingCookie;
+  if (existing) {
+    if (!existingStorage) {
+      window.localStorage.setItem(analyticsVisitorStorageKey, existing);
+    }
+    if (!existingCookie) {
+      writeCookieValue(analyticsVisitorCookieKey, existing, analyticsVisitorCookieMaxAgeSeconds);
+    }
+    return existing;
+  }
   const created = createClientId();
   window.localStorage.setItem(analyticsVisitorStorageKey, created);
+  writeCookieValue(analyticsVisitorCookieKey, created, analyticsVisitorCookieMaxAgeSeconds);
   return created;
 }
 

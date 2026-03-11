@@ -223,6 +223,10 @@ const oneDayMs = 24 * 60 * 60 * 1000;
 const maxChatHistoryItems = 12;
 const maxChatHistoryTextLen = 600;
 const maxAnalyticsTextLen = 240;
+const analyticsCountryCacheTtlMs = 24 * 60 * 60 * 1000;
+const nameTextPattern = /^[\p{L}\p{M} .,'’-]+$/u;
+const companyTextPattern = /^[\p{L}\p{M}\d .,'’&()\/+-]+$/u;
+const phoneTextPattern = /^[0-9+()\-\s/]+$/;
 const isMeaningfulMessage = (value: string) => {
   const normalized = collapseWhitespace(value);
   if (normalized.length < 10) return false;
@@ -231,6 +235,7 @@ const isMeaningfulMessage = (value: string) => {
 const chatRateLimitStore = new Map<string, { count: number; resetAt: number }>();
 const analyticsRateLimitStore = new Map<string, { count: number; resetAt: number }>();
 const analyticsDedupeStore = new Map<string, number>();
+const analyticsCountryCache = new Map<string, { country: string; expiresAt: number }>();
 
 function isChatRateLimited(key: string, max: number, windowMs: number) {
   const now = Date.now();
@@ -286,6 +291,78 @@ function resolveRequestIp(request: FastifyRequest) {
   return (forwardedFor || request.ip || 'unknown').slice(0, 120);
 }
 
+function normalizeIpForGeoLookup(value: string) {
+  const normalized = String(value || '').trim();
+  if (!normalized) return '';
+  if (normalized.startsWith('::ffff:')) return normalized.slice(7);
+  return normalized;
+}
+
+function isPrivateOrLocalIp(value: string) {
+  const normalized = normalizeIpForGeoLookup(value).toLowerCase();
+  if (!normalized || normalized === 'unknown') return true;
+  if (normalized === '::1' || normalized === '127.0.0.1' || normalized === 'localhost') return true;
+  if (normalized.startsWith('10.') || normalized.startsWith('192.168.')) return true;
+  if (/^172\.(1[6-9]|2\d|3[0-1])\./.test(normalized)) return true;
+  if (normalized.startsWith('fc') || normalized.startsWith('fd') || normalized.startsWith('fe80:')) return true;
+  return false;
+}
+
+async function fetchCountryCodeFromUrl(url: string, selector: (payload: any) => unknown) {
+  const response = await fetch(url, {
+    headers: {
+      accept: 'application/json',
+      'user-agent': 'meri-boarding-analytics/1.0',
+    },
+    signal: AbortSignal.timeout(2500),
+  });
+  if (!response.ok) return '';
+
+  const payload = await response.json().catch(() => null);
+  const country = parseCountryCode(selector(payload));
+  return country || '';
+}
+
+async function resolveCountryFromIp(ip: string) {
+  const normalizedIp = normalizeIpForGeoLookup(ip);
+  if (isPrivateOrLocalIp(normalizedIp)) return 'UNKNOWN';
+
+  const now = Date.now();
+  const cached = analyticsCountryCache.get(normalizedIp);
+  if (cached && cached.expiresAt > now) {
+    return cached.country;
+  }
+
+  const lookupUrls: Array<{ url: string; selector: (payload: any) => unknown }> = [
+    {
+      url: `http://ip-api.com/json/${encodeURIComponent(normalizedIp)}?fields=status,countryCode`,
+      selector: (payload) => payload?.countryCode,
+    },
+    {
+      url: `https://api.country.is/${encodeURIComponent(normalizedIp)}`,
+      selector: (payload) => payload?.country,
+    },
+    {
+      url: `https://ipinfo.io/${encodeURIComponent(normalizedIp)}/json`,
+      selector: (payload) => payload?.country,
+    },
+  ];
+
+  for (const lookup of lookupUrls) {
+    try {
+      const country = await fetchCountryCodeFromUrl(lookup.url, lookup.selector);
+      if (!country) continue;
+      analyticsCountryCache.set(normalizedIp, { country, expiresAt: now + analyticsCountryCacheTtlMs });
+      return country;
+    } catch {
+      continue;
+    }
+  }
+
+  analyticsCountryCache.set(normalizedIp, { country: 'UNKNOWN', expiresAt: now + 60 * 60 * 1000 });
+  return 'UNKNOWN';
+}
+
 function enforceAnalyticsRateLimit(options: {
   scope: string;
   request: FastifyRequest;
@@ -308,7 +385,7 @@ function parseCountryCode(value: unknown) {
   return /^[A-Z]{2}$/.test(country) ? country : '';
 }
 
-function resolveRequestCountry(request: FastifyRequest) {
+async function resolveRequestCountry(request: FastifyRequest) {
   const headerCandidates = [
     request.headers['cf-ipcountry'],
     request.headers['x-vercel-ip-country'],
@@ -322,7 +399,7 @@ function resolveRequestCountry(request: FastifyRequest) {
     if (parsed) return parsed;
   }
 
-  return 'UNKNOWN';
+  return resolveCountryFromIp(resolveRequestIp(request));
 }
 
 function normalizeAnalyticsPath(value: unknown) {
@@ -349,6 +426,90 @@ function parseShortStayDate(value: string) {
 
   // Normalize to date-only UTC to avoid timezone drift in night calculations.
   return new Date(Date.UTC(parsed.getUTCFullYear(), parsed.getUTCMonth(), parsed.getUTCDate()));
+}
+
+function normalizeOptionValue(value: string) {
+  return collapseWhitespace(value).toLowerCase();
+}
+
+function matchesAllowedOption(value: string, allowedValues: string[]) {
+  const normalized = normalizeOptionValue(value);
+  if (!normalized) return false;
+  return allowedValues.some((item) => normalizeOptionValue(item) === normalized);
+}
+
+function countCaseTransitions(value: string) {
+  let transitions = 0;
+  let previousType = '';
+  for (const char of value) {
+    const nextType = char === char.toUpperCase() && char !== char.toLowerCase() ? 'upper' : 'lower';
+    if (previousType && previousType !== nextType) transitions += 1;
+    previousType = nextType;
+  }
+  return transitions;
+}
+
+function longestConsonantRun(value: string) {
+  let longest = 0;
+  let current = 0;
+  for (const char of value) {
+    if (/[aeiouyäöü]/i.test(char)) {
+      current = 0;
+      continue;
+    }
+    current += 1;
+    if (current > longest) longest = current;
+  }
+  return longest;
+}
+
+function looksLikeSpammyWord(value: string) {
+  const normalized = String(value || '')
+    .normalize('NFKD')
+    .replace(/[^\p{L}]/gu, '');
+  if (normalized.length < 4) return false;
+
+  const letters = normalized.toLowerCase();
+  const vowelCount = Array.from(letters).filter((char) => /[aeiouyäöü]/i.test(char)).length;
+  const vowelRatio = vowelCount / letters.length;
+  const caseTransitions = countCaseTransitions(String(value || '').replace(/[^\p{L}]/gu, ''));
+  const consonantRun = longestConsonantRun(letters);
+
+  if (letters.length >= 6 && vowelCount === 0) return true;
+  if (letters.length >= 7 && consonantRun >= 6) return true;
+  if (letters.length >= 12 && vowelRatio < 0.2) return true;
+  if (letters.length >= 14 && caseTransitions >= 5) return true;
+  return false;
+}
+
+function containsSuspiciousGibberish(value: string) {
+  const normalized = collapseWhitespace(value);
+  if (!normalized) return false;
+
+  return normalized
+    .split(/[\s.'’-]+/)
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .some((item) => looksLikeSpammyWord(item));
+}
+
+function isReasonablePhoneNumber(value: string) {
+  const normalized = collapseWhitespace(value);
+  if (!normalized || !phoneTextPattern.test(normalized)) return false;
+  const digits = normalized.replace(/\D/g, '');
+  return digits.length >= 6 && digits.length <= 16;
+}
+
+function validateHumanText(value: string, options: { minLength: number; maxLength: number; allowCompanyChars?: boolean }) {
+  const normalized = collapseWhitespace(value);
+  if (!normalized) return false;
+  if (normalized.length < options.minLength || normalized.length > options.maxLength) return false;
+
+  const pattern = options.allowCompanyChars ? companyTextPattern : nameTextPattern;
+  if (!pattern.test(normalized)) return false;
+  if (!/[\p{L}]/u.test(normalized)) return false;
+  if (containsSuspiciousGibberish(normalized)) return false;
+  return true;
 }
 
 function normalizeAnalyticsHref(value: unknown) {
@@ -410,7 +571,11 @@ function isAllowedAnalyticsSource(request: FastifyRequest) {
 }
 
 function isLikelyBotUserAgent(userAgent: string) {
-  return /(bot|crawler|spider|preview|headless|curl|wget|python|node-fetch|go-http-client|axios)/i.test(userAgent);
+  return /(bot|crawler|spider|preview|headless|curl|wget|python|node-fetch|go-http-client|axios|postman|insomnia|okhttp|java\/|apache-httpclient|libwww-perl|scrapy|phantomjs|selenium|playwright|puppeteer|facebookexternalhit|slurp|discordbot|telegrambot|whatsapp)/i.test(userAgent);
+}
+
+function isLikelyHumanBrowserUserAgent(userAgent: string) {
+  return /(mozilla\/5\.0|chrome\/|safari\/|firefox\/|edg\/|opr\/)/i.test(userAgent);
 }
 
 function normalizeAnalyticsDeviceType(value: unknown) {
@@ -628,12 +793,15 @@ server.post('/api/v1/public/analytics/events', async (request, reply) => {
     return reply.send({ ok: true, deduped: true });
   }
 
-  const country = resolveRequestCountry(request);
   const ip = resolveRequestIp(request);
   const userAgent = normalizeAnalyticsText(request.headers['user-agent'] || '', 260);
-  if (isLikelyBotUserAgent(userAgent)) {
+  if (isPrivateOrLocalIp(ip)) {
+    return reply.code(202).send({ ok: false, ignored: 'internal' });
+  }
+  if (!userAgent || isLikelyBotUserAgent(userAgent) || !isLikelyHumanBrowserUserAgent(userAgent)) {
     return reply.code(202).send({ ok: false, ignored: 'bot' });
   }
+  const country = await resolveRequestCountry(request);
 
   try {
     const db = await getDb();
@@ -1138,21 +1306,34 @@ server.post('/api/v1/public/forms/request', async (request, reply) => {
   const moveIn = String(body?.moveIn || '').trim();
   const message = String(body?.message || '').trim();
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const reservationContent = await getReservationContent(locale);
+  const allowedPurposes = Array.isArray(reservationContent?.inquiry?.stayPurposes)
+    ? reservationContent.inquiry.stayPurposes.map((item) => String(item?.value || '').trim()).filter(Boolean)
+    : [];
+  const allowedBoardingOptions = Array.isArray(reservationContent?.inquiry?.boardingOptions)
+    ? reservationContent.inquiry.boardingOptions.map((item) => String(item || '').trim()).filter(Boolean)
+    : [];
+  const allowedRoomOptions = Array.isArray(reservationContent?.inquiry?.roomOptions)
+    ? reservationContent.inquiry.roomOptions.map((item) => String(item || '').trim()).filter(Boolean)
+    : [];
 
-  if (!firstName || firstName.length < 2) {
-    return reply.code(400).send({ error: 'First name is required.' });
+  if (!validateHumanText(firstName, { minLength: 2, maxLength: 80 })) {
+    return reply.code(400).send({ error: 'Please enter a valid first name.' });
   }
-  if (!lastName || lastName.length < 2) {
-    return reply.code(400).send({ error: 'Last name is required.' });
+  if (!validateHumanText(lastName, { minLength: 2, maxLength: 80 })) {
+    return reply.code(400).send({ error: 'Please enter a valid last name.' });
+  }
+  if (company && !validateHumanText(company, { minLength: 2, maxLength: 120, allowCompanyChars: true })) {
+    return reply.code(400).send({ error: 'Please enter a valid company name.' });
   }
   if (!emailRegex.test(email)) {
     return reply.code(400).send({ error: 'Valid email is required.' });
   }
-  if (!phone || phone.length < 5) {
-    return reply.code(400).send({ error: 'Phone is required.' });
+  if (!isReasonablePhoneNumber(phone)) {
+    return reply.code(400).send({ error: 'Please enter a valid phone number.' });
   }
-  if (!purpose || purpose.length < 2) {
-    return reply.code(400).send({ error: 'Purpose is required.' });
+  if (!purpose || !matchesAllowedOption(purpose, allowedPurposes)) {
+    return reply.code(400).send({ error: 'Please select a valid purpose.' });
   }
   if (!(guestsIsGroup || (Number.isFinite(guests) && guests >= 1 && guests <= 5))) {
     return reply.code(400).send({ error: 'Number of guests must be between 1 and 5, or 5+ for group requests.' });
@@ -1160,11 +1341,11 @@ server.post('/api/v1/public/forms/request', async (request, reply) => {
   if (!Number.isFinite(children) || children < 0) {
     return reply.code(400).send({ error: 'Number of child is invalid.' });
   }
-  if (!rooms || rooms.length < 1) {
-    return reply.code(400).send({ error: 'Number of rooms is required.' });
+  if (!rooms || !matchesAllowedOption(rooms, allowedRoomOptions)) {
+    return reply.code(400).send({ error: 'Please select a valid number of rooms.' });
   }
-  if (!boarding || boarding.length < 1) {
-    return reply.code(400).send({ error: 'Boarding house is required.' });
+  if (!boarding || !matchesAllowedOption(boarding, allowedBoardingOptions)) {
+    return reply.code(400).send({ error: 'Please select a valid boarding house.' });
   }
   if (message.length > 5000) {
     return reply.code(400).send({ error: 'Message is too long.' });
@@ -1295,16 +1476,26 @@ server.post('/api/v1/public/forms/short-stay', async (request, reply) => {
   const lastName = String(body?.lastName || '').trim();
   const email = String(body?.email || '').trim().toLowerCase();
   const phone = String(body?.phone || '').trim();
+  const reservationContent = await getReservationContent(locale);
+  const allowedBoardingOptions = Array.isArray(reservationContent?.form?.boardingOptions)
+    ? reservationContent.form.boardingOptions.map((item) => String(item || '').trim()).filter(Boolean)
+    : [];
+  const allowedRoomOptions = Array.isArray(reservationContent?.form?.roomOptions)
+    ? reservationContent.form.roomOptions.map((item) => String(item || '').trim()).filter(Boolean)
+    : [];
+  const allowedGuestOptions = Array.isArray(reservationContent?.form?.guestOptions)
+    ? reservationContent.form.guestOptions.map((item) => String(item || '').trim()).filter(Boolean)
+    : [];
 
   if (!checkInRaw) return reply.code(400).send({ error: 'Check-in is required.' });
   if (!checkOutRaw) return reply.code(400).send({ error: 'Check-out is required.' });
-  if (!boarding) return reply.code(400).send({ error: 'Boarding house is required.' });
-  if (!roomsRaw) return reply.code(400).send({ error: 'Number of rooms is required.' });
-  if (!guestsRaw) return reply.code(400).send({ error: 'Number of guests is required.' });
-  if (!firstName || firstName.length < 2) return reply.code(400).send({ error: 'First name is required.' });
-  if (!lastName || lastName.length < 2) return reply.code(400).send({ error: 'Last name is required.' });
+  if (!boarding || !matchesAllowedOption(boarding, allowedBoardingOptions)) return reply.code(400).send({ error: 'Please select a valid boarding house.' });
+  if (!roomsRaw || !matchesAllowedOption(roomsRaw, allowedRoomOptions)) return reply.code(400).send({ error: 'Please select a valid number of rooms.' });
+  if (!guestsRaw || !matchesAllowedOption(guestsRaw, allowedGuestOptions)) return reply.code(400).send({ error: 'Please select a valid number of guests.' });
+  if (!validateHumanText(firstName, { minLength: 2, maxLength: 80 })) return reply.code(400).send({ error: 'Please enter a valid first name.' });
+  if (!validateHumanText(lastName, { minLength: 2, maxLength: 80 })) return reply.code(400).send({ error: 'Please enter a valid last name.' });
   if (!emailRegex.test(email)) return reply.code(400).send({ error: 'Valid email is required.' });
-  if (!phone || phone.length < 5) return reply.code(400).send({ error: 'Phone is required.' });
+  if (!isReasonablePhoneNumber(phone)) return reply.code(400).send({ error: 'Please enter a valid phone number.' });
 
   const checkInDate = parseShortStayDate(checkInRaw);
   const checkOutDate = parseShortStayDate(checkOutRaw);

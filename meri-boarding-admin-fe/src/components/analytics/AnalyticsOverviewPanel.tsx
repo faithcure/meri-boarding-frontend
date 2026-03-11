@@ -56,6 +56,20 @@ function formatDeviceLabel(value: string) {
   return normalized || 'Unknown'
 }
 
+function formatCountryLabel(value: string) {
+  const normalized = String(value || '').trim().toUpperCase()
+  if (!normalized || normalized === 'UNKNOWN') return 'Unknown'
+  if (!/^[A-Z]{2}$/.test(normalized)) return normalized
+
+  try {
+    const displayNames = new Intl.DisplayNames(['en'], { type: 'region' })
+    const resolved = displayNames.of(normalized)
+    return resolved ? `${resolved} (${normalized})` : normalized
+  } catch {
+    return normalized
+  }
+}
+
 function MetricCard({ label, value }: { label: string; value: string }) {
   return (
     <Card variant='outlined'>
@@ -258,7 +272,7 @@ export default function AnalyticsOverviewPanel({ analytics, topLimit = 10 }: Ana
 
   const countries = analytics.countries.slice(0, topLimit).map(item => ({
     id: `country-${item.country}`,
-    label: item.country,
+    label: formatCountryLabel(item.country),
     value: item.visitors,
     helper: `Page views: ${formatInteger(item.pageViews)}`
   }))
